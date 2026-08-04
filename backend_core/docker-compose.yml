@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  aymnguard_core:
+    build: .
+    container_name: aymnguard_core_app
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - TELEGRAM_BOT_TOKEN=8885095463:AAGRRtirIswzPutKdhuOTf_OeDzO2PTu_FQ
+    volumes:
+      - .:/app
