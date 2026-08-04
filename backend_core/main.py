@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnCoder Plus : Aegis AI Core & AymnGuard Sovereign Platform (v11.0.0-SecurityCore)
+Aymn Coder Plus : Aegis AI Core & AymnGuard Sovereign Platform (v11.0.0-SecurityCore)
 ==============================================================================
 النواة المؤسسية الشاملة للسيادة اللوجستية، إدارة قواعد البيانات المستمرة،
 عُقد الأتمتة، بوابات التداول، حماية Rate Limiting (SlowAPI)، والتنبيهات الفورية (WebSockets).
