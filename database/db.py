@@ -1,57 +1,132 @@
-cat << 'EOF' > database/db.py
-import sqlite3
-import redis
-import psycopg2
-from psycopg2 import pool
-from pymongo import MongoClient
-from urllib.parse import quote_plus
-from config import settings
+# -*- coding: utf-8 -*-
+"""
+==============================================================================
+AymnCoder Plus : Aegis AI Core - Enterprise Database & Cache Engine (Async)
+==============================================================================
+النظام المؤسسي المتكامل لإدارة اتصالات قاعدة البيانات (PostgreSQL Async) 
+وذاكرة التخزين المؤقت الموزعة (Redis Async) بأعلى أداء واستقرار لاستيعاب الآلاف.
+"""
+
+import os
 import logging
+from typing import AsyncGenerator
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.orm import declarative_base
+from sqlalchemy.sql import text
+import redis.asyncio as redis
 
-logger = logging.getLogger("AymnGuardEnterprise")
+logger = logging.getLogger("AegisAICore.EnterpriseDatabase")
 
-pg_pool = None
-try:
-    if "sslmode" not in settings.DATABASE_URL:
-        separator = "&" if "?" in settings.DATABASE_URL else "?"
-        secure_url = f"{settings.DATABASE_URL}{separator}sslmode=require"
-    else:
-        secure_url = settings.DATABASE_URL
-    pg_pool = psycopg2.pool.SimpleConnectionPool(1, 100, secure_url)
-    logger.info("✅ تم إنشاء تجمع اتصالات PostgreSQL بنجاح.")
-except Exception as e:
-    logger.warning(f"⚠️ فشل تجمع PostgreSQL: {e}")
+# جلب إعدادات البيئة مع قيم افتراضية مرنة
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", 
+    "postgresql+asyncpg://postgres:password@localhost:5432/aymnguard_enterprise"
+)
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
-def get_pg_connection():
+# ==============================================================================
+# 1. إعداد محرك PostgreSQL غير المتزامن (Connection Pooling محسن للذكاء السيادي)
+# ==============================================================================
+engine = create_async_engine(
+    DATABASE_URL,
+    echo=False,
+    future=True,
+    pool_size=40,          # عدد الاتصالات النشطة الافتراضية في الخلفية
+    max_overflow=60,       # الاتصالات الإضافية المسموح بها أوقات الذروة الكبرى
+    pool_timeout=30,       # مهلة الانتظار للاتصال المتاح (بالثواني)
+    pool_recycle=1800,     # إعادة تدوير الاتصالات كل 30 دقيقة لمنع انقطاعها
+    pool_pre_ping=True     # فحص صحة الاتصال تلقائياً قبل الاستخدام لمنع الأخطاء الميتة
+)
+
+# مصنع الجلسات غير المتزامنة (Async Session Maker)
+async_session = async_sessionmaker(
+    engine, 
+    class_=AsyncSession, 
+    expire_on_commit=False,
+    autocommit=False,
+    autoflush=False
+)
+
+# القاعدة الأساسية لجميع نماذج الجداول (ORM Models Base)
+Base = declarative_base()
+
+
+# ==============================================================================
+# 2. مدير ذاكرة التخزين المؤقت الموزعة (Redis Async Manager)
+# ==============================================================================
+class EnterpriseRedisManager:
+    def __init__(self):
+        self.client: redis.Redis | None = None
+
+    async def connect(self):
+        """الاتصال بذاكرة Redis بشكل غير متزامن وآمن."""
+        try:
+            self.client = redis.from_url(
+                REDIS_URL, 
+                encoding="utf-8", 
+                decode_responses=True,
+                socket_timeout=5.0,
+                retry_on_timeout=True
+            )
+            await self.client.ping()
+            logger.info("✅ [Redis Async Engine]: تم الاتصال بذاكرة التخزين المؤقت بنجاح وبكفاءة عالية.")
+        except Exception as e:
+            logger.warning(f"⚠️ [Redis Warning]: تعذر الاتصال بـ Redis (النظام يعمل بوضع الاحتياط): {str(e)}")
+            self.client = None
+
+    async def disconnect(self):
+        """إغلاق اتصال Redis بأمان عند إيقاف النظام."""
+        if self.client:
+            await self.client.close()
+            logger.info("🛑 [Redis Async Engine]: تم إغلاق اتصال Redis بأمان وتفريغ الذاكرة.")
+
+redis_manager = EnterpriseRedisManager()
+
+
+# ==============================================================================
+# 3. إدارة دورة حياة قواعد البيانات والاتصالات (Lifespan Handlers)
+# ==============================================================================
+async def init_databases() -> None:
+    """فحص واختبار صحة الاتصال بقاعدة البيانات و Redis عند إقلاع النواة."""
+    # فحص اتصال PostgreSQL
     try:
-        if pg_pool: return pg_pool.getconn()
-        return psycopg2.connect(settings.DATABASE_URL)
-    except: return None
+        async with engine.begin() as conn:
+            await conn.execute(text("SELECT 1"))
+        logger.info("🗄️ [PostgreSQL Async]: تم التحقق من سلامة الاتصال بقاعدة البيانات بنجاح.")
+    except Exception as e:
+        logger.critical(f"❌ [PostgreSQL Critical]: فشل الاتصال بقاعدة البيانات: {str(e)}")
+        raise e
+    
+    # تفعيل اتصال Redis
+    await redis_manager.connect()
 
-redis_client = None
-try:
-    redis_client = redis.Redis.from_url(settings.REDIS_URL, decode_responses=True, socket_timeout=5)
-    redis_client.ping()
-    logger.info("✅ تم الاتصال بـ Redis بنجاح.")
-except Exception as e:
-    logger.warning(f"⚠️ تنبيه Redis: {e}")
+async def close_databases() -> None:
+    """إغلاق محركات الاتصال وتفريغ الموارد بأمان تام عند إيقاف الخادم."""
+    try:
+        await engine.dispose()
+        logger.info("🛑 [PostgreSQL Async]: تم إغلاق محرك الاتصال بقاعدة البيانات بأمان.")
+    except Exception as e:
+        logger.error(f"⚠️ [PostgreSQL Error]: خطأ أثناء إغلاق المحرك: {str(e)}")
+    
+    await redis_manager.disconnect()
 
-mongo_client = None
-mongo_db = None
-users_col = None
-wallets_col = None
 
-try:
-    password = quote_plus(settings.MONGO_PASSWORD)
-    mongo_uri = f"mongodb+srv://{settings.MONGO_USER}:{password}@cluster0.joccmoz.mongodb.net/AymnGuardDB?retryWrites=true&w=majority&appName=Cluster0"
-    mongo_client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
-    mongo_client.admin.command("ping")
-    mongo_db = mongo_client["AymnGuardDB"]
-    wallets_col = mongo_db["wallets"]
-    users_col = mongo_db["paid_users"]
-    users_col.create_index("user_id", unique=True)
-    logger.info("✅ تم الاتصال بقاعدة بيانات MongoDB السحابية بنجاح!")
-except Exception as e:
-    logger.error(f"❌ خطأ MongoDB: {e}")
-EOF
-
+# ==============================================================================
+# 4. مزوّد الجلسات الآمن لكل طلب (Async Session Dependency)
+# ==============================================================================
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """
+    مزوّد جلسات قاعدة البيانات غير المتزامنة لكل طلب API
+    مع ضمان الحفظ التلقائي (Commit) أو التراجع الآمن (Rollback) عند حدوث أي خطأ،
+    وإغلاق الجلسة نهائياً لمنع تسريب الذاكرة (Memory Leaks).
+    """
+    async with async_session() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception as e:
+            await session.rollback()
+            logger.error(f"⚠️ [Database Session Error]: تم التراجع عن المعاملة بسبب خطأ: {str(e)}")
+            raise e
+        finally:
+            await session.close()
