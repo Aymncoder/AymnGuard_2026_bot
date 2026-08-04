@@ -1,0 +1,77 @@
+2026-08-04 18:51:04,152 | INFO     | [main.py:53] | [main] | 🚀 [AymnGuard Core v5.0] إدراج نواة الأمان والتشغيل المؤسسي قيد البدء...
+2026-08-04 18:51:04,159 | INFO     | [database.py:50] | [database] | ⚙️ بدء عملية المزامنة وهندسة الجداول داخل قاعدة البيانات...
+2026-08-04 18:51:04,160 | INFO     | [database.py:52] | [database] | ✅ تمت تهيئة كافة الجداول والهياكل بنجاح مؤسسي.
+2026-08-04 18:51:04,160 | INFO     | [main.py:59] | [main] | ✅ تم إنجاز تهيئة قواعد البيانات ومواعيد الاتصال بنجاح.
+2026-08-04 18:51:04,182 | ERROR    | [scheduler.py:29] | [scheduler] | ❌ خطأ أثناء إعداد الجدول الزمني: 'No time zone found with key Asia/Aden'
+2026-08-04 18:51:04,182 | ERROR    | [main.py:70] | [main] | ⚠️ تحذير في إقلاع الجدول الزمني: 'No time zone found with key Asia/Aden'
+2026-08-04 18:51:04,182 | WARNING  | [main.py:82] | [main] | ℹ️ لم يتم إدخال بيانات الويب هوك الخاصة بتليجرام.
+2026-08-04 18:52:42,960 | WARNING  | [main.py:87] | [main] | 🛑 [AymnGuard Core] إيقاف تشغيل النظام وأمان الأرجوحة اللوجستية قيد التنفيذ...
+2026-08-04 18:52:42,964 | INFO     | [scheduler.py:51] | [scheduler] | ℹ️ محرك الجدولة لم يكن قيد التشغيل.
+2026-08-04 18:52:42,964 | INFO     | [main.py:90] | [main] | ✅ تم إيقاف المداولات واللوجستيات الخلفية بأمان ت تام.
+2026-08-04 18:53:33,213 | INFO     | [main.py:216] | [main] | 🌐 دفق إدخال الـ (port)...
+2026-08-04 18:53:33,232 | INFO     | [main.py:53] | [main] | 🚀 [AymnGuard Core v5.0] إدراج نواة الأمان والتشغيل المؤسسي قيد البدء...
+2026-08-04 18:53:33,237 | INFO     | [database.py:50] | [database] | ⚙️ بدء عملية المزامنة وهندسة الجداول داخل قاعدة البيانات...
+2026-08-04 18:53:33,237 | INFO     | [database.py:52] | [database] | ✅ تمت تهيئة كافة الجداول والهياكل بنجاح مؤسسي.
+2026-08-04 18:53:33,238 | INFO     | [main.py:59] | [main] | ✅ تم إنجاز تهيئة قواعد البيانات ومواعيد الاتصال بنجاح.
+2026-08-04 18:53:33,238 | INFO     | [base.py:507] | [base] | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-08-04 18:53:33,238 | INFO     | [scheduler.py:44] | [scheduler] | ⚙️ تم إعداد وتهيئة جدول المهام الخلفية المؤسسية (UTC) بنجاح تام وخلو كامل من التحذيرات.
+2026-08-04 18:53:33,238 | INFO     | [base.py:1092] | [base] | Added job "AymnGuard Enterprise Health Audit (UTC)" to job store "default"
+2026-08-04 18:53:33,238 | INFO     | [base.py:214] | [base] | Scheduler started
+2026-08-04 18:53:33,239 | INFO     | [scheduler.py:54] | [scheduler] | ▶️ تم إقلاع وتشغيل محرك الجدولة والمهام الخلفية بنجاح مؤسسي مطلق.
+2026-08-04 18:53:33,239 | INFO     | [main.py:68] | [main] | ✅ قنوات المتابعة والجدولة الزمنية قيد التشغيل التام.
+2026-08-04 18:53:33,239 | WARNING  | [main.py:82] | [main] | ℹ️ لم يتم إدخال بيانات الويب هوك الخاصة بتليجرام.
+2026-08-04 18:54:13,269 | WARNING  | [main.py:87] | [main] | 🛑 [AymnGuard Core] إيقاف تشغيل النظام وأمان الأرجوحة اللوجستية قيد التنفيذ...
+2026-08-04 18:54:13,273 | INFO     | [base.py:245] | [base] | Scheduler has been shut down
+2026-08-04 18:54:13,275 | INFO     | [scheduler.py:66] | [scheduler] | 🛑 تم إيقاف الجدول الزمني والمهام الخلفية بأمان تام وحفظ استقرار الموارد.
+2026-08-04 18:54:13,276 | INFO     | [main.py:90] | [main] | ✅ تم إيقاف المداولات واللوجستيات الخلفية بأمان ت تام.
+2026-08-04 18:55:11,554 | INFO     | [main.py:53] | [main] | 🚀 [AymnGuard Core v5.0] إدراج نواة الأمان والتشغيل المؤسسي قيد البدء...
+2026-08-04 18:55:11,556 | INFO     | [database.py:50] | [database] | ⚙️ بدء عملية المزامنة وهندسة الجداول داخل قاعدة البيانات...
+2026-08-04 18:55:11,556 | INFO     | [database.py:52] | [database] | ✅ تمت تهيئة كافة الجداول والهياكل بنجاح مؤسسي.
+2026-08-04 18:55:11,556 | INFO     | [main.py:59] | [main] | ✅ تم إنجاز تهيئة قواعد البيانات ومواعيد الاتصال بنجاح.
+2026-08-04 18:55:11,557 | INFO     | [base.py:507] | [base] | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-08-04 18:55:11,557 | INFO     | [scheduler.py:44] | [scheduler] | ⚙️ تم إعداد وتهيئة جدول المهام الخلفية المؤسسية (UTC) بنجاح تام وخلو كامل من التحذيرات.
+2026-08-04 18:55:11,557 | INFO     | [base.py:1092] | [base] | Added job "AymnGuard Enterprise Health Audit (UTC)" to job store "default"
+2026-08-04 18:55:11,557 | INFO     | [base.py:214] | [base] | Scheduler started
+2026-08-04 18:55:11,557 | INFO     | [scheduler.py:54] | [scheduler] | ▶️ تم إقلاع وتشغيل محرك الجدولة والمهام الخلفية بنجاح مؤسسي مطلق.
+2026-08-04 18:55:11,557 | INFO     | [main.py:68] | [main] | ✅ قنوات المتابعة والجدولة الزمنية قيد التشغيل التام.
+2026-08-04 18:55:11,557 | WARNING  | [main.py:82] | [main] | ℹ️ لم يتم إدخال بيانات الويب هوك الخاصة بتليجرام.
+2026-08-04 19:05:32,774 | INFO     | [base.py:129] | [base] | Running job "AymnGuard Enterprise Health Audit (UTC) (trigger: interval[0:10:00], next run at: 2026-08-04 16:15:11 UTC)" (scheduled at 2026-08-04 16:05:11.557000+00:00)
+2026-08-04 19:05:32,781 | INFO     | [scheduler.py:18] | [scheduler] | 🛡️ [Enterprise Telemetry] فحص سلامة النظام الخلفي الدوري نشط في: 2026-08-04 16:05:32 UTC
+2026-08-04 19:05:32,781 | INFO     | [base.py:156] | [base] | Job "AymnGuard Enterprise Health Audit (UTC) (trigger: interval[0:10:00], next run at: 2026-08-04 16:15:11 UTC)" executed successfully
+2026-08-04 19:13:25,111 | WARNING  | [main.py:87] | [main] | 🛑 [AymnGuard Core] إيقاف تشغيل النظام وأمان الأرجوحة اللوجستية قيد التنفيذ...
+2026-08-04 19:13:25,118 | INFO     | [base.py:245] | [base] | Scheduler has been shut down
+2026-08-04 19:13:25,122 | INFO     | [scheduler.py:66] | [scheduler] | 🛑 تم إيقاف الجدول الزمني والمهام الخلفية بأمان تام وحفظ استقرار الموارد.
+2026-08-04 19:13:25,122 | INFO     | [main.py:90] | [main] | ✅ تم إيقاف المداولات واللوجستيات الخلفية بأمان ت تام.
+2026-08-04 19:15:17,128 | INFO     | [main.py:53] | [main] | 🚀 [AymnGuard Core v5.0] إدراج نواة الأمان والتشغيل المؤسسي قيد البدء...
+2026-08-04 19:15:17,134 | INFO     | [database.py:50] | [database] | ⚙️ بدء عملية المزامنة وهندسة الجداول داخل قاعدة البيانات...
+2026-08-04 19:15:17,134 | INFO     | [database.py:52] | [database] | ✅ تمت تهيئة كافة الجداول والهياكل بنجاح مؤسسي.
+2026-08-04 19:15:17,135 | INFO     | [main.py:59] | [main] | ✅ تم إنجاز تهيئة قواعد البيانات ومواعيد الاتصال بنجاح.
+2026-08-04 19:15:17,135 | INFO     | [base.py:507] | [base] | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-08-04 19:15:17,135 | INFO     | [scheduler.py:44] | [scheduler] | ⚙️ تم إعداد وتهيئة جدول المهام الخلفية المؤسسية (UTC) بنجاح تام وخلو كامل من التحذيرات.
+2026-08-04 19:15:17,135 | INFO     | [base.py:1092] | [base] | Added job "AymnGuard Enterprise Health Audit (UTC)" to job store "default"
+2026-08-04 19:15:17,135 | INFO     | [base.py:214] | [base] | Scheduler started
+2026-08-04 19:15:17,136 | INFO     | [scheduler.py:54] | [scheduler] | ▶️ تم إقلاع وتشغيل محرك الجدولة والمهام الخلفية بنجاح مؤسسي مطلق.
+2026-08-04 19:15:17,136 | INFO     | [main.py:68] | [main] | ✅ قنوات المتابعة والجدولة الزمنية قيد التشغيل التام.
+2026-08-04 19:15:17,136 | WARNING  | [main.py:82] | [main] | ℹ️ يعمل بوت تليجرام في وضع الاستماع المحلي أو اليدوي.
+2026-08-04 19:16:59,158 | WARNING  | [main.py:87] | [main] | 🛑 [AymnGuard Core] إيقاف تشغيل النظام وأمان الأرجوحة اللوجستية قيد التنفيذ...
+2026-08-04 19:16:59,165 | INFO     | [base.py:245] | [base] | Scheduler has been shut down
+2026-08-04 19:16:59,168 | INFO     | [scheduler.py:66] | [scheduler] | 🛑 تم إيقاف الجدول الزمني والمهام الخلفية بأمان تام وحفظ استقرار الموارد.
+2026-08-04 19:16:59,168 | INFO     | [main.py:90] | [main] | ✅ تم إيقاف المداولات واللوجستيات الخلفية بأمان تام.
+2026-08-04 19:19:30,644 | INFO     | [main.py:53] | [main] | 🚀 [AymnGuard Core v5.0] إدراج نواة الأمان والتشغيل المؤسسي قيد البدء...
+2026-08-04 19:19:30,649 | INFO     | [database.py:50] | [database] | ⚙️ بدء عملية المزامنة وهندسة الجداول داخل قاعدة البيانات...
+2026-08-04 19:19:30,649 | INFO     | [database.py:52] | [database] | ✅ تمت تهيئة كافة الجداول والهياكل بنجاح مؤسسي.
+2026-08-04 19:19:30,650 | INFO     | [main.py:59] | [main] | ✅ تم إنجاز تهيئة قواعد البيانات ومواعيد الاتصال بنجاح.
+2026-08-04 19:19:30,650 | INFO     | [base.py:507] | [base] | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-08-04 19:19:30,650 | INFO     | [scheduler.py:44] | [scheduler] | ⚙️ تم إعداد وتهيئة جدول المهام الخلفية المؤسسية (UTC) بنجاح تام وخلو كامل من التحذيرات.
+2026-08-04 19:19:30,650 | INFO     | [base.py:1092] | [base] | Added job "AymnGuard Enterprise Health Audit (UTC)" to job store "default"
+2026-08-04 19:19:30,650 | INFO     | [base.py:214] | [base] | Scheduler started
+2026-08-04 19:19:30,651 | INFO     | [scheduler.py:54] | [scheduler] | ▶️ تم إقلاع وتشغيل محرك الجدولة والمهام الخلفية بنجاح مؤسسي مطلق.
+2026-08-04 19:19:30,651 | INFO     | [main.py:68] | [main] | ✅ قنوات المتابعة والجدولة الزمنية قيد التشغيل التام.
+2026-08-04 19:19:30,651 | WARNING  | [main.py:82] | [main] | ℹ️ يعمل بوت تليجرام في وضع الاستماع المحلي أو اليدوي.
+2026-08-04 19:29:30,675 | INFO     | [base.py:129] | [base] | Running job "AymnGuard Enterprise Health Audit (UTC) (trigger: interval[0:10:00], next run at: 2026-08-04 16:39:30 UTC)" (scheduled at 2026-08-04 16:29:30.650223+00:00)
+2026-08-04 19:29:30,682 | INFO     | [scheduler.py:18] | [scheduler] | 🛡️ [Enterprise Telemetry] فحص سلامة النظام الخلفي الدوري نشط في: 2026-08-04 16:29:30 UTC
+2026-08-04 19:29:30,682 | INFO     | [base.py:156] | [base] | Job "AymnGuard Enterprise Health Audit (UTC) (trigger: interval[0:10:00], next run at: 2026-08-04 16:39:30 UTC)" executed successfully
+2026-08-04 19:32:52,663 | WARNING  | [main.py:87] | [main] | 🛑 [AymnGuard Core] إيقاف تشغيل النظام وأمان الأرجوحة اللوجستية قيد التنفيذ...
+2026-08-04 19:32:52,669 | INFO     | [base.py:245] | [base] | Scheduler has been shut down
+2026-08-04 19:32:52,673 | INFO     | [scheduler.py:66] | [scheduler] | 🛑 تم إيقاف الجدول الزمني والمهام الخلفية بأمان تام وحفظ استقرار الموارد.
+2026-08-04 19:32:52,673 | INFO     | [main.py:90] | [main] | ✅ تم إيقاف المداولات واللوجستيات الخلفية بأمان تام.

@@ -1,0 +1,39 @@
+# Git
+.git
+.gitignore
+
+# Docker
+docker-compose.yml
+.dockerignore
+Dockerfile
+
+# Virtual Environments & Caches
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+
+# Secrets & Local Configs (الأهم أمنياً)
+.env
+*.env
+secret_keys.json
+
+# Logs & Local Databases
+logs/
+*.log
+*.sqlite3
+aymnguard_local.db
+
+# OS Generated Files
+.DS_Store
+Thumbs.db
+
+# Old/Unused files in your specific setup
+old_code_archive/
+cloudflared.deb
+nohup.out
+

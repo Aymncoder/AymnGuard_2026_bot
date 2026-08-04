@@ -1,0 +1,17 @@
+cat << 'EOF' > requirements.txt
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+psycopg2-binary
+sqlalchemy
+redis
+telebot
+telethon
+apscheduler
+cryptography
+pysocks
+requests
+pymongo
+EOF
+

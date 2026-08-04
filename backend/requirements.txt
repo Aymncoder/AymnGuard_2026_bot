@@ -1,0 +1,35 @@
+# ========================================================
+# AymnGuard Enterprise Backend Dependencies
+# ========================================================
+
+# 1. Core Framework & Production Server
+fastapi>=0.109.2
+uvicorn[standard]>=0.27.0
+gunicorn>=21.2.0             # مدير عمليات الخادم للإنتاج (Production Process Manager)
+pydantic>=2.6.1              # الجيل الثاني للتحقق الصارم من البيانات
+pydantic-settings>=2.1.0     # الإدارة المؤسسية لمتغيرات البيئة
+
+# 2. Database, ORM & Migrations (Async)
+sqlalchemy>=2.0.25
+alembic>=1.13.1
+asyncpg>=0.29.0
+
+# 3. Security, Authentication & Cryptography (JWT & OAuth2)
+passlib[bcrypt]>=1.7.4       # تشفير كلمات المرور
+bcrypt>=4.1.2                # خوارزمية التشفير المتقدمة
+python-multipart>=0.0.9      # معالجة بيانات النماذج لتسجيل الدخول (OAuth2)
+
+# 4. Data Validation & Network Utilities
+python-dotenv>=1.0.1
+email-validator>=2.1.0       # التحقق من صحة البريد الإلكتروني برمجياً
+httpx>=0.26.0                # عميل HTTP غير متزامن للتواصل مع خدمات خارجية (Microservices)
+
+# 5. Caching & Performance (Enterprise Scalability)
+redis>=5.0.1                 # التخزين المؤقت وإدارة الجلسات
+
+# 6. Observability & Monitoring (Optional but Recommended for Enterprise)
+# sentry-sdk[fastapi]>=1.40.0 # تتبع الأخطاء الحية
+# prometheus-client>=0.19.0   # مراقبة أداء الخادم
+
+PyJWT
+cryptography
