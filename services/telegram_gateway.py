@@ -11,6 +11,7 @@ import asyncio
 import sys
 import os
 from typing import Optional
+from services.sovereign_agents import guardian_agent
 
 # إضافة المسار الجذري (Root) لكي تتمكن الخدمة من قراءة الملفات الرئيسية
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
