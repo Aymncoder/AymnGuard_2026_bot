@@ -22,6 +22,7 @@ from pyrogram.types import Message
 # استدعاء الأعضاء الحيوية من المسار الرئيسي (بدون backend_core)
 from task_broker import broker
 from context_vault import ContextVault
+from services.sovereign_agents import guardian_agent  # <== أضف هذا السطر هنا
 
 # إعداد مسجل الأحداث الخاص بطبقة الاتصال
 logger = logging.getLogger("AymnGuard.TelegramGateway")
@@ -66,16 +67,21 @@ class TelegramGateway:
                 
             await broker.submit_task(send_typing_action, message.chat.id)
 
-            async def cognitive_task(uid: str, text: str, msg_obj: Message):
-                try:
-                    await asyncio.sleep(1.5) 
-                    response_text = f"⚙️ [المحرك العصبي]: تم تحليل المعطيات سيادياً.\nمحتوى الإشارة: {text[:20]}..."
-                    await msg_obj.reply_text(response_text)
-                except Exception as e:
-                    logger.error(f"❌ [Telegram Gateway]: Agent failure for {uid} -> {e}")
-                    await msg_obj.reply_text("⚠️ حدث تداخل مؤقت في المسارات العصبية.")
+        async def cognitive_task(uid: str, text: str, msg_obj: Message):
+            try:
+                # توجيه النص للوكيل الذكي للتحليل والحفظ في قاعدة البيانات
+                ai_result = await guardian_agent.analyze_and_document(uid, text)
+                
+                # إرسال النتيجة النهائية للمستخدم
+                response_text = f"⚙️ [المحرك العصبي]:\n\n{ai_result}"
+                await msg_obj.reply_text(response_text)
+            except Exception as e:
+                logger.error(f"❌ [Telegram Gateway]: Agent failure for {uid} -> {e}")
+                await msg_obj.reply_text("⚠️ تعذر إتمام بروتوكول التحليل السيادي.")
 
-            await broker.submit_task(cognitive_task, user_id, payload_text, message)
+        # إرسال المهمة لوسيط المهام (Task Broker)
+        await broker.submit_task(cognitive_task, user_id, payload_text, message)
+
 
     async def boot_gateway(self) -> None:
         logger.info("🚀 [Telegram Gateway]: Initiating secure connection to Telegram...")
