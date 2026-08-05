@@ -17,6 +17,7 @@ from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.sql import text
 from database.models import Base
+from .models import Base
 
 # إعداد السجلات المؤسسية
 logger = logging.getLogger("AymnGuard.DatabaseEngine")
