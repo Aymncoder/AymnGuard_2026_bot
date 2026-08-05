@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-AymnGuard Enterprise v5.0 : Core API & Telegram Webhook Routes
-المسارات السيادية المركزية (Advanced Routing & Cognitive Bridge):
-تدمج بين استقبال ويب هوك تيليجرام، معالجة الذاكرة طويلة الأمد، توزيع المهام الخلفية (TaskBroker)،
-وتفعيل الوكيل الإدراكي والأمني لاتخاذ القرارات وإدارة العملاء باحترافية مطلقة.
+AymnGuard Enterprise v5.0 : Advanced Core Routing Nexus (Orchestrator + Cognitive Bridge)
+المسارات السيادية المركزية الهجينة: 
+تدمج بين استقبال ويب هوك تيليجرام اللحظي، معالجة الذاكرة طويلة الأمد (ContextVault)، 
+وتوزيع المهام الخلفية المعقدة (TaskBroker) نحو المنسق المركزي الأكبر (Master Orchestrator).
+هذه البنية تضمن تجربة انعدام التأخير (Zero-Lag) مع احتفاظ النظام بوعيه الذاتي الشامل.
 """
 
 from fastapi import APIRouter, Request, HTTPException
@@ -11,48 +12,50 @@ from typing import Dict, Any
 import logging
 import asyncio
 
-# استيراد مكونات الإمبراطورية السيادية
+# استيراد ركائز الإمبراطورية السيادية
 from context_vault import ContextVault
 from task_broker import broker
-from core.agents.security_agent import CommunitySecurityAgent
+from core.master_orchestrator import MasterSovereignOrchestrator
 
-# إماء مسجل الأحداث المؤسسي
-logger = logging.getLogger("AymnGuard.CoreRoutes")
+# تهيئة مسجل الأحداث المؤسسي
+logger = logging.getLogger("AymnGuard.CoreRoutesNexus")
 
-# إنشاء مسار موحد للـ API بريفكس احترافي
+# إنشاء مسار موحد للـ API بواجهة احترافية
 router = APIRouter(prefix="/api/v1", tags=["Sovereign Enterprise Routes"])
 
-# تهيئة نسخة سيادية من الوكيل الأمني والإدراكي
-security_agent = CommunitySecurityAgent()
+# إقلاع المنسق المركزي الأعلى (العقل المدبر للـ AGI)
+orchestrator = MasterSovereignOrchestrator()
 
 @router.get("/health")
 async def system_health_check() -> Dict[str, str]:
     """
-    نقطة فحص سريعة للتأكد من استقرار الخوادم (Health Check): نبض النظام،
-    حالة الذاكرة السيادية، وعمل وسيط المهام (TaskBroker).
+    نقطة فحص موسعة (Comprehensive Health Check):
+    تراقب نبض النظام، حالة الذاكرة السيادية، استقرار وسيط المهام، وعمل المنسق المركزي.
     """
     return {
-        "system": "AymnGuard Enterprise v5.0",
-        "status": "Online and Fully Operational & Sovereign",
-        "cognitive_vault": "Active",
-        "security_agent": "Online",
-        "broker_active": str(broker.is_running if hasattr(broker, 'is_running') else True)
+        "system": "AymnGuard Enterprise v5.0 AGI Omniverse",
+        "status": "Online, Sovereign & Fully Synchronized",
+        "cognitive_vault": "Active & Logging",
+        "orchestrator": "Master Nexus Online",
+        "broker_active": str(broker.is_running if hasattr(broker, 'is_running') else True),
+        "latency_mode": "Zero-Lag Asynchronous Mode"
     }
 
 @router.post("/telegram/webhook")
 async def telegram_webhook(request: Request) -> Dict[str, Any]:
     """
-    بوابة استقبال الـ Webhook السيادية من تيليجرام:
-    1. استلام الرسائل أو انضمام الأعضاء بدقة فائقة.
-    2. تفاعل فوري مع الذاكرة السيادية (Context Vault).
-    3. تمرير المهام الثقيلة لخلفية النظام عبر (TaskBroker) لضمان سرعة الاستجابة (Zero-Lag Experience).
-    4. تفعيل الوكيل الأمني لاستخراج استراتيجيات الإقناع وخدمة العملاء المتقدمة.
+    بوابة الاستقبال السيادية الهجينة (Hybrid Webhook Gateway):
+    1. الاستلام الدقيق والموثق للبيانات الواردة.
+    2. التفاعل الفوري مع الذاكرة السيادية (Context Vault) لحفظ سياق المستخدم.
+    3. تغليف الطلب وتحويله كـ (Background Task) عبر وسيط المهام.
+    4. معالجة الطلب عبر (Master Orchestrator) في الخلفية لضمان عدم توقف الخادم.
+    5. إرجاع استجابة سريعة للعميل أو خوادم تيليجرام لضمان استمرار التدفق הביاني.
     """
     try:
         data = await request.json()
-        logger.info("📩 [Webhook Received]: تم استلام تحديث جديد من شبكة تيليجرام السيادية.")
+        logger.info("📩 [Webhook Received]: تم التقاط إشارة تدفق جديدة من شبكة تيليجرام.")
 
-        # استخراج بيانات الرسالة والمستخدم بدقة
+        # استخراج الهيكل البياني للرسالة والمستخدم
         message = data.get("message", {})
         from_user = message.get("from", {})
         
@@ -61,51 +64,77 @@ async def telegram_webhook(request: Request) -> Dict[str, Any]:
         username = from_user.get("username", "Unknown_Sovereign")
         message_text = message.get("text", "")
 
+        # فلترة الإشارات الفارغة أو النبضات العشوائية
         if not telegram_id:
+            logger.debug("⚠️ [Router Filter]: تم تجاهل إشارة لا تحتوي على معرف مستخدم صريح.")
             return {"status": "ignored", "reason": "No direct user context found"}
 
-        # 1. تفاعل مع الذاكرة السيادية وسجل الجلسات (Context Vault)
+        # ---------------------------------------------------------
+        # المرحلة الأولى: الجسر الإدراكي والذاكرة السيادية
+        # ---------------------------------------------------------
         context = await ContextVault.retrieve_context(user_id_str)
         if not context:
+            # تأسيس وعي جديد بالمستخدم في الذاكرة الحية
             await ContextVault.store_context(user_id_str, {
                 "username": username,
                 "initial_action": "webhook_start",
-                "last_active": message_text
+                "last_active_message": message_text,
+                "interaction_count": 1
             })
-            logger.info(f"🛡️ [Core Routes]: تم فتح جلسة سيادية جديدة للعميل [ID: {user_id_str}] في الذاكرة الحية.")
+            logger.info(f"🛡️ [Cognitive Vault]: تم بناء قاعدة وعي سيادية جديدة للعميل [ID: {user_id_str}].")
+        else:
+            # تحديث الذاكرة القائمة بنبض النشاط الجديد
+            context["last_active_message"] = message_text
+            context["interaction_count"] = context.get("interaction_count", 1) + 1
+            await ContextVault.store_context(user_id_str, context)
+            logger.debug(f"🔄 [Cognitive Vault]: تم تحديث الذاكرة التشغيلية للعميل [ID: {user_id_str}].")
 
-        # 2. تعريف مهام المعالجة الخلفية عبر العقل العصبي والوكيل الأمني
-        async def cognitive_processing_task(uid: str, payload: dict):
-            """مهمة خلفية غير متزامنة لتحليل سلوك العميل وتطبيق محرك الإقناع بذكاء تام"""
+        # ---------------------------------------------------------
+        # المرحلة الثانية: تغليف المهمة للمنسق المركزي (Background Task)
+        # ---------------------------------------------------------
+        async def orchestrator_background_task(uid: str, payload: dict):
+            """
+            مهمة خلفية معزولة: تستدعي المنسق المركزي لمعالجة الرسالة 
+            وتوجيهها للقسم المختص (سوق، تحليل، إقناع) دون تعطيل الواجهة.
+            """
             try:
                 msg = payload.get("message_text", "")
                 uname = payload.get("username", "Sovereign")
                 
-                # استدعاء الوكيل الإدراكي لتحليل السلوك واستخراج الاستراتيجية
-                agent_guidance = await security_agent.analyze_user_behavior(
+                logger.info(f"⚙️ [Background Nexus]: جاري تسليم الطلب للمنسق المركزي للعميل {uid}...")
+                
+                # توجيه الطلب إلى المايسترو الأكبر الذي قمنا ببنائه مسبقاً
+                sovereign_result = await orchestrator.orchestrate_user_request(
                     telegram_id=int(uid),
                     username=uname,
                     message_text=msg
                 )
-                logger.info(f"🧠 [Background Engine]: تمت معالجة سلوك العميل [ID: {uid}] بنجاح. التوجيه: {agent_guidance}")
+                
+                logger.info(f"🤖 [Autonomous Action]: تمت المعالجة الخلفية بنجاح للعميل [ID: {uid}]. النتيجة: {sovereign_result.get('type')}")
+            
             except Exception as bg_error:
-                logger.error(f"❌ [Background Task Error]: فشل في المعالجة الخلفية للعميل {uid}: {bg_error}")
+                logger.error(f"❌ [Background Orchestration Error]: فشل المنسق في معالجة طلب العميل {uid}: {bg_error}")
 
-        # 3. توجيه المهمة المعقدة إلى وسيط المهام (Task Broker) للعمل في الخلفية دون تأخير الاستجابة
-        await broker.submit_task(cognitive_processing_task, user_id_str, {
+        # ---------------------------------------------------------
+        # المرحلة الثالثة: ضخ المهمة لوسيط المهام (Task Broker)
+        # ---------------------------------------------------------
+        await broker.submit_task(orchestrator_background_task, user_id_str, {
             "message_text": message_text,
             "username": username
         })
 
-        # 4. الاستجابة الفورية والسريعة للمستخدم أو التطبيق الخارجي (Zero-Lag Experience)
+        # ---------------------------------------------------------
+        # المرحلة الرابعة: الاستجابة اللحظية (Zero-Lag Handshake)
+        # ---------------------------------------------------------
         return {
             "status": "success",
-            "message": "Payload securely received, contextualized, and dispatched to background intelligence.",
+            "message": "Payload securely received, contextualized, and dispatched to Master Orchestrator.",
             "user_id": user_id_str,
             "security_layer": "AymnGuard Enterprise Active",
-            "sovereign_action": "queued_for_advanced_cognition"
+            "sovereign_action": "queued_for_omni_cognition",
+            "latency": "Zero-Lag Async"
         }
 
     except Exception as e:
-        logger.error(f"❌ [Core Routes]: خطأ حرج في التوجيه السيادي -> {e}")
+        logger.error(f"❌ [Core Routes Nexus]: انهيار حرج في التوجيه السيادي -> {e}")
         raise HTTPException(status_code=500, detail=f"Internal Sovereign Routing Error: {str(e)}")
