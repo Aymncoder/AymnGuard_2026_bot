@@ -1,13 +1,13 @@
-# Git
+# ==============================================================================
+# AymnGuard Enterprise - Sovereign .dockerignore Security Shield
+# درع تجاهل الملفات لتقليص حجم الحاوية وحماية الأسرار وقواعد البيانات
+# ==============================================================================
+
+# Git Version Control
 .git
 .gitignore
 
-# Docker
-docker-compose.yml
-.dockerignore
-Dockerfile
-
-# Virtual Environments & Caches
+# Virtual Environments & Python Caches
 venv/
 env/
 __pycache__/
@@ -17,23 +17,25 @@ __pycache__/
 .Python
 .pytest_cache/
 
-# Secrets & Local Configs (الأهم أمنياً)
+# Sensitive Environment Configurations & Secrets (الأسرار البيئية الحجووبة)
 .env
 *.env
 secret_keys.json
 
-# Logs & Local Databases
+# Logs & Local Sovereign Databases (حجب السجلات وقواعد البيانات المحلية بجميع أنماطها)
 logs/
 *.log
+*.sqlite
 *.sqlite3
+aymnguard_enterprise.db
 aymnguard_local.db
 
-# OS Generated Files
+# OS Generated Metadata
 .DS_Store
 Thumbs.db
 
-# Old/Unused files in your specific setup
+# Archive, Temp Files & Binaries
 old_code_archive/
-cloudflared.deb
+cloudflare.deb
 nohup.out
-
+tmp/
