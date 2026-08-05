@@ -18,4 +18,4 @@ aiohttp
 aiosqlite
 httpx
 pytest-asyncio
-​pytest>=8.0.0
+​pytest
