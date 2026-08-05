@@ -1,3 +1,5 @@
+pytest
+pytest-asyncio
 fastapi
 uvicorn[standard]
 pydantic
@@ -17,6 +19,3 @@ python-jose[cryptography]
 aiohttp
 aiosqlite
 httpx
-pytest
-pytest-asyncio
-​
