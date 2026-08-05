@@ -15,4 +15,5 @@ pymongo
 passlib[bcrypt]
 python-jose[cryptography]
 aiohttp
+aiosqlite
 httpx
