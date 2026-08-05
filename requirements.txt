@@ -14,3 +14,4 @@ requests
 pymongo
 passlib[bcrypt]
 python-jose[cryptography]
+aiohttp
