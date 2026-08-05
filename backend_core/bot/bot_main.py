@@ -1,114 +1,160 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================================
-AymnGuard Enterprise - Sovereign FastAPI Production Core (v5.0 Ultimate)
-النواة المركزية الموحدة: ربط الـ API، قاعدة البيانات الدائمة، محركات الذكاء الاصطناعي، واستقبال الـ Webhooks
+AymnGuard Enterprise - Sovereign Telegram Bot Engine (v5.0 Ultimate Protected)
+محرك بوت تيليجرام المتكامل مع درع الحماية الشامل، الأذكار، ورسالة الترحيب السيادية
 =============================================================================
 """
 
 import os
 import logging
-from fastapi import FastAPI, Request, status
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-from aiogram.types import Update
+import asyncio
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters import Command
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+from dotenv import load_dotenv
 
-# استيراد محركات الخدمة والنواة مع حماية المسارات المطلقة
+# استيراد محركات الحماية والخدمات السيادية بأمان تام
 try:
-    from backend_core.bot.bot_main import bot, dp
-    from backend_core.api.v1.ai_studio_router import router as ai_studio_router
-    from backend_core.api.v1.search_media_router import router as search_router
-    from backend_core.api.v1.subscription_router import router as subscription_router
-    from backend_core.database import init_db
+    from backend_core.services.queue_manager import MessageQueueManager
+    from backend_core.services.telegram_business import TelegramBusinessManager
+    from backend_core.services.group_protection_engine import GroupProtectionEngine
+    from backend_core.bot.owner_panel import get_owner_main_keyboard, OWNER_ID
+    from backend_core.bot.subscriber_panel import get_subscriber_main_keyboard
+    from backend_core.database import AsyncSessionLocal
+    from backend_core.services.subscription_service import SubscriptionService
 except ImportError:
     try:
-        from bot.bot_main import bot, dp
-        from api.v1.ai_studio_router import router as ai_studio_router
-        from api.v1.search_media_router import router as search_router
-        from api.v1.subscription_router import router as subscription_router
-        from database import init_db
+        from services.queue_manager import MessageQueueManager
+        from services.telegram_business import TelegramBusinessManager
+        from services.group_protection_engine import GroupProtectionEngine
+        from owner_panel import get_owner_main_keyboard, OWNER_ID
+        from subscriber_panel import get_subscriber_main_keyboard
+        from database import AsyncSessionLocal
+        from services.subscription_service import SubscriptionService
     except ImportError:
-        from ..bot.bot_main import bot, dp
-        from ..api.v1.ai_studio_router import router as ai_studio_router
-        from ..api.v1.search_media_router import router as search_router
-        from ..api.v1.subscription_router import router as subscription_router
-        from ..database import init_db
+        from ..services.queue_manager import MessageQueueManager
+        from ..services.telegram_business import TelegramBusinessManager
+        from ..services.group_protection_engine import GroupProtectionEngine
+        from .owner_panel import get_owner_main_keyboard, OWNER_ID
+        from .subscriber_panel import get_subscriber_main_keyboard
+        from ..database import AsyncSessionLocal
+        from ..services.subscription_service import SubscriptionService
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-logger = logging.getLogger("AymnGuardCore")
+logger = logging.getLogger("AymnGuardBotEngine")
 
-app = FastAPI(
-    title="AymnGuard Enterprise Sovereign API",
-    version="5.0.0",
-    docs_url="/docs",
-    redoc_url="/redoc"
-)
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+MINI_APP_URL = os.getenv("MINI_APP_URL", "https://mattress-before-exec-artwork.trycloudflare.com/app/index.html")
 
-# تفعيل سياسة المشاركة المتبادلة (CORS) للواجهات والـ Mini App
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+if not TELEGRAM_BOT_TOKEN:
+    raise ValueError("❌ [Configuration Error]: لم يتم العثور على TELEGRAM_BOT_TOKEN في البيئة السيادية.")
 
-# تسجيل مسارات الـ API السيادية (الاشتراكات، استوديو التصميم، البحث الشامل)
-app.include_router(subscription_router)
-app.include_router(ai_studio_router)
-app.include_router(search_router)
+bot = Bot(token=TELEGRAM_BOT_TOKEN)
+dp = Dispatcher()
 
-WEBHOOK_PATH = f"/webhook/{os.getenv('TELEGRAM_BOT_TOKEN', 'secure_token')}"
-WEBHOOK_URL = f"{os.getenv('PUBLIC_DOMAIN', 'https://your-domain.com')}{WEBHOOK_PATH}"
+# قائمة الأذكار اللحظية المباركة
+ADHAKAR_LIST = [
+    "✨ *سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ*",
+    "🌿 *لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ*",
+    "💎 *أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ الَّذِي لَا إِلَهَ إِلَّا هو الْحَيُّ الْقَيُّومُ وَأَتُوبُ إِلَيْهِ*",
+    "🌸 *اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ*",
+    "🛡️ *حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ، نِعْمَ الْمَوْلَى وَنِعْمَ النَّصِيرُ*"
+]
 
-@app.on_event("startup")
-async def startup_event():
+@dp.message(Command("start"))
+async def command_start_handler(message: types.Message):
     """
-    حدث إقلاع النواة: تهيئة قاعدة البيانات الدائمة وربط الـ Webhook مع تيليجرام تلقائياً.
+    معالجة أمر البدء، تقديم رسالة الترحيب السيادية، تسجيل المشترك بالقاعدة الدائمة، وعرض لوحة التحكم.
     """
-    logger.info("🚀 [Core Startup]: جاري إقلاع النواة السيادية وتهيئة جداول القاعدة الدائمة...")
+    user_id = message.from_user.id
+    username = message.from_user.username or "Unknown"
+    first_name = message.from_user.first_name or "القائد السيادي"
+    
+    logger.info(f"🛡️ [Bot Event]: استقبال أمر /start من المشترك {user_id} (@{username})")
+    
+    # 1. تسجيل المشترك في القاعدة الدائمة
     try:
-        # تهيئة وإنشاء جداول قاعدة البيانات عند الإقلاع الأول
-        await init_db()
-        logger.info("✅ [Database Initialized]: تم تهيئة وعمل جداول قاعدة البيانات الدائمة بنجاح.")
+        async with AsyncSessionLocal() as session:
+            await SubscriptionService.get_or_create_user(session, user_id, username, first_name)
+    except Exception as db_err:
+        logger.error(f"❌ [Database Sync Error]: فشل تسجيل المستخدم في القاعدة الدائمة - التفاصيل: {str(db_err)}")
 
-        # ربط الـ Webhook
-        await bot.set_webhook(url=WEBHOOK_URL, drop_pending_updates=True)
-        logger.info(f"✅ [Webhook Connected]: تم ربط البوت بنجاح على المسار: {WEBHOOK_URL}")
-    except Exception as e:
-        logger.error(f"❌ [Startup Error]: فشل في تهيئة النواة أو ربط الـ Webhook - التفاصيل: {str(e)}")
+    # 2. رسالة الترحيب السيادية الشاملة
+    welcome_text = (
+        f"🛡️ **مرحباً بك، {first_name} في منصة AymnGuard Enterprise v5.0 السيادية** 🚀\n\n"
+        "**فكرة وعمل التطبيق السيادي والبوت:**\n"
+        "• **درع الحماية المطلق:** حماية المجموعات والقنوات من التجميد، التهكير، وبروتوكولات التجسس مع إخفاء إشعارات الانضمام والمغادرة والبلاغات الكيدية.\n"
+        "• **استيعاب بلا حدود:** تهيئة القنوات والمجموعات لاستقبال ملايين الأعضاء بأعلى أداء سرعة وكفاءة.\n"
+        "• **استوديو الذكاء الاصطناعي (4K):** تصميم وتوليد الشعارات، القوالب، والأصول البصرية بدقة مذهلة.\n"
+        "• **محرك البحث والوسائط الشامل:** البحث في الويب ويوتيوب وشبكات التواصل ومشاهدة الفيديوهات مباشرة من داخل التطبيق دون مغادرته.\n"
+        "• **تليجرام الأعمال:** إدارة متكاملة ومؤتمتة لرسائل وحسابات الأعمال السيادية.\n\n"
+        "النظام يعمل بأحدث تقنيات الذكاء الاصطناعي والحوسبة الآمنة. اختر الخدمة المطلوبة من القائمة أدناه:"
+    )
 
-@app.on_event("shutdown")
-async def shutdown_event():
-    """
-    حدث الإيقاف: تنظيف الاتصالات وإغلاق جلسات البوت بأمان.
-    """
-    logger.info("🛑 [Core Shutdown]: جاري إيقاف النواة وإغلاق الجلسات السيادية...")
-    await bot.session.close()
+    keyboard = get_subscriber_main_keyboard()
+    await message.answer(welcome_text, reply_markup=keyboard, parse_mode="Markdown")
 
-@app.post(WEBHOOK_PATH)
-async def telegram_webhook_endpoint(request: Request):
+# 🔒 تفعيل درع الحماية الشامل لجميع رسائل المجموعات والقنوات (حذف الإشعارات والروابط الخبيثة)
+@dp.message()
+async def global_group_protection_middleware(message: types.Message):
     """
-    نقطة استقبال تحديثات تيليجرام وتليجرام الأعمال عبر الـ Webhook الفوري.
+    مُستقبل مركزي لفحص وتأمين رسائل المجموعات والقنوات لحظياً.
     """
+    if message.chat.type in ["group", "supergroup", "channel"]:
+        # 1. إخفاء رسائل الخدمة (انضمام، مغادرة، تثبيت)
+        is_sanitized = await GroupProtectionEngine.sanitize_service_messages(message, bot)
+        if is_sanitized:
+            return
+
+        # 2. منع البلاغات الهجومية والروابط الخبيثة
+        is_blocked = await GroupProtectionEngine.intercept_malicious_payloads(message)
+        if is_blocked:
+            return
+
+    # السماح بباقي الرسائل العادية بالمرور الطبيعي
+    pass
+
+@dp.message(Command("panel"))
+async def owner_control_panel_handler(message: types.Message):
+    """
+    نقطة الدخول للوحة التحكم السيادية الخاصة بالمالك حصرياً (Owner Control Panel).
+    """
+    if message.from_user.id != OWNER_ID:
+        await message.answer("❌ عذراً، هذه اللوحة مخصصة لمالك النظام السيادي فقط.")
+        return
+
+    keyboard = get_owner_main_keyboard()
+    await message.answer(
+        "🛡️ **مرحباً بك في غرفة القيادة والسيطرة السيادية (Owner Control Panel)**\n\n"
+        "جميع الأنظمة، الطوابير، ومحركات الذكاء الاصطناعي تعمل بكفاءة مطلقة. اختر العملية المطلوبة:",
+        reply_markup=keyboard,
+        parse_mode="Markdown"
+    )
+
+@dp.message(lambda msg: msg.text == "🔙 القائمة الرئيسية")
+async def return_to_main_menu(message: types.Message):
+    keyboard = get_subscriber_main_keyboard()
+    await message.answer("🛡️ **القائمة الرئيسية السيادية للمشترك:**", reply_markup=keyboard, parse_mode="Markdown")
+
+# معالجات تليجرام الأعمال
+@dp.business_connection()
+async def business_connection_handler(business_connection: types.BusinessConnection):
+    await TelegramBusinessManager.handle_business_connection(business_connection)
+
+@dp.business_message()
+async def business_message_handler(message: types.Message):
+    await TelegramBusinessManager.handle_business_message(message)
+
+async def main():
+    logger.info("🚀 [Bot Launch]: إطلاق محرك بوت تيليجرام السيادي مع درع الحماية الشامل والميزات المتقدمة (v5.0)...")
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
     try:
-        json_data = await request.json()
-        update = Update.model_validate(json_data, context={"bot": bot})
-        await dp.feed_update(bot, update)
-        return {"status": "ok"}
-    except Exception as e:
-        logger.error(f"❌ [Webhook Processing Error]: خطأ في معالجة تحديث الـ Webhook - التفاصيل: {str(e)}")
-        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"status": "error", "detail": str(e)})
-
-@app.get("/health", tags=["System Health"])
-async def health_check():
-    """
-    فحص صحة النواة وحالة النظام اللحظية.
-    """
-    return {
-        "status": "healthy",
-        "system": "AymnGuard Enterprise Core",
-        "version": "5.0.0",
-        "database": "Active Async SQLAlchemy",
-        "security": "Active & Sovereign"
-    }
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logger.info("🛑 [Bot Shutdown]: تم إيقاف محرك البوت يدوياً بأمان تام.")
