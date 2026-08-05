@@ -15,6 +15,9 @@ import asyncio
 from datetime import datetime
 from contextlib import asynccontextmanager
 from typing import Any, Dict, Optional, List
+from app.enterprise_gateway import router as enterprise_router
+# ربط الراوتر المؤسسي بسيرفر FastAPI الرئيسي
+app.include_router(enterprise_router)
 
 # ==============================================================================
 # 1. نظام التثبيت والتهيئة الذكي (Smart Auto-Installer Engine)
