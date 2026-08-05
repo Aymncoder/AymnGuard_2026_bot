@@ -53,43 +53,29 @@ class TelegramGateway:
                 "**AymnGuard Enterprise v5.0** 🛡️\n\n"
                 "تم تفعيل البروتوكولات السيادية بنجاح."
             )
-
         @self.app.on_message(filters.text & filters.private & ~filters.command("start"))
         async def ai_agent_dispatcher(client: Client, message: Message):
             user_id = str(message.from_user.id)
             payload_text = message.text
-            
+
             logger.debug(f"📥 [Telegram Gateway]: Payload received from {user_id}. Dispatching...")
 
             async def send_typing_action(chat_id: int):
-                # استدعاء حالة الكتابة مباشرة باستخدام raw API لتجنب استيراد enums
+                # لتجنب استيراد enums استدعاء حالة الكتابة مباشرة باستخدام
                 await client.send_chat_action(chat_id, "typing")
-                
+
             await broker.submit_task(send_typing_action, message.chat.id)
 
-                # لاحظ المسافات هنا
-        async def cognitive_task(uid: str, text: str, msg_obj: Message):
-            try:
-                ai_result = await guardian_agent.analyze_and_document(uid, text)
-                response_text = f"⚙️ [المحرك العصبي]:\n\n{ai_result}"
-                await msg_obj.reply_text(response_text)
-            except Exception as e:
-                logger.error(f"❌ [Telegram Gateway]: Agent failure for {uid} -> {e}")
-                await msg_obj.reply_text("⚠️ تعذر إتمام بروتوكول التحليل السيادي.")
+            async def cognitive_task(uid: str, text: str, msg_obj: Message):
+                try:
+                    # توجيه النص للوكيل الذكي للتحليل والحفظ
+                    ai_result = await guardian_agent.analyze_and_document(uid, text)
+                    
+                    response_text = f"⚙️ [المحرك العصبي]:\n\n{ai_result}"
+                    await msg_obj.reply_text(response_text)
+                except Exception as e:
+                    logger.error(f"❌ [Telegram Gateway]: Agent failure for {uid} -> {e}")
+                    await msg_obj.reply_text("⚠️ تعذر إتمام بروتوكول التحليل السيادي.")
 
-        # 🔥 الحل هنا: يجب أن يكون هذا السطر تحته مباشرة بنفس عدد المسافات بالضبط
-        await broker.submit_task(cognitive_task, user_id, payload_text, message)
-
-
-        # إرسال المهمة لوسيط المهام (Task Broker)
-        await broker.submit_task(cognitive_task, user_id, payload_text, message)
-
-
-    async def boot_gateway(self) -> None:
-        logger.info("🚀 [Telegram Gateway]: Initiating secure connection to Telegram...")
-        await self.app.start()
-        logger.info("✅ [Telegram Gateway]: Online and listening.")
-        
-    async def shutdown_gateway(self) -> None:
-        logger.info("🛑 [Telegram Gateway]: Terminating connection securely...")
-        await self.app.stop()
+            # إرسال المهمة لوسيط المهام
+            await broker.submit_task(cognitive_task, user_id, payload_text, message)
