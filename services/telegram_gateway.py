@@ -67,17 +67,19 @@ class TelegramGateway:
                 
             await broker.submit_task(send_typing_action, message.chat.id)
 
+                # لاحظ المسافات هنا
         async def cognitive_task(uid: str, text: str, msg_obj: Message):
             try:
-                # توجيه النص للوكيل الذكي للتحليل والحفظ في قاعدة البيانات
                 ai_result = await guardian_agent.analyze_and_document(uid, text)
-                
-                # إرسال النتيجة النهائية للمستخدم
                 response_text = f"⚙️ [المحرك العصبي]:\n\n{ai_result}"
                 await msg_obj.reply_text(response_text)
             except Exception as e:
                 logger.error(f"❌ [Telegram Gateway]: Agent failure for {uid} -> {e}")
                 await msg_obj.reply_text("⚠️ تعذر إتمام بروتوكول التحليل السيادي.")
+
+        # 🔥 الحل هنا: يجب أن يكون هذا السطر تحته مباشرة بنفس عدد المسافات بالضبط
+        await broker.submit_task(cognitive_task, user_id, payload_text, message)
+
 
         # إرسال المهمة لوسيط المهام (Task Broker)
         await broker.submit_task(cognitive_task, user_id, payload_text, message)
