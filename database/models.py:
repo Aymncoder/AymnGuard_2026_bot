@@ -1,0 +1,42 @@
+# -*- coding: utf-8 -*-
+"""
+AymnGuard Enterprise v5.0 : Sovereign Database Models
+طبقة حفظ البيانات المؤسسية: نماذج SQLAlchemy غير المتزامنة لإدارة الجداول،
+تخزين الصفقات، سجلات الأمان، وتقارير التدقيق بمانعة أخطاء مطلقة.
+"""
+
+from datetime import datetime
+from sqlalchemy import Column, Integer, String, Float, Text, DateTime, Boolean
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
+
+class SovereignUser(Base):
+    __tablename__ = "sovereign_users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    telegram_id = Column(Integer, unique=True, index=True, nullable=False)
+    username = Column(String(100), nullable=True)
+    role = Column(String(50), default="operator")  # operator, admin, sovereign
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class TradingTransaction(Base):
+    __tablename__ = "trading_transactions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    symbol = Column(String(20), index=True, nullable=False)
+    side = Column(String(10), nullable=False)  # buy, sell
+    amount = Column(Float, nullable=False)
+    execution_price = Column(Float, nullable=True)
+    status = Column(String(30), default="pending")  # success, failed, pending
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class SecurityAuditLog(Base):
+    __tablename__ = "security_audit_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    target_contract = Column(String(255), nullable=False)
+    audit_result = Column(Text, nullable=False)
+    risk_score = Column(String(20), default="SAFE")
+    created_at = Column(DateTime, default=datetime.utcnow)
