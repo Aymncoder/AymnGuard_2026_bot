@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================================
-AymnGuard Enterprise - Sovereign Telegram Bot Engine (v5.0 + Business Support)
-محرك بوت تيليجرام المدعوم بميزات تليجرام الأعمال والطوابير الذكية
+AymnGuard Enterprise - Sovereign Telegram Bot Engine (v5.0 + Business & Owner Panel)
+محرك بوت تيليجرام المتكامل مع تليجرام الأعمال، الطوابير، ولوحة تحكم المالك
 =============================================================================
 """
 
@@ -14,17 +14,20 @@ from aiogram.filters import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from dotenv import load_dotenv
 
-# 🛡️ [حماية المسارات]: محاولة استيراد خدمات النواة بمختلف المسارات الممكنة لمنع أي تداخل
+# 🛡️ [حماية المسارات]: محاولة استيراد خدمات النواة ولوحة المالك بمختلف المسارات الممكنة لمنع أي تداخل
 try:
     from backend_core.services.queue_manager import MessageQueueManager
     from backend_core.services.telegram_business import TelegramBusinessManager
+    from backend_core.bot.owner_panel import get_owner_main_keyboard, OWNER_ID
 except ImportError:
     try:
         from services.queue_manager import MessageQueueManager
         from services.telegram_business import TelegramBusinessManager
+        from owner_panel import get_owner_main_keyboard, OWNER_ID
     except ImportError:
         from ..services.queue_manager import MessageQueueManager
         from ..services.telegram_business import TelegramBusinessManager
+        from .owner_panel import get_owner_main_keyboard, OWNER_ID
 
 load_dotenv()
 
@@ -76,6 +79,23 @@ async def command_start_handler(message: types.Message):
         parse_mode="Markdown"
     )
 
+@dp.message(Command("panel"))
+async def owner_control_panel_handler(message: types.Message):
+    """
+    نقطة الدخول للوحة التحكم السيادية للمالك. تفحص الصلاحيات الأمنية وتציد لوحة السيطرة.
+    """
+    if message.from_user.id != OWNER_ID:
+        await message.answer("❌ عذراً، هذه اللوحة مخصصة لمالك النظام السيادي فقط.")
+        return
+
+    keyboard = get_owner_main_keyboard()
+    await message.answer(
+        "🛡️ **مرحباً بك في غرفة القيادة والسيطرة السيادية (Owner Control Panel)**\n\n"
+        "جميع الأنظمة، الطوابير، ومحركات الذكاء الاصطناعي تعمل بكفاءة مطلقة. اختر العملية المطلوبة:",
+        reply_markup=keyboard,
+        parse_mode="Markdown"
+    )
+
 # 💼 معالجات تليجرام الأعمال المتقدمة (Telegram Business Handlers)
 @dp.business_connection()
 async def business_connection_handler(business_connection: types.BusinessConnection):
@@ -95,7 +115,7 @@ async def main():
     """
     إقلاع محرك البوت والخدمات بكفاءة عالية.
     """
-    logger.info("🚀 [Bot Launch]: جاري إطلاق محرك بوت تيليجرام السيادي مع دعم ميزات الأعمال...")
+    logger.info("🚀 [Bot Launch]: جاري إطلاق محرك بوت تيليجرام السيادي مع دعم ميزات الأعمال ولوحة المالك...")
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
