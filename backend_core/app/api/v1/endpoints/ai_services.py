@@ -65,7 +65,8 @@ class AutonomousUserAssistant:
             )
             action_type = "logistics_guidance"
             
-        elif "مشكلة" in query_lower or "خطأ" in query_lower or لا يعمل: # type: ignore
+       elif "مشكلة" in query_lower or "خطأ" in query_lower or "لا يعمل" in query_lower:
+ 
             response_text = (
                 "🛠️ **الدعم الفني الذاتي:**\n"
                 "النظام يفحص حالتك الآن. إذا واجهتك مشكلة في الاستجابة، جرب إعادة إرسال الأمر `/start` أو تأكد من اتصال الشبكة. تم تسجيل التنبيه لفريق الصيانة الذاتي."
