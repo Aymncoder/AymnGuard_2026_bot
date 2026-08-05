@@ -120,7 +120,7 @@ async def serve_enterprise_dashboard():
     logger.info("🌐 [Enterprise Dashboard]: تم طلب عرض لوحة القيادة المؤسسية.")
     return gateway_instance.get_enterprise_html_dashboard()
 
-@router.get("/status", response_status=status.HTTP_200_OK)
+@router.get("/status", status_code=status.HTTP_200_OK)
 async def get_system_health() -> Dict[str, Any]:
     """
     فحص سلامة النظام وتقديم تقرير شامل عن حالة كافة الأذرع السيادية.
