@@ -1,31 +1,12 @@
+# ==============================================================================
+# AymnGuard Enterprise - Sovereign Docker Compose Architecture (v5.0)
+# نظام التنسيق الحاوي المركزي المتوافق مع معمارية النواة و SQLite
+# ==============================================================================
+
 version: '3.8'
 
 services:
-  # 1. قاعدة البيانات الرئيسية (PostgreSQL) - الأساس القوي الآمن
-  postgres:
-    image: postgres:16-alpine
-    container_name: aymnguard_postgres
-    restart: always
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-aymnguard_db}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - aymn_network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d aymnguard_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  # 2. الذاكرة المؤقتة (Redis) - لسرعة الاستجابة وإدارة طوابير الرسائل
+  # 1. الذاكرة المؤقتة والطوابير (Redis) - لسرعة الاستجابة ومعالجة الأحداث
   redis:
     image: redis:7-alpine
     container_name: aymnguard_redis
@@ -45,36 +26,31 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # 3. سيرفر الويب المركزي (Backend FastAPI + Mini App)
+  # 2. سيرفر الويب المركزي (Backend FastAPI + Mini App Core)
   backend:
     build: 
-      context: ./backend
+      context: ./backend_core
       dockerfile: Dockerfile
     container_name: aymnguard_backend
     restart: always
     ports:
       - "10000:10000"
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - redis
     environment:
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/aymnguard_db}
+      - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///./aymnguard_enterprise.db}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - TELEGRAM_SECRET_TOKEN=${TELEGRAM_SECRET_TOKEN:-AymnGuard2026}
+      - TELEGRAM_SECRET_TOKEN=${TELEGRAM_SECRET_TOKEN:-aymnguard_secure_secret_2026}
       - API_ID=${API_ID:-2040}
-      - API_HASH=${API_HASH:-b18441a1ff607e10a989891a5462e627}
+      - API_HASH=${API_HASH:-b18441aff607e10a989891a5462e627}
       - OWNER_ID=${OWNER_ID:-5193790077}
       - ENVIRONMENT=${ENVIRONMENT:-production}
       - PORT=10000
       - WEBHOOK_URL=${WEBHOOK_URL}
       - MINI_APP_URL=${MINI_APP_URL}
-      - AYMN_GUARD_SECRET_KEY=${AYMN_GUARD_SECRET_KEY}
-      - MASTER_ENCRYPTION_KEY=${MASTER_ENCRYPTION_KEY}
     volumes:
-      - ./backend/static:/app/static
+      - ./backend_core:/app
       - ./logs:/app/logs
     networks:
       - aymn_network
@@ -84,72 +60,22 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # 4. محرك البوت والخدمات الخلفية (Telegram Bot & Scrapers)
-  bot:
-    build: 
-      context: ./bot
-      dockerfile: Dockerfile
-    container_name: aymnguard_bot
-    restart: always
-    depends_on:
-      - backend
-    environment:
-      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - API_ID=${API_ID:-2040}
-      - API_HASH=${API_HASH:-b18441a1ff607e10a989891a5462e627}
-      - OWNER_ID=${OWNER_ID:-5193790077}
-      - API_BASE_URL=http://backend:10000
-      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/aymnguard_db}
-      - AYMN_GUARD_SECRET_KEY=${AYMN_GUARD_SECRET_KEY}
-    networks:
-      - aymn_network
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  # 5. عامل طوابير الرسائل الخلفي (Redis Queue Worker) لمعالجة الطلبات العالية المتزامنة
+  # 3. عامل طوابير الرسائل الخلفي (Redis Queue Worker) لمعالجة الطلبات المتزامنة
   worker:
     build: 
-      context: .
-      dockerfile: backend/Dockerfile
+      context: ./backend_core
+      dockerfile: Dockerfile
     container_name: aymnguard_worker
     restart: always
     command: python services/worker.py
     depends_on:
       - redis
-      - postgres
     environment:
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/aymnguard_db}
+      - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///./aymnguard_enterprise.db}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - AYMN_GUARD_SECRET_KEY=${AYMN_GUARD_SECRET_KEY}
-    networks:
-      - aymn_network
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  # 6. عامل المهام الموزعة (Celery Worker) بناءً على إعدادات Termux المتقدمة
-  celery_worker:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: aymnguard_celery_worker
-    restart: always
-    command: celery -A core.celery_app.celery_app worker --loglevel=info
-    depends_on:
-      - redis
-      - postgres
-    environment:
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/aymnguard_db}
-      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
-      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - AYMN_GUARD_SECRET_KEY=${AYMN_GUARD_SECRET_KEY}
+    volumes:
+      - ./backend_core:/app
     networks:
       - aymn_network
     logging:
@@ -159,7 +85,6 @@ services:
         max-file: "3"
 
 volumes:
-  postgres_data:
   redis_data:
 
 networks:
