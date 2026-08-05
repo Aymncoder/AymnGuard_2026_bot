@@ -1,10 +1,11 @@
 # ==============================================================================
-# AymnGuard Enterprise Core - Ultimate Production Dockerfile (Degree of Honor)
-# V2 - Enhanced Security, Tini Init, Lifecycle Management & Timezone Sync
+# AymnGuard Enterprise v5.0 - Ultimate Production Dockerfile (Degree of Honor)
+# المنسق الهيكلي المدمج: أمان سيبراني مطلق، دعم كامل للبلوكتشين والتشفير،
+# إدارة دورة حياة العمليات عبر Tini، تزامن التوقيت، وأداء Zero-Lag فائق.
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
-# Stage 1: Builder Stage (مرحلة البناء وتجهيز الاعتماديات)
+# Stage 1: Builder Stage (مرحلة البناء وتجهيز الاعتماديات ومكتبات التشفير)
 # ------------------------------------------------------------------------------
 FROM python:3.12-slim-bookworm AS builder
 
@@ -17,10 +18,12 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /build
 
-# تثبيت أدوات البناء الأساسية
+# تثبيت أدوات البناء الأساسية ومكتبات التشفير والبلوكتشين (gcc, libffi, libssl)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
+    libffi-dev \
+    libssl-dev \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
@@ -33,11 +36,11 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install -r requirements.txt
 
 # ------------------------------------------------------------------------------
-# Stage 2: Runtime Stage (المرحلة النهائية التشغيلية فائقة الحماية)
+# Stage 2: Runtime Stage (المرحلة النهائية التشغيلية فائقة الحماية والاتزان)
 # ------------------------------------------------------------------------------
 FROM python:3.12-slim-bookworm AS runtime
 
-# إعداد متغيرات البيئة للتشغيل الآمن، الأداء، والتوقيت المحلي
+# إعداد متغيرات البيئة للتشغيل الآمن، الأداء العالي، والتوقيت المحلي
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PORT=10000 \
@@ -46,10 +49,12 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# تثبيت Tini (لإدارة العمليات) و libpq (لقاعدة البيانات) و tzdata (للتوقيت)
+# تثبيت Tini (لإدارة العمليات) و libpq (لقاعدة البيانات) و tzdata (التوقيت) ومكتبات الأمان
 RUN apt-get update && apt-get install -y --no-install-recommends \
     tini \
     libpq5 \
+    libffi8 \
+    libssl3 \
     curl \
     tzdata \
     && cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
@@ -58,15 +63,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # (Hardening) إزالة صلاحيات setuid/setgid لمنع تصعيد الامتيازات من قبل المخترقين
 RUN find / -xdev -type f -perm /6000 -exec chmod a-s {} \; || true
 
-# إنشاء مستخدم آمن غير جذري وإعداد الصلاحيات
+# إنشاء مستخدم آمن غير جذري وإعداد الصلاحيات المؤسسية
 RUN groupadd -g 10001 aymngroup && \
     useradd -u 10001 -g aymngroup -s /bin/false -m aymnuser
 
-# نسخ المكتبات من مرحلة البناء
+# نسخ المكتبات الجاهزة من مرحلة البناء
 COPY --from=builder /usr/local/lib/python3.12/site-packages/ /usr/local/lib/python3.12/site-packages/
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
 
-# نسخ الكود المصدري وإعطاء الملكية الفورية للمستخدم الآمن (يضمن Alembic وجميع الأكواد)
+# نسخ الكود المصدري وإعطاء الملكية الفورية للمستخدم الآمن
 COPY --chown=aymnuser:aymngroup . .
 
 # إعداد مجلدات التشغيل وضبط الأذونات بدقة جراحية
@@ -81,11 +86,11 @@ USER aymnuser
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
     CMD curl -f http://localhost:${PORT}/ || exit 1
 
-# فتح المنفذ
+# فتح المنفذ التشغيلي الموحد
 EXPOSE ${PORT}
 
 # استخدام Tini كمدير رئيسي (PID 1) لضمان إغلاق آمن ومعالجة صحيحة للعمليات
 ENTRYPOINT ["/usr/bin/tini", "--"]
 
-# أمر التشغيل النهائي المحسن لبيئة الإنتاج مع دعم الوكيل العكسي (Reverse Proxies)
+# أمر التشغيل النهائي المحسن لبيئة الإنتاج مع دعم حلقة uvloop والوكيل العكسي
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10000", "--workers", "4", "--loop", "uvloop", "--proxy-headers", "--forwarded-allow-ips", "*"]
