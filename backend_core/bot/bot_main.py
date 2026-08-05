@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================================
-AymnGuard Enterprise - Sovereign Telegram Bot Engine (v5.0 Ultimate Unified Core)
-محرك بوت تيليجرام المتكامل: تليجرام الأعمال، طوابير Redis، لوحة المالك، ومشتركين المنصة
+AymnGuard Enterprise - Sovereign Telegram Bot Engine (v5.0 Ultimate Database Integrated)
+محرك بوت تيليجرام المتكامل: تليجرام الأعمال، طوابير Redis، لوحة المالك، والمشتركين مع القاعدة الدائمة
 =============================================================================
 """
 
@@ -14,23 +14,29 @@ from aiogram.filters import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from dotenv import load_dotenv
 
-# 🛡️ [حماية المسارات المتقدمة]: استيراد كافة خدمات النواة ولوحات التحكم دون أي تداخل أو تكرار
+# 🛡️ [حماية المسارات المتقدمة]: استيراد كافة خدمات النواة، لوحات التحكم، وقاعدة البيانات الدائمة دون أي تداخل أو تكرار
 try:
     from backend_core.services.queue_manager import MessageQueueManager
     from backend_core.services.telegram_business import TelegramBusinessManager
     from backend_core.bot.owner_panel import get_owner_main_keyboard, OWNER_ID
     from backend_core.bot.subscriber_panel import get_subscriber_main_keyboard
+    from backend_core.database import AsyncSessionLocal
+    from backend_core.services.subscription_service import SubscriptionService
 except ImportError:
     try:
         from services.queue_manager import MessageQueueManager
         from services.telegram_business import TelegramBusinessManager
         from owner_panel import get_owner_main_keyboard, OWNER_ID
         from subscriber_panel import get_subscriber_main_keyboard
+        from database import AsyncSessionLocal
+        from services.subscription_service import SubscriptionService
     except ImportError:
         from ..services.queue_manager import MessageQueueManager
         from ..services.telegram_business import TelegramBusinessManager
         from .owner_panel import get_owner_main_keyboard, OWNER_ID
         from .subscriber_panel import get_subscriber_main_keyboard
+        from ..database import AsyncSessionLocal
+        from ..services.subscription_service import SubscriptionService
 
 load_dotenv()
 
@@ -49,14 +55,22 @@ dp = Dispatcher()
 @dp.message(Command("start"))
 async def command_start_handler(message: types.Message):
     """
-    معالجة أمر البدء للمشتركين وعرض اللوحة السيادية المتكاملة مع الأزرار التفاعلية والخدمات.
+    معالجة أمر البدء للمشتركين، تسجيلهم تلقائياً في قاعدة البيانات الدائمة، وعرض اللوحة السيادية المتكاملة.
     """
     user_id = message.from_user.id
     username = message.from_user.username or "Unknown"
+    first_name = message.from_user.first_name or "المستخدم السيادي"
     
     logger.info(f"🛡️ [Bot Event]: استقبال أمر /start من المشترك {user_id} (@{username})")
     
-    # دفع الحدث لطوابير Redis للاستجابة الخلفية غير المتزامنة
+    # 1. تسجيل المشترك أو جلب بياناته من قاعدة البيانات الدائمة غير المتزامنة بصمت تام
+    try:
+        async with AsyncSessionLocal() as session:
+            await SubscriptionService.get_or_create_user(session, user_id, username, first_name)
+    except Exception as db_err:
+        logger.error(f"❌ [Database Sync Error]: فشل تسجيل المستخدم في القاعدة الدائمة - التفاصيل: {str(db_err)}")
+
+    # 2. دفع الحدث لطوابير Redis للاستجابة الخلفية غير المتزامنة
     await MessageQueueManager.push_to_queue("telegram_updates_queue", {
         "update_id": message.message_id,
         "chat_id": message.chat.id,
@@ -69,7 +83,7 @@ async def command_start_handler(message: types.Message):
 
     await message.answer(
         "🛡️ **مرحباً بك في منصة AymnGuard Enterprise v5.0 السيادية**\n\n"
-        "النظام يعمل بأقصى معايير الأمان، الذكاء الاصطناعي، والحوسبة الفائقة. اختر الخدمة التي تود إدارتها من القائمة أدناه:",
+        "النظام يعمل بأقصى معايير الأمان، الذكاء الاصطناعي، والحوسبة الفائقة. تم مزامنة حسابك مع القاعدة الدائمة بنجاح. اختر الخدمة التي تود إدارتها من القائمة أدناه:",
         reply_markup=keyboard,
         parse_mode="Markdown"
     )
@@ -118,7 +132,7 @@ async def main():
     """
     إقلاع محرك البوت والخدمات السيادية بكفاءة فائقة.
     """
-    logger.info("🚀 [Bot Launch]: جاري إطلاق محرك بوت تيليجرام السيادي المتكامل (v5.0)...")
+    logger.info("🚀 [Bot Launch]: جاري إطلاق محرك بوت تيليجرام السيادي المتكامل مع القاعدة الدائمة (v5.0)...")
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
