@@ -1,0 +1,104 @@
+# -*- coding: utf-8 -*-
+"""
+=============================================================================
+AymnGuard Enterprise - Telegram WebApp Cryptographic Authentication Engine
+محرك المصادقة والتحقق الرياضي المشفر لبيانات تيليجرام المصغرة (InitData Validation)
+=============================================================================
+"""
+
+import hmac
+import hashlib
+import urllib.parse
+import os
+from fastapi import APIRouter, HTTPException, Header, status
+from pydantic import BaseModel
+from datetime import datetime, timedelta
+import jwt
+
+router = APIRouter(prefix="/api/v1/auth", tags=["Authentication"])
+
+BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "your_telegram_bot_token_here")
+SECRET_KEY = os.getenv("API_SECRET_KEY", "AymnGuard_Enterprise_2026_Secure_Key")
+ALGORITHM = "HS256"
+
+class TelegramAuthPayload(BaseModel):
+    user_id: int | None = None
+    username: str | None = None
+    first_name: str | None = None
+
+def verify_telegram_init_data(init_data: str, bot_token: str) -> bool:
+    """
+    التحقق الرياضي المشفر من توقيع Telegram WebApp InitData وفقاً للبروتوكول الرسمي.
+    """
+    try:
+        parsed_url = urllib.parse.parse_qsl(init_data, keep_blank_values=True)
+        data_dict = dict(parsed_url)
+        
+        if "hash" not in data_dict:
+            return False
+            
+        received_hash = data_dict.pop("hash")
+        
+        # ترتيب المفاتيح أبجدياً لإنشاء سلسلة التحقق (Data Check String)
+        sorted_keys = sorted(data_dict.keys())
+        data_check_string = "\n".join([f"{key}={data_dict[key]}" for key in sorted_keys])
+        
+        # حساب المفتاح السري باستخدام HMAC-SHA256 مع بادئة "WebAppData"
+        secret_key = hmac.new(b"WebAppData", bot_token.encode(), hashlib.sha256).digest()
+        
+        # حساب التوقيع المقارن
+        calculated_hash = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
+        
+        # مقارنة التوقيعين بأمان تام لمنع هجمات توقيت التنفيذ (Timing Attacks)
+        return hmac.compare_digest(calculated_hash, received_hash)
+    except Exception:
+        return False
+
+@router.post("/telegram/verify")
+async def telegram_auth_endpoint(payload: TelegramAuthPayload, authorization: str = Header(...)):
+    """
+    نقطة النهاية السيادية لاستلام بيانات Telegram Mini App والتحقق منها ثم إصدار JWT Token.
+    """
+    try:
+        # استخراج initData من رأس الطلب (Authorization Header بصيغة: tma <init_data>)
+        if not authorization.startswith("tma "):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="صيغة ترخيص الوصول غير صالحة."
+            )
+            
+        init_data_raw = authorization.split(" ")[1]
+        
+        # تنفيذ التحقق الكريبتوغرافي الرياضي
+        if not verify_telegram_init_data(init_data_raw, BOT_TOKEN):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="فشل التحقق الرياضي المشفر لتوقيع تيليجرام. البيانات غير موثوقة!"
+            )
+            
+        # إصدار رمز الدخول السيادي (JWT Token) للمستخدم الموثق
+        token_expires = timedelta(hours=12)
+        expire = datetime.utcnow() + token_expires
+        
+        jwt_payload = {
+            "sub": str(payload.user_id),
+            "username": payload.username,
+            "exp": expire
+        }
+        
+        access_token = jwt.encode(jwt_payload, SECRET_KEY, algorithm=ALGORITHM)
+        
+        return {
+            "status": "success",
+            "message": "تم التحقق الأمني الكريبتوغرافي وإصدار الترخيص بنجاح.",
+            "access_token": access_token,
+            "token_type": "bearer"
+        }
+        
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"خطأ داخلي في معالجة المصادقة: {str(e)}"
+        )
