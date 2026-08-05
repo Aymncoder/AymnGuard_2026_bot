@@ -56,7 +56,7 @@ class AutonomousUserAssistant:
             )
             action_type = "payment_guidance"
           
-  elif "نقل" in query_lower or "أعضاء" in query_lower or "لوجستيات" in query_lower:
+        elif "نقل" in query_lower or "أعضاء" in query_lower or "لوجستيات" in query_lower:
             response_text = (
                 "⚙️ **دليل العمليات اللوجستية ونقل الأعضاء:**\n"
                 "• يتم تنفيذ العمليات عبر العُقد الآمنة الموزعة.\n"
@@ -65,14 +65,14 @@ class AutonomousUserAssistant:
             )
             action_type = "logistics_guidance"
             
-elif "مشكلة" in query_lower or "خطأ" in query_lower or "لا يعمل" in query_lower:
- 
+        elif "مشكلة" in query_lower or "خطأ" in query_lower or "لا يعمل" in query_lower:
             response_text = (
                 "🛠️ **الدعم الفني الذاتي:**\n"
                 "النظام يفحص حالتك الآن. إذا واجهتك مشكلة في الاستجابة، جرب إعادة إرسال الأمر `/start` أو تأكد من اتصال الشبكة. تم تسجيل التنبيه لفريق الصيانة الذاتي."
             )
             action_type = "troubleshooting"
-      else:
+            
+        else:
             response_text = (
                 "✨ **أهلاً بك في منصة Aegis السيادية!**\n"
                 "أنا مساعدك الذكي الآلي. يمكنني مساعدتك في:\n"
@@ -82,7 +82,7 @@ elif "مشكلة" in query_lower or "خطأ" in query_lower or "لا يعمل" i
             )
             action_type = "general_welcome"
 
-       return {
+        return {
             "status": "success",
             "user_id": payload.user_id,
             "guidance_response": response_text,
@@ -165,13 +165,13 @@ class SystemHealthAuditor:
         
         # تقييم افتراضي للاختناقات
         if database_status != "healthy":
-    # type: ignore
-              detected_issues.append("اختناق محتمل في استجابة قاعدة البيانات الرئيسية.")
-              performance_score -= 15
+            # type: ignore
+            detected_issues.append("اختناق محتمل في استجابة قاعدة البيانات الرئيسية.")
+            performance_score -= 15
 
         if redis_status != "operational":
-              detected_issues.append("انقطاع جزئي في ذاكرة Redis الموزعة.")
-              performance_score -= 20
+            detected_issues.append("انقطاع جزئي في ذاكرة Redis الموزعة.")
+            performance_score -= 20
 
         audit_result = {
             "audit_timestamp": datetime.utcnow().isoformat(),
