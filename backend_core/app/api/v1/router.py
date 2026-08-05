@@ -1,66 +1,74 @@
+# -*- coding: utf-8 -*-
 """
 =============================================================================
-Project: AymnGuard Enterprise Edition (v2.6)
-Module: Central API Router Hub
-Description: التوجيه المركزي المتقدم لجميع المسارات البرمجية، الخدمات اللوجستية، 
-المالية، وتقنيات الذكاء الاصطناعي مع هيكلة مؤمنة وقابلة للتوسع المستقبلي.
+AymnGuard Enterprise Edition - The Sovereign API Gateway (v1)
+البوابة المركزية الموحدة - دمج وتوجيه كافة قطاعات المنصة السيادية
+تضمن هذه الهندسة العزل التام للنطاقات (Domain Isolation) ومنع أي تداخل.
 =============================================================================
 """
 
-from fastapi import APIRouter, Depends
+import logging
+from fastapi import APIRouter
+
+# استيراد كافة أدمغة المنصة وقطاعاتها الحيوية
 from app.api.v1.endpoints import (
-    telegram,
-    telegram_bot,
-    telethon_transfer,
-    users,
-    ai_services,
-    web3_financial
+    auth, system, users, 
+    telegram, telegram_bot, telethon_transfer, 
+    ai_services, web3_financial
 )
-# استيراد الاعتماديات السيادية العامة إن وجدت (مثل التحقق من رتبة النظام)
-# from app.api.dependencies.auth import verify_sovereign_gateway
 
-# إنشاء الموجه الرئيسي مع متطلبات توثيق متطورة
-api_router = APIRouter()
+logger = logging.getLogger("AymnGuardGateway")
 
-# 1. قطاع أتمتة وعمليات التليجرام السيادية (Userbot Core)
-api_router.include_router(
-    telegram.router,
-    prefix="",
+# 🛡️ إنشاء الموجه المركزي الأوحد
+api_v1_router = APIRouter()
+
+# ==============================================================================
+# 1. قطاع الهوية والتشخيص (Identity, Access & Health)
+# ==============================================================================
+api_v1_router.include_router(auth.router) # البادئة معرفة مسبقاً داخل الملف
+api_v1_router.include_router(system.router)
+api_v1_router.include_router(
+    users.router, 
+    prefix="/users", 
+    tags=["Enterprise User Management"]
+)
+
+# ==============================================================================
+# 2. قطاع أتمتة الشبكات واللوجستيات الرقمية (Automation & Telethon Logistics)
+# ==============================================================================
+# 🚨 تصحيح الثغرة: تم منح بادئة مخصصة للتليجرام لمنع التلوث المساري (Namespace Pollution)
+api_v1_router.include_router(
+    telegram.router, 
+    prefix="/network/telegram-core", 
     tags=["Sovereign Telegram Operations"]
 )
-
-# 2. قطاع إدارة البوتات التفاعلية والخدمية (Telegram Bot API)
-api_router.include_router(
-    telegram_bot.router,
-    prefix="/bot",
-    tags=["Telegram Bot Management"]
+api_v1_router.include_router(
+    telegram_bot.router, 
+    prefix="/network/bot-manager", 
+    tags=["Telegram Bot API"]
 )
-
-# 3. قطاع اللوجستيات الرقمية وعمليات النقل الضخمة (Bulk Logistics & Scraping)
-api_router.include_router(
-    telethon_transfer.router,
-    prefix="/logistics",
+api_v1_router.include_router(
+    telethon_transfer.router, 
+    prefix="/logistics/telethon-bulk", 
     tags=["Sovereign Telethon Logistics & Transfers"]
 )
 
-# 4. قطاع إدارة المستخدمين، الهويات، والصلاحيات (Identity & Access)
-api_router.include_router(
-    users.router,
-    prefix="/users",
-    tags=["Enterprise User & Security Management"]
-)
-
-# 5. قطاع محركات الذكاء الاصطناعي والأتمتة المعرفية (AI Cognitive Engines)
-api_router.include_router(
-    ai_services.router,
-    prefix="/ai",
+# ==============================================================================
+# 3. قطاع محركات الذكاء الاصطناعي (Cognitive AI Engines)
+# ==============================================================================
+api_v1_router.include_router(
+    ai_services.router, 
+    prefix="/ai-core", 
     tags=["Advanced AI & Neural Services"]
 )
 
-# 6. قطاع العملات الرقمية، البوابات المالية والـ Web3 (Sovereign Finance)
-api_router.include_router(
-    web3_financial.router,
-    prefix="/finance",
+# ==============================================================================
+# 4. قطاع البوابات المالية اللامركزية (Web3 Sovereign Finance)
+# ==============================================================================
+api_v1_router.include_router(
+    web3_financial.router, 
+    prefix="/finance/web3", 
     tags=["Web3 & Decentralized Financial Gateways"]
 )
 
+logger.info("🌐 [Sovereign Gateway]: تم دمج وتأمين كافة قطاعات المنصة. لا يوجد أي تداخل مساري.")
