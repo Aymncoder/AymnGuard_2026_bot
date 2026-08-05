@@ -1,12 +1,13 @@
 # ==============================================================================
-# AymnGuard Enterprise - Sovereign Docker Compose Architecture (v5.0)
-# نظام التنسيق الحاوي المركزي المتوافق مع معمارية النواة و SQLite
+# AymnGuard Enterprise v5.0 - Sovereign Multi-Service Docker Compose Architecture
+# البنية المؤسسية المتكاملة: Redis للذاكرة المؤقتة والطوابير، خادم FastAPI السيادي،
+# وعامل المهام الخلفية (Worker) مع شبكات معزولة، سجلات دوارة، وفحوصات سلامة.
 # ==============================================================================
 
 version: '3.8'
 
 services:
-  # 1. الذاكرة المؤقتة والطوابير (Redis) - لسرعة الاستجابة ومعالجة الأحداث
+  # 1. خدمة الذاكرة المؤقتة وموجه الطوابير (Redis Cache & Message Broker)
   redis:
     image: redis:7-alpine
     container_name: aymnguard_redis
@@ -26,31 +27,34 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # 2. سيرفر الويب المركزي (Backend FastAPI + Mini App Core)
+  # 2. خادم الويب المركزي وواجهة النبض (Backend FastAPI Core)
   backend:
-    build: 
-      context: ./backend_core
+    build:
+      context: .
       dockerfile: Dockerfile
-    container_name: aymnguard_backend
+    container_name: aymnguard-master-node
     restart: always
     ports:
       - "10000:10000"
+      - "8000:8000"
     depends_on:
       - redis
     environment:
-      - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///./aymnguard_enterprise.db}
-      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///aymnguard_enterprise.db}
+      - REDIS_URL=redis://redis:6379/0
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_SECRET_TOKEN=${TELEGRAM_SECRET_TOKEN:-aymnguard_secure_secret_2026}
-      - API_ID=${API_ID:-2040}
-      - API_HASH=${API_HASH:-b18441aff607e10a989891a5462e627}
-      - OWNER_ID=${OWNER_ID:-5193790077}
-      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - BINANCE_API_KEY=${BINANCE_API_KEY}
+      - BINANCE_API_SECRET=${BINANCE_API_SECRET}
+      - API_ID=${API_ID}
+      - API_HASH=${API_HASH}
+      - OWNER_ID=${OWNER_ID}
+      - APP_ENV=${APP_ENV:-production}
       - PORT=10000
       - WEBHOOK_URL=${WEBHOOK_URL}
       - MINI_APP_URL=${MINI_APP_URL}
     volumes:
-      - ./backend_core:/app
+      - .:/app
       - ./logs:/app/logs
     networks:
       - aymn_network
@@ -60,10 +64,10 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # 3. عامل طوابير الرسائل الخلفي (Redis Queue Worker) لمعالجة الطلبات المتزامنة
+  # 3. عامل المهام الخلفية غير المتزامنة (Background Worker Service)
   worker:
-    build: 
-      context: ./backend_core
+    build:
+      context: .
       dockerfile: Dockerfile
     container_name: aymnguard_worker
     restart: always
@@ -71,11 +75,16 @@ services:
     depends_on:
       - redis
     environment:
-      - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///./aymnguard_enterprise.db}
-      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///aymnguard_enterprise.db}
+      - REDIS_URL=redis://redis:6379/0
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - BINANCE_API_KEY=${BINANCE_API_KEY}
+      - BINANCE_API_SECRET=${BINANCE_API_SECRET}
+      - API_ID=${API_ID}
+      - API_HASH=${API_HASH}
     volumes:
-      - ./backend_core:/app
+      - .:/app
+      - ./logs:/app/logs
     networks:
       - aymn_network
     logging:
@@ -88,5 +97,6 @@ volumes:
   redis_data:
 
 networks:
+ms:
   aymn_network:
     driver: bridge
