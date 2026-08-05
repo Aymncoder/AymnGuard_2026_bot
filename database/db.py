@@ -7,19 +7,26 @@ import os
 import sys
 import logging
 
-# إضافة مجلد database نفسه إلى مسارات بايثون لضمان نجاح الاستيراد الفوري مهما كان مسار التشغيل
+# إضافة المجلد الجذر للمشروع إلى مسارات بايثون لضمان التعرف على حزمة database
 current_dir = os.path.dirname(os.path.abspath(__file__))
-if current_dir not in sys.path:
-    sys.path.insert(0, current_dir)
+root_dir = os.path.dirname(current_dir)
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
 
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.sql import text
-from models import Base
+
+# استيراد النماذج بطريقة مطلقة صحيحة ومضمونة داخل مسارات المشروع
+try:
+    from database.models import Base
+except ImportError:
+    from .models import Base
 
 # إعداد السجلات المؤسسية
 logger = logging.getLogger("AymnGuard.DatabaseEngine")
 logger.setLevel(logging.INFO)
+
 
 # قراءة رابط قاعدة البيانات من المتغيرات البيئية مع دعم SQLite و PostgreSQL/MySQL افتراضياً
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///aymnguard_enterprise.db")
