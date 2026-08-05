@@ -1,66 +1,105 @@
 # -*- coding: utf-8 -*-
 """
-==============================================================================
-AymnGuard Enterprise v5.0 : Context Vault (Memory Management)
-==============================================================================
-خزنة الذاكرة السياقية: مسؤولة عن تذكر سياق المستخدمين وحالة الجلسات (Sessions)
-لمنع تكرار معالجة البيانات، تقليل الضغط على المحرك العصبي، وتسريع الاستجابة.
+AymnGuard Enterprise v5.0 : Sovereign Cognitive Vault (Advanced Memory & Intent Management)
+دمج ذكي بين: ذاكرة التخزين المؤقت سريعة الزوال (TTL Cache) + محرك الذاكرة السيادية طويلة الأمد وتحليل النوايا.
 """
 
 import logging
-from typing import Dict, Any, Optional
 import time
+from datetime import datetime
+from typing import Dict, Any, Optional
 
-# إعداد مسجل الأحداث لطبقة الذاكرة
-logger = logging.getLogger("AymnGuard.ContextVault")
+logger = logging.getLogger("AymnGuard.SovereignCognitiveVault")
 
-class ContextVault:
+class SovereignCognitiveVault:
     """
-    نظام ذاكرة فائق السرعة يعتمد على الذاكرة الحية (In-Memory) كبداية.
-    مصمم معمارياً (Adapter Pattern) ليرتبط بقواعد بيانات ضخمة (مثل Redis) لاحقاً 
-    دون الحاجة لتغيير أي سطر كود في باقي النظام.
+    خزنة الذاكرة السيادية المتقدمة (Sovereign Cognitive Vault):
+    تجمع بين الأداء فائق السرعة مع آلية التدمير الذاتي المؤقت (TTL)، 
+    وبين الذاكرة طويلة الأمد لتحليل السلوك، حساب التفاعلات، واستراتيجيات الإقناع السيادي.
     """
     
-    # قاموس الذاكرة المركزي: يخزن البيانات مع منع التداخل بين المستخدمين
+    # ذاكرة التخزين المؤقت مع الطابع الزمني للـ TTL وحفظ السجل التاريخي
     _memory_store: Dict[str, Dict[str, Any]] = {}
-    
-    # مدة بقاء الذاكرة قبل التدمير التلقائي (هنا محددة بساعة واحدة لضمان أمان البيانات)
-    _ttl_seconds: int = 3600  
+    _ttl_seconds: int = 3600  # ساعة واحدة كافتراضي لانتهاء صلاحية الجلسة الحية
 
     @classmethod
-    async def store_context(cls, user_id: str, context_data: Dict[str, Any]) -> None:
+    async def remember_user(cls, user_id: str, username: str, interaction_data: dict) -> Dict[str, Any]:
         """
-        تخزين حالة أو سياق المستخدم مع ختم زمني دقيق.
+        تخزين أو تحديث سجل التفاعلات، حساب عدد المرات، الحفاظ على السجل التاريخي،
+        وتحديث مؤقت الجلسة (TTL) لضمان أمان البيانات.
         """
-        cls._memory_store[user_id] = {
-            "data": context_data,
-            "timestamp": time.time()
-        }
-        logger.info(f"💾 [Context Vault]: Context securely saved for user: {user_id}")
+        current_time = time.time()
+        utc_now = datetime.utcnow().isoformat()
+
+        if user_id not in cls._memory_store:
+            cls._memory_store[user_id] = {
+                "username": username,
+                "first_seen": utc_now,
+                "interactions_count": 0,
+                "history": [],
+                "profile_traits": {},
+                "data": {},
+                "timestamp": current_time
+            }
+        
+        user_record = cls._memory_store[user_id]
+        user_record["timestamp"] = current_time  # تحديث الـ TTL مع كل تفاعل نشط
+        user_record["interactions_count"] += 1
+        user_record["history"].append({
+            "timestamp": utc_now,
+            "data": interaction_data
+        })
+        
+        # دمج البيانات الحية للجلسة
+        user_record["data"].update(interaction_data)
+        
+        logger.info(f"💾 [Cognitive Vault]: تم تحديث ذاكرة السيادة للعميل [ID: {user_id}]. التفاعلات الكلية: {user_record['interactions_count']}")
+        return user_record
 
     @classmethod
     async def retrieve_context(cls, user_id: str) -> Optional[Dict[str, Any]]:
         """
-        استرجاع سياق المستخدم لحظياً، مع فحص صلاحية انتهاء الجلسة.
+        استرجاع سياق الجلسة مع فحص صلاحية الـ TTL للتدمير الذاتي عند انتهاء الوقت،
+        مع إرجاع الملف السلوكي والتاريخي الكامل للمستخدم.
         """
         record = cls._memory_store.get(user_id)
         if not record:
+            logger.warning(f"⚠️ [Cognitive Vault]: لم يتم العثور على سجل سابق للعميل [ID: {user_id}].")
             return None
-        
-        # تفعيل قاطع أمان زمني: مسح البيانات تلقائياً إذا انتهت صلاحيتها
+
+        # فحص انتهاء الصلاحية الزمنية (TTL)
         if time.time() - record["timestamp"] > cls._ttl_seconds:
-            logger.info(f"⏳ [Context Vault]: Context expired for user: {user_id}. Auto-clearing...")
+            logger.info(f"⏳ [Cognitive Vault]: انتهت صلاحية جلسة العميل [ID: {user_id}]. جاري مسح الذاكرة الحية...")
             await cls.clear_context(user_id)
             return None
+
+        logger.debug(f"🔍 [Cognitive Vault]: استرجاع فائق السرعة لسياق العميل [ID: {user_id}].")
+        return record
+
+    @classmethod
+    async def analyze_intent_and_persuasion(cls, user_id: str, current_message: str) -> str:
+        """
+        محرك تحليل النوايا والإقناع المتقدم:
+        يدرس رسالة المستخدم الحالية بالاستناد إلى تاريخه التفاعلي وعدد مرات زيارته 
+        لتحديد استراتيجية الإقناع السيادية (ولاء، ترحيب، فض نزاع، أو عرض مخصص).
+        """
+        user_context = await cls.retrieve_context(user_id)
+        
+        if not user_context:
+            strategy = "زيارة أولية أو منتهية الصلاحية - تفعيل خطط الشرح التأسيسي وأسلوب الاستقبال الاحترافي."
+        elif user_context["interactions_count"] > 5:
+            strategy = "عميل سيادي دائم وموثوق - تطبيق لغة الولاء العالي والعروض المخصصة المتقدمة."
+        elif user_context["interactions_count"] > 2:
+            strategy = "عميل تفاعلي في مرحلة اتخاذ القرار - التركيز على حجج الإقناع ودعم مميزات الشركة."
+        else:
+            strategy = "عميل مستكشف - تقديم إجابات دقيقة واحترافية تفوق توقعات الإدارة البشرية."
             
-        logger.debug(f"⚡ [Context Vault]: Ultra-fast retrieval for user: {user_id}")
-        return record["data"]
+        logger.info(f"🎯 [Persuasion Engine]: الاستراتيجية السيادية للعميل [ID: {user_id}]: {strategy}")
+        return strategy
 
     @classmethod
     async def clear_context(cls, user_id: str) -> None:
-        """
-        التدمير الآمن لسياق المستخدم (يُستخدم فور انتهاء المعاملة أو تسجيل الخروج).
-        """
+        """التدمير الآمن لسياق المستخدم (عند انتهاء المعاملة أو تسجيل الخروج)"""
         if user_id in cls._memory_store:
             del cls._memory_store[user_id]
-            logger.info(f"🧹 [Context Vault]: Context permanently cleared for user: {user_id}")
+            logger.info(f"🧹 [Cognitive Vault]: تم تطهير ومسح الذاكرة نهائياً للعميل [ID: {user_id}] لأسباب أمنية.")
