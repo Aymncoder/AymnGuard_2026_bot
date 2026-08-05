@@ -6,8 +6,8 @@ services:
     container_name: aymnguard_core_app
     restart: always
     ports:
-      - "8000:8000"
-    environment:
-      - TELEGRAM_BOT_TOKEN=8885095463:AAGRRtirIswzPutKdhuOTf_OeDzO2PTu_FQ
+      - "10000:10000"  # مطابقة تامة للمنفذ التشغيلي المعتمد في الـ Dockerfile (10000)
+    env_file:
+      - .env          # استدعاء المتغيرات البيئية والأسرار بأمان تام من ملف .env
     volumes:
       - .:/app
