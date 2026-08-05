@@ -11,7 +11,15 @@ import logging
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.sql import text
-from .models import Base
+
+# استيراد آمن ومحصن لنموذج القاعدة بجميع الطرق الممكنة لضمان عدم فشل مسارات الفحص
+try:
+    from database.models import Base
+except ImportError:
+    try:
+        from .models import Base
+    except ImportError:
+        from models import Base
 
 # إعداد السجلات المؤسسية
 logger = logging.getLogger("AymnGuard.DatabaseEngine")
@@ -57,7 +65,6 @@ async def init_db() -> None:
     """
     try:
         async with async_engine.begin() as conn:
-            # إنشاء الجداول المعرفة في Base.metadata تدريجياً وبأمان تام
             await conn.run_sync(Base.metadata.create_all)
         logger.info("🗄️ [Database Engine]: تم إنشاء وتجهيز كافة جداول قاعدة البيانات السيادية بنجاح مطلق.")
     except Exception as e:
@@ -80,7 +87,6 @@ async def check_database_health() -> bool:
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """
     مولد جلسات قاعدة البيانات المؤسسي (Dependency Injection) للاستخدام الآمن داخل مسارات FastAPI وخلفيات العمل.
-    يضمن الالتزام التام بإدارة المعاملات (Commit/Rollback/Close) بدقة ميكروسكوبية لضمان عدم تسريب الجلسات.
     """
     async with SessionLocal() as session:
         try:
