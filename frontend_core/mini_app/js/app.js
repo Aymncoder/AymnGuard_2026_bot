@@ -1,7 +1,7 @@
 /**
  * ==============================================================================
- * AymnGuard Enterprise - Main Mini App Controller
- * المنسق الرئيسي لدورة الحياة، التفاعل الحسي، واستجابة الواجهة الفورية
+ * AymnGuard Enterprise - Main Mini App Controller (v5.0 Sovereign Enhanced)
+ * المنسق الرئيسي لدورة الحياة، التفاعل الحسي، ومزامنة الثيمات التلقائية
  * ==============================================================================
  */
 
@@ -12,10 +12,20 @@ const tg = window.Telegram.WebApp;
 try {
     tg.expand();
     tg.ready();
-    tg.setHeaderColor('#0f172a');
-    tg.setBackgroundColor('#0f172a');
+    
+    // ⚡ [التكيف التلقائي للثيمات]: مزامنة ألوان الواجهة مع وضع (Dark/Light Mode) الخاص بتليجرام
+    const isDarkTheme = tg.colorScheme === 'dark';
+    if (isDarkTheme) {
+        document.documentElement.classList.add('dark');
+        tg.setHeaderColor('#0f172a');
+        tg.setBackgroundColor('#0f172a');
+    } else {
+        document.documentElement.classList.remove('dark');
+        tg.setHeaderColor('#f8fafc');
+        tg.setBackgroundColor('#f8fafc');
+    }
 } catch (e) {
-    console.warn("بيئة التشغيل ليست داخل تطبيق تيليجرام الرسمي.");
+    console.warn("بيئة التشغيل خارج تطبيق تيليجرام الرسمي، تم استخدام الثيم الافتراضي الداكن.");
 }
 
 const UI = {
