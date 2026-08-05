@@ -17,5 +17,6 @@ python-jose[cryptography]
 aiohttp
 aiosqlite
 httpx
+pytest
 pytest-asyncio
-​pytest
+​
