@@ -55,8 +55,8 @@ class AutonomousUserAssistant:
                 "3. سيتم تفعيل رصيدك وتحديثه آلياً فور تأكيد المعاملة من شبكة البلوكشين."
             )
             action_type = "payment_guidance"
-            
-        elif "نقل" in query_lower or "أعضاء" in query_lower or "لوجستيات" in query_lower:
+          
+  elif "نقل" in query_lower or "أعضاء" in query_lower or "لوجستيات" in query_lower:
             response_text = (
                 "⚙️ **دليل العمليات اللوجستية ونقل الأعضاء:**\n"
                 "• يتم تنفيذ العمليات عبر العُقد الآمنة الموزعة.\n"
@@ -65,14 +65,14 @@ class AutonomousUserAssistant:
             )
             action_type = "logistics_guidance"
             
-       elif "مشكلة" in query_lower or "خطأ" in query_lower or "لا يعمل" in query_lower:
+elif "مشكلة" in query_lower or "خطأ" in query_lower or "لا يعمل" in query_lower:
  
             response_text = (
                 "🛠️ **الدعم الفني الذاتي:**\n"
                 "النظام يفحص حالتك الآن. إذا واجهتك مشكلة في الاستجابة، جرب إعادة إرسال الأمر `/start` أو تأكد من اتصال الشبكة. تم تسجيل التنبيه لفريق الصيانة الذاتي."
             )
             action_type = "troubleshooting"
-        else:
+      else:
             response_text = (
                 "✨ **أهلاً بك في منصة Aegis السيادية!**\n"
                 "أنا مساعدك الذكي الآلي. يمكنني مساعدتك في:\n"
@@ -82,7 +82,7 @@ class AutonomousUserAssistant:
             )
             action_type = "general_welcome"
 
-        return {
+       return {
             "status": "success",
             "user_id": payload.user_id,
             "guidance_response": response_text,
