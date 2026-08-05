@@ -7,6 +7,7 @@ AymnGuard Enterprise v5.0 : Master Sovereign Orchestrator (AGI Core Nexus)
 
 import logging
 from typing import Dict, Any, Optional
+from core.market_engine import SovereignMarketEngine
 
 from core.agents.security_agent import CommunitySecurityAgent
 from services.market_intelligence import MarketIntelligenceEngine
