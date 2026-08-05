@@ -15,8 +15,11 @@ import asyncio
 from datetime import datetime
 from contextlib import asynccontextmanager
 from typing import Any, Dict, Optional, List
-from app.enterprise_gateway import router as enterprise_router
-# ربط الراوتر المؤسسي بسيرفر FastAPI الرئيسي
+
+# 1. يتم إنشاء كائن التطبيق أولاً
+app = FastAPI(title="AymnGuard Enterprise Core", version="5.0.0")
+
+# 2. يتم ربط الراوتر المؤسسي بعده مباشرة
 app.include_router(enterprise_router)
 
 # ==============================================================================
