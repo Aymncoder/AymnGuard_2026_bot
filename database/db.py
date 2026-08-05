@@ -1,132 +1,94 @@
 # -*- coding: utf-8 -*-
 """
-==============================================================================
-AymnCoder Plus : Aegis AI Core - Enterprise Database & Cache Engine (Async)
-==============================================================================
-النظام المؤسسي المتكامل لإدارة اتصالات قاعدة البيانات (PostgreSQL Async) 
-وذاكرة التخزين المؤقت الموزعة (Redis Async) بأعلى أداء واستقرار لاستيعاب الآلاف.
+AymnGuard Enterprise v5.0 : Ultimate Sovereign Database Engine & Connection Manager
+محرك قاعدة البيانات المؤسسي الفائق (النسخة المدمجة والمطورة عالمياً):
+إدارة الاتصالات غير المتزامنة العالية الأداء (AsyncIO SQLAlchemy) مع دعم ميزات الفحص الحي (Health Check)،
+إدارة السيولات المجمعّة (Connection Pooling)، وضمان موثوقية حفظ البيانات وسجلات الأمان دون فقدان أي ذرة بيانات.
 """
 
 import os
 import logging
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.orm import declarative_base
 from sqlalchemy.sql import text
-import redis.asyncio as redis
+from database.models import Base
 
-logger = logging.getLogger("AegisAICore.EnterpriseDatabase")
+# إعداد السجلات المؤسسية
+logger = logging.getLogger("AymnGuard.DatabaseEngine")
+logger.setLevel(logging.INFO)
 
-# جلب إعدادات البيئة مع قيم افتراضية مرنة
-DATABASE_URL = os.getenv(
-    "DATABASE_URL", 
-    "postgresql+asyncpg://postgres:password@localhost:5432/aymnguard_enterprise"
-)
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+# قراءة رابط قاعدة البيانات من المتغيرات البيئية مع دعم SQLite و PostgreSQL/MySQL افتراضياً
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///aymnguard_enterprise.db")
 
-# ==============================================================================
-# 1. إعداد محرك PostgreSQL غير المتزامن (Connection Pooling محسن للذكاء السيادي)
-# ==============================================================================
-engine = create_async_engine(
-    DATABASE_URL,
-    echo=False,
-    future=True,
-    pool_size=40,          # عدد الاتصالات النشطة الافتراضية في الخلفية
-    max_overflow=60,       # الاتصالات الإضافية المسموح بها أوقات الذروة الكبرى
-    pool_timeout=30,       # مهلة الانتظار للاتصال المتاح (بالثواني)
-    pool_recycle=1800,     # إعادة تدوير الاتصالات كل 30 دقيقة لمنع انقطاعها
-    pool_pre_ping=True     # فحص صحة الاتصال تلقائياً قبل الاستخدام لمنع الأخطاء الميتة
-)
+# تحديد إعدادات التجمع بناءً على نوع قاعدة البيانات لتجنب تعارضات SQLite ورفع الكفاءة لبيئات الإنتاج
+is_sqlite = "sqlite" in DATABASE_URL
 
-# مصنع الجلسات غير المتزامنة (Async Session Maker)
-async_session = async_sessionmaker(
-    engine, 
-    class_=AsyncSession, 
+engine_kwargs = {
+    "echo": False,
+    "future": True,
+}
+
+if not is_sqlite:
+    engine_kwargs.update({
+        "pool_size": 20,
+        "max_overflow": 10,
+        "pool_pre_ping": True,
+        "pool_recycle": 3600
+    })
+else:
+    engine_kwargs.update({
+        "connect_args": {"check_same_thread": False}
+    })
+
+# إنشاء محرك الاتصال غير المتزامن المتقدم (Advanced Async Engine)
+async_engine = create_async_engine(DATABASE_URL, **engine_kwargs)
+
+# مصنع الجلسات غير المتزامنة المؤسسي (Enterprise Async Session Maker)
+SessionLocal = async_sessionmaker(
+    bind=async_engine,
+    class_=AsyncSession,
     expire_on_commit=False,
-    autocommit=False,
     autoflush=False
 )
 
-# القاعدة الأساسية لجميع نماذج الجداول (ORM Models Base)
-Base = declarative_base()
-
-
-# ==============================================================================
-# 2. مدير ذاكرة التخزين المؤقت الموزعة (Redis Async Manager)
-# ==============================================================================
-class EnterpriseRedisManager:
-    def __init__(self):
-        self.client: redis.Redis | None = None
-
-    async def connect(self):
-        """الاتصال بذاكرة Redis بشكل غير متزامن وآمن."""
-        try:
-            self.client = redis.from_url(
-                REDIS_URL, 
-                encoding="utf-8", 
-                decode_responses=True,
-                socket_timeout=5.0,
-                retry_on_timeout=True
-            )
-            await self.client.ping()
-            logger.info("✅ [Redis Async Engine]: تم الاتصال بذاكرة التخزين المؤقت بنجاح وبكفاءة عالية.")
-        except Exception as e:
-            logger.warning(f"⚠️ [Redis Warning]: تعذر الاتصال بـ Redis (النظام يعمل بوضع الاحتياط): {str(e)}")
-            self.client = None
-
-    async def disconnect(self):
-        """إغلاق اتصال Redis بأمان عند إيقاف النظام."""
-        if self.client:
-            await self.client.close()
-            logger.info("🛑 [Redis Async Engine]: تم إغلاق اتصال Redis بأمان وتفريغ الذاكرة.")
-
-redis_manager = EnterpriseRedisManager()
-
-
-# ==============================================================================
-# 3. إدارة دورة حياة قواعد البيانات والاتصالات (Lifespan Handlers)
-# ==============================================================================
-async def init_databases() -> None:
-    """فحص واختبار صحة الاتصال بقاعدة البيانات و Redis عند إقلاع النواة."""
-    # فحص اتصال PostgreSQL
+async def init_db() -> None:
+    """
+    إنشاء كافة الجداول والنماذج في قاعدة البيانات آلياً عند إقلاع النظام مع معالجة استباقية للأخطاء.
+    """
     try:
-        async with engine.begin() as conn:
-            await conn.execute(text("SELECT 1"))
-        logger.info("🗄️ [PostgreSQL Async]: تم التحقق من سلامة الاتصال بقاعدة البيانات بنجاح.")
+        async with async_engine.begin() as conn:
+            # إنشاء الجداول المعرفة في Base.metadata تدريجياً وبأمان تام
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("🗄️ [Database Engine]: تم إنشاء وتجهيز كافة جداول قاعدة البيانات السيادية بنجاح مطلق.")
     except Exception as e:
-        logger.critical(f"❌ [PostgreSQL Critical]: فشل الاتصال بقاعدة البيانات: {str(e)}")
-        raise e
-    
-    # تفعيل اتصال Redis
-    await redis_manager.connect()
+        logger.error(f"❌ [Database Error]: فشل حرج في تهيئة قاعدة البيانات: {e}", exc_info=True)
+        raise
 
-async def close_databases() -> None:
-    """إغلاق محركات الاتصال وتفريغ الموارد بأمان تام عند إيقاف الخادم."""
+async def check_database_health() -> bool:
+    """
+    ميزة مؤسسية متقدمة: فحص نبض وسلامة الاتصال بقاعدة البيانات لحظياً (Health Check Probe).
+    """
     try:
-        await engine.dispose()
-        logger.info("🛑 [PostgreSQL Async]: تم إغلاق محرك الاتصال بقاعدة البيانات بأمان.")
+        async with SessionLocal() as session:
+            await session.execute(text("SELECT 1"))
+        logger.info("🟢 [Database Health]: اتصال قاعدة البيانات مستقر ويعمل بكفاءة Zero-Lag.")
+        return True
     except Exception as e:
-        logger.error(f"⚠️ [PostgreSQL Error]: خطأ أثناء إغلاق المحرك: {str(e)}")
-    
-    await redis_manager.disconnect()
+        logger.error(f"🔴 [Database Health Alert]: فشل فحص سلامة قاعدة البيانات: {e}")
+        return False
 
-
-# ==============================================================================
-# 4. مزوّد الجلسات الآمن لكل طلب (Async Session Dependency)
-# ==============================================================================
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """
-    مزوّد جلسات قاعدة البيانات غير المتزامنة لكل طلب API
-    مع ضمان الحفظ التلقائي (Commit) أو التراجع الآمن (Rollback) عند حدوث أي خطأ،
-    وإغلاق الجلسة نهائياً لمنع تسريب الذاكرة (Memory Leaks).
+    مولد جلسات قاعدة البيانات المؤسسي (Dependency Injection) للاستخدام الآمن داخل مسارات FastAPI وخلفيات العمل.
+    يضمن الالتزام التام بإدارة المعاملات (Commit/Rollback/Close) بدقة ميكروسكوبية لضمان عدم تسريب الجلسات.
     """
-    async with async_session() as session:
+    async with SessionLocal() as session:
         try:
             yield session
             await session.commit()
         except Exception as e:
             await session.rollback()
-            logger.error(f"⚠️ [Database Session Error]: تم التراجع عن المعاملة بسبب خطأ: {str(e)}")
-            raise e
+            logger.error(f"❌ [Session Transaction Error]: حدث استثناء أثناء إدارة المعاملة، تم التراجع (Rollback) بنجاح: {e}")
+            raise
         finally:
             await session.close()
