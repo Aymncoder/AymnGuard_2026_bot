@@ -1,52 +1,67 @@
+# -*- coding: utf-8 -*-
+"""
+=============================================================================
+AymnGuard Enterprise - Sovereign Telemetry & Logging System
+نظام الاستشعار المركزي - تسجيل الأحداث المؤسسية مع دعم التتبع العميق للعمليات
+=============================================================================
+"""
+
 import logging
 from logging.handlers import RotatingFileHandler
 import sys
 import os
 
-def setup_logger(name: str = "AymnGuard") -> logging.Logger:
+class SovereignFormatter(logging.Formatter):
     """
-    إعداد نظام تسجيل مركزي (Enterprise Logger).
-    يدعم الطباعة المباشرة لـ Docker، وتدوير الملفات التلقائي لحماية سعة التخزين.
+    منسق متقدم يعالج السجلات. 
+    يضمن وجود بصمة التتبع (request_id) لكل عملية، مما يمنع تداخل المسارات.
     """
+    def format(self, record: logging.LogRecord) -> str:
+        if not hasattr(record, 'request_id'):
+            # إذا كان الحدث داخلياً (من النظام نفسه وليس من مستخدم)، نوسمه بـ SYSTEM
+            record.request_id = 'SYSTEM-CORE'
+        return super().format(record)
+
+def setup_logger(name: str = "AymnGuard", default_level: int = logging.INFO) -> logging.Logger:
+    """إعداد نظام التسجيل المؤسسي مع حماية من تكرار التهيئة"""
+    
     logger = logging.getLogger(name)
     
-    # منع تكرار إنشاء الـ Handlers إذا تم استيراد الملف في أكثر من مكان
+    # منع التكرار القاتل للمسارات في حال استدعاء الملف أكثر من مرة
     if getattr(logger, '_init_done', False):
         return logger
 
-    # تحديد المستوى الأساسي (يمكن جعله يتغير بناءً على ملف .env مستقبلاً)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(default_level)
+    
+    # 🔍 التنسيق المؤسسي: الوقت | المستوى | [بصمة العملية] | الملف:السطر | الرسالة
+    log_format = "%(asctime)s | %(levelname)-8s | [%(request_id)s] | %(module)s:%(lineno)d | %(message)s"
+    formatter = SovereignFormatter(log_format, datefmt="%Y-%m-%d %H:%M:%S")
 
-    # تنسيق احترافي يوضح: الوقت | مستوى الخطأ | اسم الملف ورقم السطر | الرسالة
-    formatter = logging.Formatter(
-        fmt="%(asctime)s | %(levelname)-8s | %(module)s:%(lineno)d | %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
-    )
-
-    # 1. معالج الشاشة (Console Handler) - ضروري لتتبع السجلات عبر أمر docker logs
+    # 1. معالج النافذة (Console - stdout) لبيئات Docker و AI Monitoring
     console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
 
-    # 2. معالج الملفات (File Handler) - مع نظام التدوير
-    # ينشئ مجلد logs إذا لم يكن موجوداً
+    # 2. معالج الملفات (File Handler) مع التدوير الذاتي (Self-Healing Storage)
     os.makedirs("logs", exist_ok=True)
-    
-    # يحتفظ بملفات حجمها 5MB كحد أقصى، ويحتفظ بـ 3 نسخ احتياطية فقط
     file_handler = RotatingFileHandler(
         filename="logs/aymnguard_sys.log",
-        maxBytes=5 * 1024 * 1024,  # 5 MB
-        backupCount=3,
+        maxBytes=10 * 1024 * 1024,  # رفعنا السعة إلى 10 ميجابايت للنسخة
+        backupCount=5,              # الاحتفاظ بـ 5 نسخ تاريخية
         encoding="utf-8"
     )
-    file_handler.setLevel(logging.WARNING) # نسجل في الملفات الأخطاء والتحذيرات فقط لتقليل الحجم
+    
+    # سنجعل الملف يلتقط تحذيرات النظام والأخطاء بشكل افتراضي
+    file_handler.setLevel(logging.WARNING)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 
     logger._init_done = True
+    
+    # تسجيل لحظة الاستيقاظ
+    logger.info("📡 [Telemetry Engine]: تم تشغيل نظام الاستشعار المركزي بنجاح.")
+    
     return logger
 
-# كائن جاهز للاستيراد المباشر: from core.logger import logger
+# كائن جاهز للاستيراد المباشر في كافة أنحاء المنصة
 logger = setup_logger()
-
