@@ -19,14 +19,14 @@ from fastapi import FastAPI
 from app.enterprise_gateway import router as enterprise_router
 from services.telegram_bridge import router as telegram_bridge_router
 
-# ربط جسر تيليجرام بالسيرفر الرئيسي
-app.include_router(telegram_bridge_router)
-
 # 1. يتم إنشاء كائن التطبيق أولاً
 app = FastAPI(title="AymnGuard Enterprise Core", version="5.0.0")
 
 # 2. يتم ربط الراوتر المؤسسي بعده مباشرة
 app.include_router(enterprise_router)
+
+# ربط جسر تيليجرام بالسيرفر الرئيسي
+app.include_router(telegram_bridge_router)
 
 # ==============================================================================
 # 1. نظام التثبيت والتهيئة الذكي (Smart Auto-Installer Engine)
