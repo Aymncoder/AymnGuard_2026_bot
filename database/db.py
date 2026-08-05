@@ -6,20 +6,25 @@ AymnGuard Enterprise v5.0 : Ultimate Sovereign Database Engine & Connection Mana
 إدارة السيولات المجمعّة (Connection Pooling)، وضمان موثوقية حفظ البيانات وسجلات الأمان دون فقدان أي ذرة بيانات.
 """
 
+# -*- coding: utf-8 -*-
+"""
+AymnGuard Enterprise v5.0 : Ultimate Sovereign Database Engine & Connection Manager
+"""
+
 import os
+import sys
 import logging
+
+# حقن مجلد الجذر في مسارات بايثون لضمان نجاح الاستيرادات مهما كانت طريقة التشغيل
+current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(current_dir)
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.sql import text
-
-# استيراد آمن ومحصن لنموذج القاعدة بجميع الطرق الممكنة لضمان عدم فشل مسارات الفحص
-try:
-    from database.models import Base
-except ImportError:
-    try:
-        from .models import Base
-    except ImportError:
-        from models import Base
+from database.models import Base
 
 # إعداد السجلات المؤسسية
 logger = logging.getLogger("AymnGuard.DatabaseEngine")
