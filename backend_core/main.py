@@ -15,6 +15,8 @@ import asyncio
 from datetime import datetime
 from contextlib import asynccontextmanager
 from typing import Any, Dict, Optional, List
+from fastapi import FastAPI
+from app.enterprise_gateway import router as enterprise_router
 
 # 1. يتم إنشاء كائن التطبيق أولاً
 app = FastAPI(title="AymnGuard Enterprise Core", version="5.0.0")
