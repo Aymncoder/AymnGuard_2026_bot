@@ -1,26 +1,26 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================================
-AymnGuard Enterprise Logistics Platform - Authentication & User Management API
-محرك المصادقة والتحكم بالمستخدمين - أمان سيادي، تشفير متقدم، واستجابة فورية.
+AymnGuard Enterprise - Sovereign Authentication & User Management Hub
+محرك المصادقة، التسجيل، وإصدار التصاريح الأمنية (JWT & Users Core)
 =============================================================================
 """
 
 import logging
-from datetime import datetime
+from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import func # تم الإضافة لحساب العدد بكفاءة عالية
+from sqlalchemy import func
 
-# 🛡️ تصحيح التداخل: استخدام صمام الأمان المعزول الذي قمنا ببنائه مسبقاً
-from app.api.dependencies.db_deps import get_db_session
-from app.models.user import User
-from app.schemas.user_schema import UserCreateSchema, UserResponseSchema, UserListResponseSchema
-
-# استيراد أدوات التشفير السيادي (يجب التأكد من وجود get_password_hash)
-from app.core.security import verify_sovereign_key, get_password_hash 
-from app.core.exceptions import SovereignAuthenticationError
+# 🛡️ تصحيح المسارات المعمارية لتوحيد الجذور داخل backend_core
+from backend_core.db.session import get_db_session
+from backend_core.models.user import User
+from backend_core.schemas.user_schema import UserCreateSchema, UserResponseSchema, UserListResponseSchema
+from backend_core.core.security import verify_password, get_password_hash, create_access_token
+from backend_core.core.config import settings
+from backend_core.crud.user import user_crud
 
 router = APIRouter(prefix="/auth", tags=["Sovereign Authentication & Users"])
 logger = logging.getLogger("AymnGuardAuthEngine")
@@ -28,19 +28,17 @@ logger = logging.getLogger("AymnGuardAuthEngine")
 @router.post(
     "/register", 
     response_model=UserResponseSchema, 
-    status_code=status.HTTP_201_CREATED, # تعديل مؤسسي: الاستجابة الدقيقة للإنشاء
+    status_code=status.HTTP_201_CREATED,
     summary="تسجيل مستخدم سيادي جديد في المنصة"
 )
 async def register_user(
     user_data: UserCreateSchema,
-    db: AsyncSession = Depends(get_db_session) # تم ربط الاعتمادية المعزولة
+    db: AsyncSession = Depends(get_db_session)
 ):
     """
-    تسجيل مستخدم جديد مع التحقق الاستباقي من تفرد البريد واسم المستخدم،
-    وتشفير بيانات الاعتماد بمعايير الأمان المؤسسي الصارمة.
+    تسجيل مستخدم جديد مع التحقق الاستباقي وتشفير بيانات الاعتماد بمعايير الأمان المؤسسي.
     """
     try:
-        # التحقق الاستباقي (يمكن نقله لاحقاً إلى crud/user.py لضمان نظافة المعمارية)
         query = select(User).where(
             (User.email == user_data.email) | (User.username == user_data.username)
         )
@@ -49,14 +47,13 @@ async def register_user(
         
         if existing_user:
             raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT, # تعديل مؤسسي: 409 أفضل من 400 للتضارب
+                status_code=status.HTTP_409_CONFLICT,
                 detail="تحذير أمني: اسم المستخدم أو البريد الإلكتروني مسجل مسبقاً في النظام."
             )
 
-        # 🔒 تطبيق التشفير السيادي الحقيقي قبل الحفظ
+        # تطبيق التشفير السيادي الآمن
         secured_password = get_password_hash(user_data.password)
 
-        # إنشاء كائن المستخدم الجديد
         new_user = User(
             username=user_data.username,
             email=user_data.email,
@@ -65,7 +62,7 @@ async def register_user(
             role=user_data.role,
             is_active=user_data.is_active,
             is_verified=user_data.is_verified,
-            hashed_password=secured_password # تم ربط التشفير بنجاح
+            hashed_password=secured_password
         )
         
         db.add(new_user)
@@ -76,15 +73,52 @@ async def register_user(
         return new_user
 
     except HTTPException:
-        # إعادة رفع استثناءات HTTP المبرمجة مسبقاً دون تغيير
         raise
     except Exception as e:
-        await db.rollback() # تراجع فوري عن أي تلوث في البيانات
+        await db.rollback()
         logger.critical(f"❌ [Auth Engine Error]: فشل تسجيل المستخدم - التفاصيل: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="خطأ داخلي حرج أثناء معالجة التسجيل السيادي. تم التراجع عن العملية لتأمين النظام."
+            detail="خطأ داخلي حرج أثناء معالجة التسجيل السيادي. تم التراجع عن العملية."
         )
+
+
+@router.post("/login", summary="إصدار التوكن السيادي (تسجيل الدخول)")
+async def login_access_token(
+    db: AsyncSession = Depends(get_db_session),
+    form_data: OAuth2PasswordRequestForm = Depends()
+) -> dict:
+    """
+    التحقق من بيانات الاعتماد وإصدار مفتاح وصول مؤقت (JWT Access Token).
+    """
+    user = await user_crud.get_by_username(db, username=form_data.username)
+    if not user:
+        user = await user_crud.get_by_email(db, email=form_data.username)
+        
+    if not user or not verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="اسم المستخدم أو كلمة المرور غير صحيحة."
+        )
+        
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="هذا الكيان السيادي معطل ولا يملك صلاحية الوصول."
+        )
+        
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    token = create_access_token(
+        subject=user.id, expires_delta=access_token_expires
+    )
+    
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "status": "Authorized",
+        "sovereign_node": settings.PROJECT_NAME
+    }
+
 
 @router.get(
     "/users", 
@@ -97,19 +131,14 @@ async def list_users(
     db: AsyncSession = Depends(get_db_session)
 ):
     """
-    استرجاع قائمة المستخدمين مع تقسيم الصفحات (Pagination).
-    تمت هندسة هذا المسار لتجنب استنزاف الذاكرة (Memory Leaks) في قواعد البيانات الضخمة.
+    استرجاع قائمة المستخدمين مع تقسيم الصفحات (Pagination) وحماية الذاكرة.
     """
     try:
-        # حساب إزاحة البيانات
         offset = (page - 1) * page_size
-        
-        # 1. جلب البيانات المطلوبة فقط (Zero-Waste Query)
         query = select(User).offset(offset).limit(page_size)
         result = await db.execute(query)
         users = result.scalars().all()
         
-        # 2. ⚡ التعديل الجوهري: حساب العدد الإجمالي عبر قاعدة البيانات مباشرة وليس الذاكرة
         count_query = select(func.count()).select_from(User)
         total_count = await db.scalar(count_query)
 
@@ -124,5 +153,5 @@ async def list_users(
         logger.error(f"❌ [Database Read Error]: خطأ في جلب قائمة الكيانات - التفاصيل: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="فشل استرداد البيانات من النواة المركزية. جارٍ التدقيق."
+            detail="فشل استرداد البيانات من النواة المركزية."
         )
