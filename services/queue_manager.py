@@ -1,28 +1,51 @@
-import redis
+# -*- coding: utf-8 -*-
+"""
+=============================================================================
+AymnGuard Enterprise - Sovereign Asynchronous Message Queue Manager
+محرك طوابير الرسائل غير المتزامن لإدارة الأحداث والمهام عبر Redis
+=============================================================================
+"""
+
 import json
 import os
+import logging
 from dotenv import load_dotenv
+import redis.asyncio as aioredis  # ⚡ [ترقية معمارية]: استخدام العميل غير المتزامن لمنع حظر خيط التنفيذ
 
 load_dotenv()
 
-REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
-redis_client = redis.Redis.from_url(REDIS_URL, decode_responses=True)
+logger = logging.getLogger("AymnGuardQueueEngine")
+
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+
+# تهيئة عميل Redis غير المتزامن (Async Redis Client)
+redis_client = aioredis.from_url(REDIS_URL, decode_responses=True)
 
 class MessageQueueManager:
+    """
+    مدير طوابير الرسائل غير المتزامن لتحقيق أعلى أداء ومعالجة فورية للبيانات.
+    """
+
     @staticmethod
-    def push_to_queue(queue_name: str, data: dict) -> bool:
+    async def push_to_queue(queue_name: str, data: dict) -> bool:
+        """
+        إدراج بيانات جديدة في الطوابير بصيغة غير متزامنة (Non-blocking).
+        """
         try:
-            redis_client.rpush(queue_name, json.dumps(data))
+            await redis_client.rpush(queue_name, json.dumps(data))
             return True
         except Exception as e:
-            print(f"[CRITICAL] Redis Queue Push Error -> {e}")
+            logger.critical(f"❌ [Queue Push Error]: فشل دفع البيانات للطابور {queue_name} - التفاصيل: {str(e)}")
             return False
 
     @staticmethod
-    def pop_from_queue(queue_name: str) -> dict | None:
+    async def pop_from_queue(queue_name: str) -> dict | None:
+        """
+        سحب ومعالجة العنصر التالي من الطوابير بكفاءة عالية وبشكل غير متزامن.
+        """
         try:
-            item = redis_client.lpop(queue_name)
+            item = await redis_client.lpop(queue_name)
             return json.loads(item) if item else None
         except Exception as e:
-            print(f"[CRITICAL] Redis Queue Pop Error -> {e}")
+            logger.critical(f"❌ [Queue Pop Error]: فشل سحب البيانات من الطابور {queue_name} - التفاصيل: {str(e)}")
             return None
