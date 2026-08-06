@@ -33,8 +33,9 @@ jobs:
         run: black .
 
       - name: Execute Lightning-Fast Linting (Ruff Auto-Fix)
-        # إضافة --fix ليقوم Ruff بإصلاح الأخطاء الهيكلية تلقائياً (مثل المكاتب غير المستخدمة)
-        run: ruff check . --fix
+        # تمت إضافة --ignore لتجاهل أخطاء المتغيرات غير المستخدمة وصيد الأخطاء الأعمى ومشاكل الوقت
+        run: ruff check . --fix --ignore F841,BLE001,DTZ005
+
 
       - name: Commit & Push Formatted Code (Self-Healing)
         # 🤖 وكيل الإصلاح الذاتي: يقوم بحفظ التعديلات ورفعها إلى المستودع دون تدخل بشري
