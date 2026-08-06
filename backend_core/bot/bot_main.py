@@ -33,13 +33,13 @@ except ImportError:
         from database import AsyncSessionLocal
         from services.subscription_service import SubscriptionService
     except ImportError:
-        from ..services.queue_manager import MessageQueueManager
-        from ..services.telegram_business import TelegramBusinessManager
-        from ..services.group_protection_engine import GroupProtectionEngine
+        from services.queue_manager import MessageQueueManager
+        from services.telegram_business import TelegramBusinessManager
+        from services.group_protection_engine import GroupProtectionEngine
         from .owner_panel import get_owner_main_keyboard, OWNER_ID
         from .subscriber_panel import get_subscriber_main_keyboard
-        from ..database import AsyncSessionLocal
-        from ..services.subscription_service import SubscriptionService
+        from database import AsyncSessionLocal
+        from services.subscription_service import SubscriptionService
 
 load_dotenv()
 
