@@ -1,14 +1,14 @@
 name: 👑 Sovereign Master Engine Trigger
 
 on:
-  workflow_dispatch: # هذا هو الكود السحري الذي يصنع "الزر اليدوي" في GitHub
+  workflow_dispatch:
 
 jobs:
   run_master_engine:
     name: 🚀 تشغيل المحرك السيادي الشامل وإصلاح الأخطاء
     runs-on: ubuntu-latest
     permissions:
-      contents: write # للسماح للزر بحفظ التعديلات آلياً في المشروع
+      contents: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -24,7 +24,8 @@ jobs:
         run: pip install fastapi pydantic uvicorn httpx ccxt sqlalchemy
 
       - name: Execute Sovereign Master Engine
-        run: python scripts/sovereign_master_engine.py
+        run: |
+          python ./scripts/sovereign_master_engine.py
 
       - name: Commit & Push Fixed Files
         uses: stefanzweifel/git-auto-commit-action@v5
