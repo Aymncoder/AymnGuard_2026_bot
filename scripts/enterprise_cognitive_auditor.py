@@ -153,6 +153,7 @@ class UltimateSovereignOrchestrator:
         reports_text = "\n\n".join([f"### تقرير {r['name']}:\n{r['report']}" for r in agent_reports])
         
         judge_prompt = """
+
         أنت "القاضي السيادي (The Supreme Architect)" لنظام AymnGuard.
         مهمتك مراجعة تقارير السرب المرفقة واتخاذ قرار تنفيذي قطعي لا يقبل المساومة.
         
