@@ -23,11 +23,10 @@ jobs:
       - name: Install Core Dependencies
         run: pip install fastapi pydantic uvicorn httpx ccxt sqlalchemy
 
-      - name: Execute Sovereign Master Engine
+        - name: Execute Sovereign Master Engine
         run: |
-          python "$GITHUB_WORKSPACE/scripts/sovereign_master_engine.py"
-  
-          python ./scripts/sovereign_master_engine.py
+          python "python scripts/sovereign_master_engine.py"
+
 
       - name: Commit & Push Fixed Files
         uses: stefanzweifel/git-auto-commit-action@v5
