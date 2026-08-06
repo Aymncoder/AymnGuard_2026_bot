@@ -16,14 +16,9 @@ jobs:
         with:
           fetch-depth: 0 # استدعاء كامل التاريخ البرمجي لضمان دقة تحليل المسارات
 
-      - name: 🐍 Set up Sovereign Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-          cache: 'pip' # تفعيل الكاش المتقدم لتسريع البناء اللوجستي
-
       - name: 📦 Install Enterprise Dependencies & AI Scanners
-        run: |
+        run: 
+        
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           # تثبيت أدوات الفحص المؤسسي للذكاء الاصطناعي وأمن النواة
