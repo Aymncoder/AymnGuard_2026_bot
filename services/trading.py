@@ -15,10 +15,12 @@ import json
 import httpx
 import logging
 import asyncio
+import random  # <--- قمنا بإضافة هذا السطر هنا
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+
 
 # 1. استيراد طبقة النواة (العضلات) - معزولة تماماً
 try:
