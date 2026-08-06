@@ -34,8 +34,7 @@ jobs:
 
       - name: 📦 Install Enterprise Core Dependencies & Libraries
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install fastapi pydantic uvicorn httpx ccxt sqlalchemy ruff
+          python3 -m pip install fastapi pydantic uvicorn httpx ccxt sqlalchemy ruff --break-system-packages
 
       - name: 🧭 Pre-Flight Workspace Diagnostic & Path Resolution
         run: |
