@@ -25,6 +25,8 @@ jobs:
 
       - name: Execute Sovereign Master Engine
         run: |
+          python "$GITHUB_WORKSPACE/scripts/sovereign_master_engine.py"
+  
           python ./scripts/sovereign_master_engine.py
 
       - name: Commit & Push Fixed Files
