@@ -34,6 +34,7 @@ jobs:
 
       - name: 📦 Install Enterprise Core Dependencies & Libraries
         run: |
+          python3 -m pip install --upgrade pip --break-system-packages
           python3 -m pip install fastapi pydantic uvicorn httpx ccxt sqlalchemy ruff --break-system-packages
 
       - name: 🧭 Pre-Flight Workspace Diagnostic & Path Resolution
@@ -41,25 +42,30 @@ jobs:
           echo "=== Sovereign Workspace Diagnostics ==="
           pwd
           ls -la
-          export PYTHONPATH=$PWD
-          echo "PYTHONPATH set to $PYTHONPATH"
+          # الطريقة الصحيحة والموثوقة لتمرير المتغيرات في GitHub Actions
+          echo "PYTHONPATH=$PWD" >> $GITHUB_ENV
+          echo "PYTHONPATH set to $PWD"
 
       - name: ⚙️ Execute Sovereign Master Engine (Mega-Core v17.0)
         env:
           PYTHONPATH: ${{ github.workspace }}
         run: |
+          # تفعيل خاصية التوقف الفوري إذا فشل سكريبت البايثون لتسهيل اكتشاف الأخطاء
+          set -e
+          
           echo "👑 Starting Sovereign Master Engine Execution..."
           
           # مسح وتحديد المسار الديناميكي بمرونة فائقة لتفادي أي أخطاء مفقودة
           if [ -f "./scripts/sovereign_master_engine.py" ]; then
             echo "-> Executing from standard ./scripts/ path..."
             python3 ./scripts/sovereign_master_engine.py
-          elif [ -f "python scripts/sovereign_master_engine.py" ]; then
-            echo "-> Executing from python scripts/ path..."
-            python3 "python scripts/sovereign_master_engine.py"
+          elif [ -f "./python_scripts/sovereign_master_engine.py" ]; then
+            echo "-> Executing from ./python_scripts/ path..."
+            python3 "./python_scripts/sovereign_master_engine.py"
           else
             echo "-> Searching dynamically for Sovereign Engine..."
-            ENGINE_PATH=$(find . -name "sovereign_master_engine.py" | head -n 1)
+            # بحث ذكي يستثني المجلدات المخفية (مثل .git) لتسريع العملية
+            ENGINE_PATH=$(find . -not -path '*/\.*' -name "sovereign_master_engine.py" | head -n 1)
             if [ -n "$ENGINE_PATH" ]; then
               echo "-> Found engine at: $ENGINE_PATH"
               python3 "$ENGINE_PATH"
@@ -74,4 +80,3 @@ jobs:
         with:
           commit_message: "👑 Sovereign Master Engine: إتمام التدقيق، الإصلاح المعماري، والربط المؤسسي بنجاح تام"
           branch: main
-          push_options: '--force'
