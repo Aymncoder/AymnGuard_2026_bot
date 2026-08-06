@@ -15,14 +15,6 @@ import asyncio
 from datetime import datetime
 from contextlib import asynccontextmanager
 from typing import Any, Dict, Optional, List
-from fastapi import FastAPI
-from app.enterprise_gateway import router as enterprise_router
-from services.telegram_bridge import router as telegram_bridge_router
-
-# 1. يتم إنشاء كائن التطبيق أولاً
-app = FastAPI(title="AymnGuard Enterprise Core", version="5.0.0")
-app.include_router(enterprise_router)
-app.include_router(telegram_bridge_router)
 
 # ==============================================================================
 # 1. نظام التثبيت والتهيئة الذكي (Smart Auto-Installer Engine)
@@ -90,6 +82,17 @@ from pyrogram import Client as PyroClient, filters
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column
 from sqlalchemy import String, Integer, DateTime, Text, Float, select
+
+# استيراد المسارات المعمارية الجانبية (Enterprise & Telegram Bridges)
+try:
+    from app.enterprise_gateway import router as enterprise_router
+except ImportError:
+    enterprise_router = None
+
+try:
+    from services.telegram_bridge import router as telegram_bridge_router
+except ImportError:
+    telegram_bridge_router = None
 
 # ==============================================================================
 # 2. إعدادات التسجيل والبيئة (Logging & Config Settings)
@@ -331,6 +334,7 @@ async def lifespan(app: FastAPI):
     logger.info("🛑 [Aegis AI Core]: إيقاف العُقد وتفريغ الموارد...")
     await stop_automation_nodes()
 
+# إنشاء كائن FastAPI الموحد والإمبريالي الشامل
 app = FastAPI(
     title="AymnCoder Plus: Aegis AI Core & AymnGuard Enterprise",
     description="نظام الأمان السيادي المؤسسي مع حماية Rate Limiting وبث تنبيهات WebSockets.",
@@ -351,6 +355,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# دمج المسارات الجانبية إذا توفرت
+if enterprise_router:
+    app.include_router(enterprise_router)
+if telegram_bridge_router:
+    app.include_router(telegram_bridge_router)
 
 # ==============================================================================
 # 9. نماذج البيانات الهندسية (Pydantic v2 Models)
@@ -457,7 +467,7 @@ async def answer_callback_query(callback_query_id: str, text: str):
 # 11. مسارات الـ API التشغيلية وحماية Rate Limiting (API Endpoints)
 # ==============================================================================
 @app.post("/api/v1/telegram/webhook", tags=["Telegram Webhook"])
-@limiter.limit("20/minute") # حماية الويب هوك من الطلبات المتكررة والهجمات
+@limiter.limit("20/minute")
 async def telegram_webhook_endpoint(
     request: Request,
     background_tasks: BackgroundTasks,
@@ -481,7 +491,7 @@ async def telegram_webhook_endpoint(
         return {"status": "error", "details": str(e)}
 
 @app.post("/api/v1/auth", tags=["Authentication & VIP"])
-@limiter.limit("5/minute") # حماية نقاط المصادقة من هجمات التخمين
+@limiter.limit("5/minute")
 async def authenticate_and_activate_vip(request: Request, payload: AuthPayload, session: AsyncSession = Depends(get_db)):
     try:
         result = await session.execute(select(UserAuthModel).where(UserAuthModel.chat_id == payload.chat_id))
@@ -554,7 +564,6 @@ async def sovereign_control_center():
         except Exception as e:
             logger.error(f"⚠️ خطأ في قراءة قالب الواجهة: {str(e)}")
     
-    # قالب احتياطي طارئ في حال عدم توفر الملف محلياً مؤقتاً
     fallback_html = """
     <!DOCTYPE html>
     <html lang="ar" dir="rtl">
