@@ -9,7 +9,7 @@ on:
 jobs:
   validate-core:
     name: 🚀 Enterprise Validation & Security Core
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: 📥 Checkout Sovereign Repository
         uses: actions/checkout@v4
