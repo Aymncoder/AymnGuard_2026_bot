@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-AymnGuard Enterprise v5.0 : Ultimate Sovereign Infrastructure & Connection Core
-النسخة الماسية الفائقة والمدمجة كلياً: دمج النواة التحتية وهندسة تجمعات الاتصالات العالية الأداء 
-مع نظام إعادة المحاولة الأسّي (Exponential Backoff)، الإغلاق النظيف (Graceful Shutdown)، 
-ومسبار الفحص الحي الشامل بمعايير عمالقة التكنولوجيا العالمية.
+==============================================================================
+AymnGuard Enterprise v5.0 : Ultimate Sovereign Database & Infrastructure Core
+==============================================================================
+النسخة الماسية الهندسية الفائقة والمدمجة كلياً: إدارة تجمعات الاتصالات الذكية، 
+خوارزمية إعادة المحاولة ذات التراجع الأسّي (Exponential Backoff)، 
+الإغلاق النظيف (Graceful Shutdown)، ومسبار الفحص الحي الدقيق بمعايير عمالقة التكنولوجيا.
 """
 
 import os
@@ -11,32 +13,35 @@ import sys
 import time
 import logging
 import asyncio
-from typing import AsyncGenerator, Optional, Dict, Any
+from typing import AsyncGenerator, Dict, Any, Optional
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.sql import text
 from sqlalchemy import event
 
-# --- حقن مسارات الجذر لضمان الاستقرار المطلق في مسارات التنفيذ وتجنب أي أخطاء استيراد ---
+# --- حقن مسارات الجذر لضمان الاستقرار المطلق وتجنب أي أخطاء في مسارات الاستيراد ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(current_dir)
 if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
 
-# --- استيراد آمن ومحصن لنموذج القاعدة (Base Model) مع تغطية شاملة لجميع المسارات المحتملة ---
+# --- استيراد آمن ومحصن لنموذج القاعدة (Base Model) مع تغطية شاملة لكافة الهياكل المحتملة ---
 try:
-    from .models import Base
+    from database.models import Base
 except ImportError:
     try:
-        from database.models import Base
+        from .models import Base
     except ImportError:
-        from models import Base
+        try:
+            from models import Base
+        except ImportError:
+            raise ImportError("❌ [Sovereign DB Critical]: تعذر العثور على نموذج القاعدة (Base Model) في أي مسار محتمل.")
 
 # إعداد السجلات المؤسسية والسيادية الموحدة
 logger = logging.getLogger("AymnGuard.SovereignInfrastructureCore")
 logger.setLevel(logging.INFO)
 
-# قراءة رابط قاعدة البيانات مع توفير دعم SQLite افتراضي مدمج
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///aymnguard_enterprise.db")
+# قراءة رابط قاعدة البيانات مع دعم SQLite افتراضي مدمج عالي المرونة
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./aymnguard_enterprise.db")
 is_sqlite = "sqlite" in DATABASE_URL
 
 # إعدادات المحرك المتقدمة وعالية الأداء (Advanced Engine Parameters)
@@ -99,7 +104,7 @@ async def init_db(max_retries: int = 5, delay: float = 2.0) -> None:
             backoff_delay = delay * (2 ** (attempt - 1))
             await asyncio.sleep(backoff_delay)
 
-# محاذاة دالة التهيئة الاحتياطية لتتوافق مع المعيار المدمج
+# محاذاة دالة التهيئة الاحتياطية لتتوافق مع المعيار المدمج الشامل
 init_infrastructure = init_db
 
 async def close_db() -> None:
@@ -138,7 +143,7 @@ async def check_database_health() -> Dict[str, Any]:
             "engine": "AsyncIO SQLAlchemy Sovereign Core"
         }
 
-# محاذاة دالة فحص الصحة الاحتياطية لتتوافق مع المعيار المدمج
+# محاذاة دالة فحص الصحة الاحتياطية لتتوافق مع المعيار المدمج الشامل
 check_infrastructure_health = check_database_health
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
@@ -157,5 +162,5 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         finally:
             await session.close()
 
-# محاذاة مولد الجلسات الاحتياطي لتتوافق مع المعيار المدمج
+# محاذاة مولد الجلسات الاحتياطي لتتوافق مع المعيار المدمج الشامل
 get_db_session = get_db
