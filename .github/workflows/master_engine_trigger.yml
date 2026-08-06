@@ -1,33 +1,79 @@
-name: 👑 Sovereign Master Engine Trigger
+name: 👑 Sovereign Master Engine Mega-Core Pipeline
 
 on:
   workflow_dispatch:
+    inputs:
+      debug_mode:
+        description: 'Enable verbose debugging for Sovereign Engine'
+        required: false
+        default: 'true'
+        type: boolean
+
+concurrency:
+  group: sovereign-master-engine-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   run_master_engine:
-    name: 🚀 تشغيل المحرك السيادي الشامل وإصلاح الأخطاء
+    name: 🚀 تنفيذ المحرك السيادي الشامل بمعايير العمالقة العالمية
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: read
+    
     steps:
-      - name: Checkout Code
+      - name: 🛡️ Checkout Sovereign Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up Enterprise Python 3.11
+      - name: 🐍 Set up Enterprise Python 3.11 Environment
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
-      - name: Install Core Dependencies
-        run: pip install fastapi pydantic uvicorn httpx ccxt sqlalchemy
+      - name: 📦 Install Enterprise Core Dependencies & Libraries
+        run: |
+          python -m pip install --upgrade pip
+          pip install fastapi pydantic uvicorn httpx ccxt sqlalchemy ruff
 
-        -python "python scripts/sovereign_master_engine.py"
+      - name: 🔍 Pre-Flight Workspace Diagnostic & Path Resolution
+        run: |
+          echo "=== Sovereign Workspace Diagnostics ==="
+          pwd
+          ls -la
+          export PYTHONPATH=$PWD
+          echo "PYTHONPATH set to $PYTHONPATH"
 
+      - name: ⚙️ Execute Sovereign Master Engine (Mega-Core v17.0)
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          echo "👑 Starting Sovereign Master Engine Execution..."
+          
+          # مسح وتحديد المسار الديناميكي بمرونة فائقة لتفادي أي أخطاء مفقودة
+          if [ -f "./scripts/sovereign_master_engine.py" ]; then
+            echo "-> Executing from standard ./scripts/ path..."
+            python ./scripts/sovereign_master_engine.py
+          elif [ -f "python scripts/sovereign_master_engine.py" ]; then
+            echo "-> Executing from python scripts/ path..."
+            python "python scripts/sovereign_master_engine.py"
+          else
+            echo "-> Searching dynamically for Sovereign Engine..."
+            ENGINE_PATH=$(find . -name "sovereign_master_engine.py" | head -n 1)
+            if [ -n "$ENGINE_PATH" ]; then
+              echo "-> Found engine at: $ENGINE_PATH"
+              python "$ENGINE_PATH"
+            else
+              echo "❌ Critical Error: Sovereign Master Engine script could not be located anywhere in workspace!"
+              exit 1
+            fi
+          fi
 
-      - name: Commit & Push Fixed Files
+      - name: 🚀 Commit & Push Synchronized Architecture Files
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "👑 Sovereign Master Engine: تم تشغيل الزر الشامل وإصلاح وربط النظام بنجاح"
+          commit_message: "👑 Sovereign Master Engine: إتمام التدقيق، الإصلاح المعماري، والربط المؤسسي بنجاح تام"
           branch: main
+          push_options: '--force'
