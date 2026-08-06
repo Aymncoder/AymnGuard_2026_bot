@@ -6,32 +6,47 @@ on:
   pull_request:
     branches: [ "main" ]
 
+# 🛡️ تصريح سيادي: السماح للعمالة الرقمية بإجراء تعديلات وإصلاحات مباشرة على الكود
+permissions:
+  contents: write
+
 jobs:
-  Hyper_Static_Analysis:
-    name: 🔍 التحليل الثابت المفرط (Syntax & Complexity)
+  Hyper_Static_Analysis_And_Healing:
+    name: 🔍 التحليل والإصلاح الذاتي (Auto-Healing & Linting)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # ضروري لتمكين رفع التعديلات (Push)
 
       - name: Set up Enterprise Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Linting Workforce
+      - name: Install Auto-Healing Workforce
         run: pip install ruff black
 
-      - name: Execute Sovereign Formatting (Black)
-        run: black --check .
+      - name: Execute Sovereign Formatting (Auto-Fix)
+        # تمت إزالة --check لتقوم الأداة بإصلاح الملفات الـ 97 فعلياً
+        run: black .
 
-      - name: Execute Lightning-Fast Linting (Ruff)
-        run: ruff check .
+      - name: Execute Lightning-Fast Linting (Ruff Auto-Fix)
+        # إضافة --fix ليقوم Ruff بإصلاح الأخطاء الهيكلية تلقائياً (مثل المكاتب غير المستخدمة)
+        run: ruff check . --fix
+
+      - name: Commit & Push Formatted Code (Self-Healing)
+        # 🤖 وكيل الإصلاح الذاتي: يقوم بحفظ التعديلات ورفعها إلى المستودع دون تدخل بشري
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🤖 Auto-Healing: تم تنسيق وإصلاح الكود برمجياً (Black & Ruff)"
+          branch: ${{ github.head_ref || github.ref_name }}
 
   Security_Payload_Scan:
     name: 🛡️ الفحص الأمني الاستباقي (SAST)
     runs-on: ubuntu-latest
-    needs: Hyper_Static_Analysis
+    needs: Hyper_Static_Analysis_And_Healing
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -65,25 +80,28 @@ jobs:
           fi
 
   Cognitive_AI_Review:
-    name: 🧠 المراجعة الإدراكية عبر الذكاء الاصطناعي
+    name: 🧠 المراجعة الإدراكية للمنطق المالي (Enterprise Core)
     runs-on: ubuntu-latest
     needs: [Security_Payload_Scan, Smart_Contract_Audit]
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # جلب تاريخ التعديلات بالكامل
+          fetch-depth: 0
       
-      - name: Set up Python
+      - name: Set up Enterprise Python
         uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       
-      - name: Install AI Dependencies
-        run: pip install httpx
+      - name: Install System Dependencies
+        run: pip install httpx asyncio
 
-      - name: Run Cognitive AI Auditor
+      - name: Deploy Sovereign AI Auditor
         env:
-          AI_AGENT_API_KEY: ${{ secrets.AI_AGENT_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python scripts/ai_cognitive_reviewer.py
+          AI_AGENT_API_KEY: ${{ secrets.AI_AGENT_API_KEY }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: python scripts/enterprise_cognitive_auditor.py
 
   Dynamic_Execution_Sandboxing:
     name: ⚡ بيئة المحاكاة وفحص تدفق البيانات (Binance Spot/Futures)
