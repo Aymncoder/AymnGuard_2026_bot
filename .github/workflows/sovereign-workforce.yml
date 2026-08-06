@@ -17,7 +17,7 @@ jobs:
   # ==============================================================================
   Sovereign_Heal_And_Validate:
     name: ⚡ الشفاء الذاتي والتحليل الهيكلي (Hyper-Static Healing)
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: 🛡️ Checkout Sovereign Repository
         uses: actions/checkout@v4
@@ -63,7 +63,7 @@ jobs:
   # ==============================================================================
   Hyper_Security_And_Smart_Contracts:
     name: 🛡️ الفحص الأمني الاستباقي والعقود (Security & Crypto Audit)
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: Sovereign_Heal_And_Validate
     steps:
       - uses: actions/checkout@v4
@@ -105,7 +105,7 @@ jobs:
   # ==============================================================================
   Cognitive_AI_Review:
     name: 🧠 المراجعة الإدراكية للمنطق المالي (AI Core Reviewer)
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: Hyper_Security_And_Smart_Contracts
     if: github.event_name == 'pull_request' # يعمل الوكيل الإدراكي بشكل أساسي على طلبات السحب
     steps:
@@ -140,7 +140,7 @@ jobs:
   # ==============================================================================
   Dynamic_Execution_Sandboxing:
     name: ⚡ بيئة المحاكاة وفحص تدفق البيانات (Strict Validation)
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     # إذا كان الحدث Push سيتجاوز مراجعة الذكاء الاصطناعي وينتقل للمحاكاة مباشرة
     needs: [Hyper_Security_And_Smart_Contracts]
     steps:
