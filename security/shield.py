@@ -133,6 +133,5 @@ async def sovereign_payload_guard(request: Request) -> None:
     except HTTPException as he:
         raise he
     except Exception as e:
-        logger.error(f خطا غير متوقع في فاحص الحمولات الأمني: {e}", exc_info=True)
-        # السماح بمرور الطلبات في حال حدوث خطأ تقني داخلي غير مرتبط بالهجمات لضمان عدم تعطل الخدمات الحية
+        logger.error(f"خطأ غير متوقع في فاحص الحمولات الأمني: {e}", exc_info=True)
         pass
