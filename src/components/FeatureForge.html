@@ -1,0 +1,71 @@
+<!-- ===========================================================================
+   AymnGuard Enterprise - Sovereign Feature Forge Component
+   =========================================================================== -->
+<div class="sovereign-tactical-card" style="max-width: 700px; margin: 20px auto;">
+  <div class="card-header">
+    <span class="card-title">⚡ Sovereign AI Feature Forge</span>
+    <span class="card-status-badge">Autonomous Agent Active</span>
+  </div>
+  
+  <div class="card-body">
+    <p style="margin-bottom: 12px; color: var(--text-muted);">
+      اكتب أي ميزة برمجية، نظام معلومات، أو تحليل مؤسسي ترغب في إضافته، وسيقوم الوكيل الذكي ببنائها وهندستها وتفعيلها طياراً:
+    </p>
+    
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <input type="text" id="featurePromptInput" 
+             placeholder="مثال: إضافة نظام مراقبة ذكي لتحركات السيولة الحية..." 
+             style="flex: 1; min-width: 280px; background: var(--bg-core); border: 1px solid var(--border-active); color: var(--text-primary); padding: 12px; border-radius: var(--radius-md); font-family: var(--font-mono); outline: none;">
+             
+      <button onclick="forgeFeature()" 
+              style="background: var(--accent-tactical); color: var(--bg-core); border: none; padding: 12px 24px; font-weight: bold; border-radius: var(--radius-md); cursor: pointer; transition: var(--transition-fast); text-transform: uppercase; font-family: var(--font-mono);">
+        بناء وتطوير 🚀
+      </button>
+    </div>
+    
+    <!-- منطقة عرض تقارير البناء المباشرة -->
+    <div id="forgeResultOutput" style="margin-top: 20px; font-family: var(--font-mono); font-size: 12px; color: var(--accent-cyber); background: var(--bg-core); padding: 15px; border-radius: var(--radius-md); border: 1px dashed var(--border-subtle); display: none;">
+    </div>
+  </div>
+</div>
+
+<script>
+async function forgeFeature() {
+  const promptInput = document.getElementById('featurePromptInput');
+  const outputDiv = document.getElementById('forgeResultOutput');
+  const promptText = promptInput.value.trim();
+  
+  if (!promptText) return;
+  
+  outputDiv.style.display = 'block';
+  outputDiv.style.color = 'var(--accent-warning)';
+  outputDiv.innerText = "⏳ جاري المعالجة وتحليل الطلب وهندسة الأكواد بواسطة الوكيل الإدراكي...";
+  
+  try {
+    let response = await fetch('/api/v1/meta/forge-feature', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        feature_prompt: promptText,
+        target_module: "dynamic_addon",
+        execution_mode: "autonomous"
+      })
+    });
+    
+    let data = await response.json();
+    
+    if (response.ok) {
+      outputDiv.style.color = 'var(--accent-tactical)';
+      outputDiv.innerText = `✅ [نجاح التوليد المؤسسي]:\n- الرسالة: ${data.synthesis_report.agent_message}\n- الوحدة المستهدفة: ${data.synthesis_report.module_target}\n[تم حقن الكود وتفعيله في الذاكرة الحية بنجاح]`;
+    } else {
+      outputDiv.style.color = 'var(--accent-critical)';
+      outputDiv.innerText = `❌ خطأ في عملية البناء: ${data.detail || 'فشل الاتصال بالنواة'}`;
+    }
+  } catch (err) {
+    outputDiv.style.color = 'var(--accent-critical)';
+    outputDiv.innerText = "❌ حدث خطأ شبكي حرج أثناء الاتصال بالخادم المركزي.";
+  }
+}
+</script>
