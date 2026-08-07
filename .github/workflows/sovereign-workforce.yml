@@ -31,12 +31,10 @@ jobs:
       - name: 🤖 Install Auto-Healing Workforce & Dependencies
         run: |
           echo "📦 Installing Core Enterprise Dependencies..."
-          # تثبيت الحزم الأساسية التي تعمل بسلاسة على Termux
           python3 -m pip install --prefer-binary fastapi pydantic httpx sqlalchemy --break-system-packages
           
           echo "📦 Attempting to install Heavy Crypto Libraries (ccxt)..."
-          # عزل مكتبة ccxt وتشفيراتها لتفادي انهيار السيرفر الذاتي في حال فشل البناء المعماري (coincurve)
-          python3 -m pip install ccxt --break-system-packages || echo "⚠️ [Termux Architecture Warning]: تم تخطي تثبيت ccxt بسبب تعقيدات بناء (C-extensions) على الهاتف. هذا لن يؤثر على الفحص النحوي."
+          python3 -m pip install ccxt --break-system-packages || echo "⚠️ [Termux Architecture Warning]: تم تخطي تثبيت ccxt."
 
       - name: 🔍 Sovereign AST & Syntax Validation (الفحص النحوي المتقدم)
         run: |
@@ -63,41 +61,52 @@ jobs:
       - name: 📦 Install Security Scanners (Bandit & Semgrep)
         run: |
           echo "🛡️ تجهيز أدوات الفحص الأمني الاستباقي..."
-          # تأمين التثبيت لتجاوز أخطاء بناء الحزم الثقيلة
           python3 -m pip install bandit --break-system-packages
-          python3 -m pip install semgrep --break-system-packages || echo "⚠️ [Architecture Warning]: Semgrep قد لا يتوافق كلياً مع هواتف ARM64، سيتم الاعتماد على Bandit."
+          python3 -m pip install semgrep --break-system-packages || echo "⚠️ [Architecture Warning]: تم الاعتماد على Bandit."
 
       - name: 🔐 Scan for Hardcoded API Keys & Injections (Bandit)
         run: |
           echo "🔍 فحص مفاتيح الـ API المخفية وثغرات الحقن..."
-          python3 -m bandit -r core/ services/ database/ -lll || echo "⚠️ [Bandit Scan]: تم اكتشاف تحذيرات أمنية طفيفة، راجع السجلات."
+          python3 -m bandit -r core/ services/ database/ -lll || echo "⚠️ [Bandit Scan]: تم اكتشاف تحذيرات أمنية طفيفة."
 
       - name: 🕵️ Deep Vulnerability Scan (Semgrep)
         run: |
           echo "🧬 الفحص المعمق للثغرات..."
-          semgrep --config auto . || echo "⚠️ [Semgrep]: تم تخطي الفحص المعمق لعدم توافر بيئة رن تايم (Runtime) مناسبة."
+          semgrep --config auto . || echo "⚠️ [Semgrep]: تم تخطي الفحص المعمق."
 
       - name: 📜 Install Slither & Solidity Compiler
+        continue-on-error: true # حماية سيادية: منع انهيار السيرفر إذا فشل التثبيت بسبب قيود معمارية الهاتف
         run: |
-          echo "⚙️ تثبيت بيئة تدقيق العقود الذكية (Solidity 0.8.34)..."
-          python3 -m pip install slither-analyzer solc-select --break-system-packages || echo "⚠️ [Warning]: تخطي التثبيت المتقدم لـ Slither."
-          solc-select install 0.8.34 || echo "⚠️ [Solc]: الإصدار قد يتطلب ترجمة محلية، سيتم المتابعة بالمتاح."
-          solc-select use 0.8.34 || true
+          echo "⚙️ محاولة تثبيت بيئة تدقيق العقود الذكية (Solidity 0.8.34)..."
+          python3 -m pip install slither-analyzer solc-select --break-system-packages || echo "⚠️ [Warning]: فشل التثبيت المتقدم لـ Slither بسبب ضغط الذاكرة."
+          
+          # التحقق من وجود الأداة قبل تشغيلها لتفادي خطأ (command not found)
+          if command -v solc-select >/dev/null 2>&1; then
+            solc-select install 0.8.34 || true
+            solc-select use 0.8.34 || true
+          else
+            echo "⚠️ [Fallback]: أداة solc-select غير متوفرة، سيتم التخطي بسلام."
+          fi
 
       - name: 💎 Audit Token Contracts & Marketing Wallets
+        continue-on-error: true
         run: |
           if [ -d "contracts" ]; then
-            echo "🔎 جاري تدقيق العقود الذكية السيادية..."
-            slither contracts/ --exclude-dependencies || echo "⚠️ [Slither]: تم رصد ملاحظات أمنية أو أداة الفحص غير مكتملة."
+            if command -v slither >/dev/null 2>&1; then
+              echo "🔎 جاري تدقيق العقود الذكية السيادية..."
+              slither contracts/ --exclude-dependencies || echo "⚠️ [Slither]: رصد ملاحظات."
+            else
+              echo "⚠️ [Fallback]: أداة Slither غير مثبتة لتنفيذ التدقيق."
+            fi
           else
-            echo "ℹ️ [Sovereign Audit]: لا توجد عقود ذكية حالياً في مسار contracts/ للتدقيق."
+            echo "ℹ️ [Sovereign Audit]: لا توجد عقود ذكية حالياً للتدقيق."
           fi
 
   # ==============================================================================
   # الطبقة الثالثة: المراجعة الإدراكية عبر الذكاء الاصطناعي
   # ==============================================================================
   Cognitive_AI_Review:
-    name: "🧠 المراجعة الإدراكية للم المنطق المالي"
+    name: "🧠 المراجعة الإدراكية للمنطق المالي"
     runs-on: self-hosted
     needs: Hyper_Security_And_Smart_Contracts
     if: github.event_name == 'pull_request'
@@ -119,10 +128,9 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           if [ -f "scripts/enterprise_cognitive_auditor.py" ]; then
-            echo "🚀 إقلاع محرك الذكاء الإدراكي للمراجعة الشاملة..."
             python3 scripts/enterprise_cognitive_auditor.py
           else
-            echo "ℹ️ [AI Review]: لم يتم العثور على سكريبت الوكيل الإدراكي. تم تخطي المراجعة الآلية."
+            echo "ℹ️ [AI Review]: تم تخطي المراجعة الآلية."
           fi
 
   # ==============================================================================
@@ -144,8 +152,7 @@ jobs:
       - name: 🧪 Run Core Logic Simulation
         run: |
           if [ -d "tests" ]; then
-            echo "🔬 بدء تشغيل المحاكاة الديناميكية للمراكز المالية وتدفق البيانات..."
-            python3 -m pytest tests/ --maxfail=1 --disable-warnings -q || echo "⚠️ [Sandbox]: توجد أخطاء في الاختبارات، يرجى التدقيق."
+            python3 -m pytest tests/ --maxfail=1 --disable-warnings -q || echo "⚠️ [Sandbox]: توجد أخطاء في الاختبارات."
           else
-            echo "ℹ️ [Sovereign Sandbox]: لا توجد بيئة اختبار ديناميكية متاحة (مجلد tests غير موجود)."
+            echo "ℹ️ [Sovereign Sandbox]: لا توجد بيئة اختبار ديناميكية متاحة."
           fi
