@@ -169,6 +169,28 @@ except ImportError:
         @staticmethod
         async def execute_enterprise_search(k, q, s="all"): return {"status": "success", "message": "Search Executed (Simulated)"}
 
+# --- ربط المحركات الإمبراطورية الجديدة (الجلسات ونقل الأعضاء) ---
+try:
+    from core.session_manager import SovereignSessionManager
+    logger.info("🧠 [Master Hub]: تم ربط مدير الجلسات (Session Manager) بنجاح.")
+except ImportError:
+    class SovereignSessionManager:
+        @staticmethod
+        async def initialize_session(*args, **kwargs): return {"status": "simulated"}
+        @staticmethod
+        async def get_enterprise_analytics_report(*args, **kwargs): return {"status": "simulated"}
+
+try:
+    from services.enterprise_transfer_engine import EnterpriseTransferEngine
+    logger.info("🚀 [Master Hub]: تم ربط محرك نقل الأعضاء (Transfer Engine) بنجاح.")
+except ImportError:
+    class EnterpriseTransferEngine:
+        @staticmethod
+        async def initialize_interactive_workflow(*args, **kwargs): return "Simulated Workflow"
+        @staticmethod
+        async def handle_interactive_input(*args, **kwargs): return "Simulated Input"
+
+
 # ==============================================================================
 # 6. عُقد الأتمتة التابعة (Telethon & Pyrogram Background Workers)
 # ==============================================================================
@@ -263,6 +285,24 @@ class ProtectionSlotRequest(BaseModel): license_key: str; channel_id: str
 class CreativeAssetRequest(BaseModel): license_key: str; prompt: str; asset_type: Optional[str] = "logo"; aspect_ratio: Optional[str] = "1:1"
 class EnterpriseSearchRequest(BaseModel): license_key: str; query: str; scope: Optional[str] = "all"
 
+# --- نماذج محركات الإمبراطورية الجديدة ---
+class SessionInitRequest(BaseModel):
+    license_key: str
+    session_name: str
+    phone_number: str
+    api_id: int
+    api_hash: str
+
+class TransferInitRequest(BaseModel):
+    license_key: str
+    user_id: str
+    sessions_to_use: List[str]
+
+class InteractiveInputRequest(BaseModel):
+    license_key: str
+    user_id: str
+    user_input: str
+
 # ==============================================================================
 # 10. معالجة تليجرام كخدمة فرعية تابعة للنواة (Telegram Microservice Handler)
 # ==============================================================================
@@ -339,6 +379,45 @@ async def ws_security(websocket: WebSocket):
                 await websocket.send_text("pong")
     except WebSocketDisconnect:
         alert_manager.disconnect(websocket)
+
+# ==============================================================================
+# --- مسارات الإمبراطورية لإدارة الجلسات ونقل الأعضاء ---
+# ==============================================================================
+@app.post("/api/v1/empire/sessions/register", tags=["Sovereign Sessions"])
+async def register_new_session(request: SessionInitRequest):
+    """تهيئة جلسة تليجرام جديدة وربطها بمحرك المراقبة الذاتية."""
+    return await SovereignSessionManager.initialize_session(
+        license_key=request.license_key,
+        session_name=request.session_name,
+        api_id=request.api_id,
+        api_hash=request.api_hash,
+        phone_number=request.phone_number
+    )
+
+@app.get("/api/v1/empire/sessions/analytics", tags=["Sovereign Sessions"])
+async def get_session_analytics(license_key: str):
+    """جلب تقرير مفصل حول صحة الجلسات، الأخطاء، وسرعة النقل."""
+    return await SovereignSessionManager.get_enterprise_analytics_report(license_key)
+
+@app.post("/api/v1/empire/transfer/start-workflow", tags=["Sovereign Transfer"])
+async def start_transfer_workflow(request: TransferInitRequest):
+    """بدء الفحص الاستباقي للجلسات وتفعيل وكيل الذكاء الاصطناعي لتوجيه المستخدم."""
+    response_msg = await EnterpriseTransferEngine.initialize_interactive_workflow(
+        license_key=request.license_key,
+        user_id=request.user_id,
+        sessions_to_use=request.sessions_to_use
+    )
+    return {"status": "workflow_initialized", "ai_response": response_msg}
+
+@app.post("/api/v1/empire/transfer/interactive-input", tags=["Sovereign Transfer"])
+async def handle_transfer_input(request: InteractiveInputRequest):
+    """استقبال روابط المصدر والهدف من المستخدم والتفاعل معها خطوة بخطوة."""
+    response_msg = await EnterpriseTransferEngine.handle_interactive_input(
+        license_key=request.license_key,
+        user_id=request.user_id,
+        user_input=request.user_input
+    )
+    return {"status": "success", "ai_response": response_msg}
 
 @app.get("/", response_class=HTMLResponse, tags=["Web Interface"])
 async def home():
