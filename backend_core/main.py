@@ -169,7 +169,7 @@ except ImportError:
         @staticmethod
         async def execute_enterprise_search(k, q, s="all"): return {"status": "success", "message": "Search Executed (Simulated)"}
 
-# --- ربط المحركات الإمبراطورية الجديدة (الجلسات ونقل الأعضاء) ---
+# --- ربط المحركات الإمبراطورية الجديدة (الجلسات ونقل الأعضاء والمصادقة) ---
 try:
     from core.session_manager import SovereignSessionManager
     logger.info("🧠 [Master Hub]: تم ربط مدير الجلسات (Session Manager) بنجاح.")
@@ -189,6 +189,18 @@ except ImportError:
         async def initialize_interactive_workflow(*args, **kwargs): return "Simulated Workflow"
         @staticmethod
         async def handle_interactive_input(*args, **kwargs): return "Simulated Input"
+
+try:
+    from core.auth_manager import SovereignAuthManager
+    logger.info("🔐 [Master Hub]: تم ربط محرك المصادقة وتأكيد الدخول (Auth Manager) بنجاح.")
+except ImportError:
+    class SovereignAuthManager:
+        @staticmethod
+        async def send_verification_code(*args, **kwargs): return {"status": "simulated"}
+        @staticmethod
+        async def verify_code(*args, **kwargs): return {"status": "simulated"}
+        @staticmethod
+        async def verify_2fa_password(*args, **kwargs): return {"status": "simulated"}
 
 
 # ==============================================================================
@@ -303,6 +315,20 @@ class InteractiveInputRequest(BaseModel):
     user_id: str
     user_input: str
 
+class AuthSendCodeRequest(BaseModel):
+    session_name: str
+    phone_number: str
+    api_id: int
+    api_hash: str
+
+class AuthVerifyCodeRequest(BaseModel):
+    session_name: str
+    phone_code: str
+
+class AuthVerify2FARequest(BaseModel):
+    session_name: str
+    password: str
+
 # ==============================================================================
 # 10. معالجة تليجرام كخدمة فرعية تابعة للنواة (Telegram Microservice Handler)
 # ==============================================================================
@@ -379,6 +405,35 @@ async def ws_security(websocket: WebSocket):
                 await websocket.send_text("pong")
     except WebSocketDisconnect:
         alert_manager.disconnect(websocket)
+
+# ==============================================================================
+# --- مسارات المصادقة وتأكيد الدخول (Authentication Flow) ---
+# ==============================================================================
+@app.post("/api/v1/empire/auth/send-code", tags=["Sovereign Auth"])
+async def auth_send_code(request: AuthSendCodeRequest):
+    """طلب إرسال كود التحقق (OTP) إلى رقم الهاتف."""
+    return await SovereignAuthManager.send_verification_code(
+        session_name=request.session_name,
+        phone_number=request.phone_number,
+        api_id=request.api_id,
+        api_hash=request.api_hash
+    )
+
+@app.post("/api/v1/empire/auth/verify-code", tags=["Sovereign Auth"])
+async def auth_verify_code(request: AuthVerifyCodeRequest):
+    """إرسال الكود المستلم لتأكيد تسجيل الدخول."""
+    return await SovereignAuthManager.verify_code(
+        session_name=request.session_name,
+        phone_code=request.phone_code
+    )
+
+@app.post("/api/v1/empire/auth/verify-2fa", tags=["Sovereign Auth"])
+async def auth_verify_2fa(request: AuthVerify2FARequest):
+    """إرسال كلمة المرور السري (2FA) إذا تطلب الأمر."""
+    return await SovereignAuthManager.verify_2fa_password(
+        session_name=request.session_name,
+        password=request.password
+    )
 
 # ==============================================================================
 # --- مسارات الإمبراطورية لإدارة الجلسات ونقل الأعضاء ---
