@@ -1,4 +1,4 @@
-name: 🌐 AymnGuard Sovereign Mega-Pipeline: Autonomous Workforce & Auto-Healing
+name: "🌐 AymnGuard Sovereign Mega-Pipeline: Autonomous Workforce & Auto-Healing"
 
 on:
   push:
@@ -6,41 +6,37 @@ on:
   pull_request:
     branches: [ "main", "master" ]
 
-# تصريح سيادي: السماح للوكيل الرقمي بكتابة الإصلاحات وإدارة طلبات السحب 🛡️
-
+permissions:
   contents: write
   pull-requests: write
-  jobs:
+
+jobs:
   # ==============================================================================
   # الطبقة الأولى: محرك الشفاء الذاتي والفحص النحوي المفرط (Auto-Healing & AST)
   # ==============================================================================
   Sovereign_Heal_And_Validate:
-    name:  #الشفاء الذاتي والتحليل الهيكلي #(Hyper-Static Healing)
+    name: "🚀 الشفاء الذاتي والتحليل الهيكلي (Hyper-Static Healing)"
     runs-on: self-hosted
     steps:
       - name: 🛡️ Checkout Sovereign Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # ضروري لتمكين رفع التعديلات (Push) والإصلاح الذاتي
+          fetch-depth: 0
 
       - name: 🐍 Verify Sovereign Python Environment
-        run: python3 --version - name: 🤖 Install Auto-Healing Workforce & Dependencies
-      run: |
-    python3 -m pip install --upgrade pip --break-system-packages
-    python3 -m pip install --prefer-binary fastapi pydantic httpx ccxt sqlalchemy --break-system-packages
+        run: python3 --version
 
-   #قائمة استثناءات سيادية لضمان عدم تعطل أنظمة FastAPI أو قواعد البيانات
-      
-     - name: 🔍 Sovereign AST & Syntax Validation (الفحص النحوي المتقدم)
-        # فحص شجري صارم للتأكد من سلامة النواة البرمجية بعد الإصلاح
+      - name: 🤖 Install Auto-Healing Workforce & Dependencies
+        run: |
+          python3 -m pip install --upgrade pip --break-system-packages
+          python3 -m pip install --prefer-binary fastapi pydantic httpx ccxt sqlalchemy --break-system-packages
+
+      - name: 🔍 Sovereign AST & Syntax Validation (الفحص النحوي المتقدم)
         run: |
           echo "🔎 [AST Gatekeeper]: بدء فحص السلامة الهيكلية لمحركات النواة..."
           python3 -m compileall core/ backend_core/ main.py || true
 
       - name: 🚀 Commit Auto-Healed Changes (حفظ التعديلات المُصححة ذاتياً)
-
-  # الوكيل يقوم برفع الكود المعالج إلى المستودع كـ "تصحيح تلقائي" دون أي تدخل بشري
-        
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "🤖 [Sovereign Auto-Healer]: تم تنسيق وإصلاح الكود برمجياً بنجاح تام."
@@ -50,7 +46,7 @@ on:
   # الطبقة الثانية: درع الأمان الاستباقي وتدقيق العقود الذكية (SAST & Solidity)
   # ==============================================================================
   Hyper_Security_And_Smart_Contracts:
-    name: 🛡️ الفحص الأمني الاستباقي والعقود (Security & Crypto Audit)
+    name: "🛡️ الفحص الأمني الاستباقي والعقود (Security & Crypto Audit)"
     runs-on: self-hosted
     needs: Sovereign_Heal_And_Validate
     steps:
@@ -63,34 +59,31 @@ on:
         run: python3 -m bandit -r core/ services/ database/ -lll || true
 
       - name: 🕵️ Deep Vulnerability Scan (Semgrep)
-        # كشف الثغرات المعقدة وتتبع مسار البيانات غير الموثوقة
         run: semgrep --config auto . || true
 
-      - name: 📜 Install Slither & Solidity Compiler (Solidity 0.8.34 Analyzer)
+      - name: 📜 Install Slither & Solidity Compiler
         run: |
           python3 -m pip install slither-analyzer solc-select --break-system-packages
-     
-      #تهيئة بيئة المترجم الخاص بالعقود الذكية
-      solc-select install 0.8.34 || echo "⚠️ الإصدار قد يتطلب ترجمة محلية، سيتم استخدام المتاح."
-      solc-select use 0.8.34 || true
+          solc-select install 0.8.34 || echo "⚠️ الإصدار قد يتطلب ترجمة محلية."
+          solc-select use 0.8.34 || true
 
-        - name: 💎 Audit Token Contracts & Marketing Wallets
+      - name: 💎 Audit Token Contracts & Marketing Wallets
         run: |
           if [ -d "contracts" ]; then
             echo "🔎 جاري تدقيق العقود الذكية السيادية..."
             slither contracts/ --exclude-dependencies
           else
-            echo "⚠️ [Sovereign Audit]: لا توجد عقود ذكية حالياً في المسار للتدقيق."
+            echo "⚠️ [Sovereign Audit]: لا توجد عقود ذكية حالياً للتدقيق."
           fi
 
   # ==============================================================================
-  # الطبقة الثالثة: المراجعة الإدراكية عبر الذكاء الاصطناعي (AI Cognitive Review)
+  # الطبقة الثالثة: المراجعة الإدراكية عبر الذكاء الاصطناعي
   # ==============================================================================
   Cognitive_AI_Review:
-    name: 🧠 المراجعة الإدراكية للمنطق المالي #(AI Core Reviewer)
+    name: "🧠 المراجعة الإدراكية للمنطق المالي"
     runs-on: self-hosted
     needs: Hyper_Security_And_Smart_Contracts
-    if: github.event_name == 'pull_request' # يعمل الوكيل الإدراكي بشكل أساسي على طلبات السحب
+    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -99,27 +92,24 @@ on:
       - name: 📦 Install AI Agent Dependencies
         run: python3 -m pip install httpx asyncio pydantic --break-system-packages
 
-      - name: 🤖 Deploy Sovereign AI Auditor (Automated PR Reviewer)
-        # وكيل الذكاء الاصطناعي يقرأ التعديلات ويحلل المنطق المالي وخوارزميات التداول
+      - name: 🤖 Deploy Sovereign AI Auditor
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AI_AGENT_API_KEY: ${{ secrets.AI_AGENT_API_KEY }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           if [ -f "scripts/enterprise_cognitive_auditor.py" ]; then
-            echo "🧠 إقلاع محرك الذكاء الإدراكي للمراجعة الشاملة..."
             python3 scripts/enterprise_cognitive_auditor.py
           else
-            echo "⚠️ لم يتم العثور على سكريبت الوكيل الإدراكي. تم تخطي المراجعة الآلية."
+            echo "⚠️ تم تخطي المراجعة الآلية."
           fi
 
   # ==============================================================================
-  # الطبقة الرابعة: المحاكاة الديناميكية وفحص تدفق البيانات (Dynamic Sandboxing)
+  # الطبقة الرابعة: المحاكاة الديناميكية
   # ==============================================================================
   Dynamic_Execution_Sandboxing:
-    name: ⚡ بيئة المحاكاة وفحص تدفق البيانات (Strict Validation)
+    name: "⚡ بيئة المحاكاة وفحص تدفق البيانات"
     runs-on: self-hosted
-    # إذا كان الحدث Push سيتجاوز مراجعة الذكاء الاصطناعي وينتقل للمحاكاة مباشرة
     needs: [Hyper_Security_And_Smart_Contracts]
     steps:
       - uses: actions/checkout@v4
@@ -127,11 +117,9 @@ on:
       - name: 📦 Install Execution Dependencies
         run: python3 -m pip install pytest pytest-asyncio pydantic ccxt httpx sqlalchemy --break-system-packages
       
-      - name: 🧪 Run Core Logic Simulation (Mutation & Data Validation)
-        # اختبارات بيئة المحاكاة التي تفرض قيود Pydantic صارمة على البيانات القادمة من المنصات
+      - name: 🧪 Run Core Logic Simulation
         run: |
           if [ -d "tests" ]; then
-            echo "⚡ بدء تشغيل المحاكاة الديناميكية للمراكز المالية وتدفق البيانات..."
             python3 -m pytest tests/ --maxfail=1 --disable-warnings -q
           else
             echo "⚠️ [Sovereign Sandbox]: لا توجد بيئة اختبار ديناميكية متاحة."
