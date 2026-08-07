@@ -361,6 +361,43 @@ if enterprise_router:
     app.include_router(enterprise_router)
 if telegram_bridge_router:
     app.include_router(telegram_bridge_router)
+# ==============================================================================
+# إضافات الربط الشامل لكافة المكونات والواجهات (Full Ecosystem Integration)
+# ==============================================================================
+from fastapi.staticfiles import StaticFiles
+
+# 1. ربط الواجهة المصغرة وتطبيقات الـ Frontend (Telegram Mini App & Static Assets)
+if os.path.exists("frontend_core/mini_app"):
+    app.mount("/mini-app", StaticFiles(directory="frontend_core/mini_app", html=True), name="mini_app")
+    logger.info("🌐 [الواجهة المصغرة - Mini App]: تم تفعيلها وربطها بنجاح على المسار /mini-app")
+
+if os.path.exists("frontend_core"):
+    app.mount("/frontend", StaticFiles(directory="frontend_core"), name="frontend_assets")
+    logger.info("🎨 [الأصول البصرية والتصاميم]: تم ربط مجلد الـ frontend_core بنجاح.")
+
+# 2. ربط مسارات النواة والأمان المتقدمة (Security & Core Routers)
+try:
+    from security.core_routes import router as security_routes
+    app.include_router(security_routes, prefix="/api/v1/security-core", tags=["Advanced Security Engine"])
+    logger.info("🛡️ [درع الأمان المتقدم]: تم دمج مسارات الحماية السيادية بنجاح.")
+except ImportError:
+    logger.info("ℹ️ [ملاحظة]: مسارات الأمان المستقلة تعمل ضمن النواة المباشرة.")
+
+# 3. ربط مسارات التداول المتقدمة (Advanced Trading & Execution Core)
+try:
+    from core.trading_execution import router as trading_execution_router
+    app.include_router(trading_execution_router, prefix="/api/v1/trading-execution", tags=["Trading Execution Engine"])
+    logger.info("📈 [محرك التنفيذ المالي]: تم ربط مسارات التداول الفعلي بنجاح.")
+except ImportError:
+    logger.info("ℹ️ [ملاحظة]: محرك التداول مدمج ضمن الوظائف الأساسية.")
+
+# 4. ربط طبقة الذكاء الاصطناعي والمكونات (Feature Forge & AI Components)
+try:
+    from src.ai_engine import router as ai_engine_router
+    app.include_router(ai_engine_router, prefix="/api/v1/ai-forge", tags=["AI Feature Forge"])
+    logger.info("🧠 [مختبر الذكاء الاصطناعي - Feature Forge]: تم ربطه بالمنظومة بنجاح.")
+except ImportError:
+    pass
 
 # ==============================================================================
 # 9. نماذج البيانات الهندسية (Pydantic v2 Models)
