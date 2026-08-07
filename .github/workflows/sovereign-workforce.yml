@@ -31,7 +31,7 @@ jobs:
       run: |
         python3 -m pip install --upgrade pip --break-system-packages
         python3 -m pip install --prefer-binary fastapi pydantic httpx ccxt sqlalchemy --break-system-packages
-        # قائمة استثناءات سيادية لضمان عدم تعطل أنظمة FastAPI أو قواعد البيانات
+        #قائمة استثناءات سيادية لضمان عدم تعطل أنظمة FastAPI أو قواعد البيانات
       
      - name: 🔍 Sovereign AST & Syntax Validation (الفحص النحوي المتقدم)
         # فحص شجري صارم للتأكد من سلامة النواة البرمجية بعد الإصلاح
@@ -40,7 +40,9 @@ jobs:
           python3 -m compileall core/ backend_core/ main.py || true
 
       - name: 🚀 Commit Auto-Healed Changes (حفظ التعديلات المُصححة ذاتياً)
-        # الوكيل يقوم برفع الكود المعالج إلى المستودع كـ "تصحيح تلقائي" دون أي تدخل بشري
+
+  # الوكيل يقوم برفع الكود المعالج إلى المستودع كـ "تصحيح تلقائي" دون أي تدخل بشري
+        
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "🤖 [Sovereign Auto-Healer]: تم تنسيق وإصلاح الكود برمجياً بنجاح تام."
