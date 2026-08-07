@@ -27,11 +27,10 @@ jobs:
       - name: 🐍 Verify Sovereign Python Environment
         run: python3 --version
 
-      - name: 📦 Install Enterprise Core Dependencies & Libraries
+        - name: 🤖 Install Auto-Healing Workforce & Dependencies
       run: |
         python3 -m pip install --upgrade pip --break-system-packages
         python3 -m pip install --prefer-binary fastapi pydantic httpx ccxt sqlalchemy --break-system-packages
-)
         # قائمة استثناءات سيادية لضمان عدم تعطل أنظمة FastAPI أو قواعد البيانات
       
      - name: 🔍 Sovereign AST & Syntax Validation (الفحص النحوي المتقدم)
