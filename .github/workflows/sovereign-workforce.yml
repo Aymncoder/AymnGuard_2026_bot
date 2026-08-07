@@ -10,7 +10,7 @@ on:
 
   contents: write
   pull-requests: write
-jobs:
+  jobs:
   # ==============================================================================
   # الطبقة الأولى: محرك الشفاء الذاتي والفحص النحوي المفرط (Auto-Healing & AST)
   # ==============================================================================
@@ -24,11 +24,9 @@ jobs:
           fetch-depth: 0 # ضروري لتمكين رفع التعديلات (Push) والإصلاح الذاتي
 
       - name: 🐍 Verify Sovereign Python Environment
-        run: python3 --version
-
-   - name: 🤖 Install Auto-Healing Workforce & Dependencies
+        run: python3 --version - name: 🤖 Install Auto-Healing Workforce & Dependencies
       run: |
-        python3 -m pip install --upgrade pip --break-system-packages
+    python3 -m pip install --upgrade pip --break-system-packages
     python3 -m pip install --prefer-binary fastapi pydantic httpx ccxt sqlalchemy --break-system-packages
 
    #قائمة استثناءات سيادية لضمان عدم تعطل أنظمة FastAPI أو قواعد البيانات
@@ -76,7 +74,7 @@ jobs:
       solc-select install 0.8.34 || echo "⚠️ الإصدار قد يتطلب ترجمة محلية، سيتم استخدام المتاح."
       solc-select use 0.8.34 || true
 
-      - name: 💎 Audit Token Contracts & Marketing Wallets
+        - name: 💎 Audit Token Contracts & Marketing Wallets
         run: |
           if [ -d "contracts" ]; then
             echo "🔎 جاري تدقيق العقود الذكية السيادية..."
