@@ -9,7 +9,7 @@ from pyrogram.errors import FloodWait, UserPrivacyRestricted, PeerFlood, UserCha
 logger = logging.getLogger("EnterpriseTransferEngine")
 
 class SovereignAIWorkerAgent:
-    """وكيل الذكاء الاصطناعي الخلفي للإرشاد، التحسين الذاتي، والمراقبة الأمنية على مدار الساعة."""
+    """وكيل الذكاء الاصطناعي الخلفي (Autonomous AI Worker Agent) للإرشاد، التحسين الذاتي، والمراقبة الأمنية على مدار الساعة."""
     
     @staticmethod
     async def analyze_and_optimize_transfer(session_id: str, source_chat: str, target_chat: str) -> Dict[str, Any]:
@@ -151,11 +151,90 @@ class EnterpriseTransferEngine:
                     return "❌ يجب أن يكون العدد أكبر من الصفر. يرجى إدخال رقم صحيح."
                 storage["limit_per_session"] = limit_val
                 storage["workflow_step"] = 0  # اكتمال الإعدادات وتصفير مؤشر الخطوات
+                
+                # تفعيل التشغيل الميداني الذاتي في الخلفية بضغطة زر
+                asyncio.create_task(cls._background_execution_trigger(license_key, user_id, storage))
+                
                 return await SovereignAIWorkerAgent.provide_24_7_user_guidance("step_4_start_execution")
             except ValueError:
                 return "❌ يرجى إدخال رقم صحيح ومقبول لعدد الأعضاء لكل جلسة."
 
         return "✅ جاري معالجة طلباتك اللوجستية في الخلفية من قبل وكلاء الذكاء الاصطناعي..."
+
+    @classmethod
+    async def _background_execution_trigger(cls, license_key: str, user_id: str, storage: Dict[str, Any]):
+        """
+        المشغل الميداني الذاتي (The Sovereign Autonomous Dispatcher):
+        يقوم بسحب الجلسات الفعالة حقيقياً من الخزنة الدائمة (قاعدة البيانات)، توزيع الأحمال، 
+        تنفيذ عمليات النقل، وتحديث حالة الحسابات (Self-Healing) في حال رصد حظر PeerFlood 
+        لجعلها RESTRICTED مؤقتاً دون التخلي المطلق عنها مع ضمان استمرارية تدفق العمل بسلاسة.
+        """
+        try:
+            from backend_core.main import async_session, EnterpriseSessionModel
+        except ImportError:
+            from main import async_session, EnterpriseSessionModel
+
+        from sqlalchemy.future import select
+        from sqlalchemy import update
+
+        logger.info(f"⚙️ [Dispatcher]: Starting Autonomous Enterprise Operation for tenant: {license_key}_{user_id}")
+
+        # 1. سحب الجلسات النشطة حصرياً من الخزنة الأبدية (قاعدة البيانات)
+        async with async_session() as db:
+            result = await db.execute(select(EnterpriseSessionModel).where(EnterpriseSessionModel.status == "ACTIVE"))
+            active_db_sessions = result.scalars().all()
+            
+        session_map = {s.session_name: s.session_string for s in active_db_sessions}
+        
+        # 2. جلب معطيات التشغيل من البيئة المعزولة للمستخدم
+        valid_session_names = storage.get("valid_sessions", [])
+        target_chat = storage.get("target_chat")
+        source_chats = storage.get("source_chats", [])
+        limit_per_session = storage.get("limit_per_session", 50)
+
+        if not target_chat or not source_chats:
+            logger.error("❌ [Dispatcher Error]: Critical configuration missing. Target chat or source links are empty.")
+            return
+
+        # 3. تدوير وتوزيع المهام على الجلسات المتاحة بالتوازي مع نظام الإصلاح الذاتي
+        for session_name in valid_session_names:
+            if session_name not in session_map:
+                logger.warning(f"⚠️ [Dispatcher]: Session '{session_name}' was requested but not found in the secure vault database. Skipping.")
+                continue
+                
+            session_string = session_map[session_name]
+            
+            logger.info(f"🚀 [Dispatcher]: Launching live Pyrogram worker for session: {session_name} | Limit: {limit_per_session}")
+            
+            # تنفيذ دورة النقل الحقيقية
+            task_result = await cls.execute_real_transfer_task(
+                session_name=session_name,
+                session_string=session_string,
+                api_id=2040, 
+                api_hash="b18441aff607e10a989891a5462e627", 
+                target_chat=target_chat,
+                members_to_add=source_chats,
+                limit_per_session=limit_per_session
+            )
+
+            # 4. نظام الإصلاح الذاتي المؤسسي (Self-Healing & Vault Status Management)
+            if task_result.get("status") == "error" and "PeerFlood" in task_result.get("error_details", ""):
+                async with async_session() as db:
+                    await db.execute(
+                        update(EnterpriseSessionModel)
+                        .where(EnterpriseSessionModel.session_name == session_name)
+                        .values(status="RESTRICTED")
+                    )
+                    await db.commit()
+                logger.critical(f"🛑 [Self-Healing]: Account {session_name} encountered PeerFlood. Secure vault updated status to RESTRICTED temporarily.")
+            
+            logger.info(f"📊 [Execution Report]: Worker {session_name} concluded -> {task_result.get('message')} | Added: {task_result.get('added_success', 0)}")
+
+        # 5. تنظيف البيئة المعزولة وإعادتها للوضع الساكن بعد الانتهاء التام من التدفق اللوجستي
+        storage["workflow_step"] = 0
+        storage["source_chats"] = []
+        storage["target_chat"] = None
+        logger.info("✅ [Dispatcher]: All enterprise transfer streams concluded successfully. Isolated container reset to IDLE.")
 
     @classmethod
     async def execute_real_transfer_task(
@@ -207,7 +286,6 @@ class EnterpriseTransferEngine:
                 logger.warning(f"⚠️ [Worker {session_name}]: Target chat join notice (may already be a member): {e}")
 
             for user in members_to_add:
-                # التحقق الاستباقي من الحصة المحددة لكل جلسة لمنع إرهاق الحساب
                 if added_count >= limit_per_session:
                     logger.info(f"🏁 [Worker {session_name}]: Reached designated session limit of {limit_per_session} members. Safely halting worker.")
                     break
