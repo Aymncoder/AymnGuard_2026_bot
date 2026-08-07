@@ -64,28 +64,28 @@ class SovereignMegaMetaEngine:
 
             for node in ast.walk(tree):
                 # فحص الاستيرادات المحظورة
-         if isinstance(node, ast.Import):
-         for alias in node.names:
-         if alias.name in forbidden_modules:
-           logger.error(f"🚨 [Security Violation]: محاولة استيراد وحدة محظورة أمنياً: {alias.name}")
-          return False
-          elif isinstance(node, ast.ImportFrom):
-           if node.module in forbidden_modules:
-           logger.error(f"🚨 [Security Violation]: محاولة استيراد من وحدة محظورة أمنياً: {node.module}")
-           return False
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        if alias.name in forbidden_modules:
+                            logger.error(f"🚨 [Security Violation]: محاولة استيراد وحدة محظورة أمنياً: {alias.name}")
+                            return False
+                elif isinstance(node, ast.ImportFrom):
+                    if node.module in forbidden_modules:
+                        logger.error(f"🚨 [Security Violation]: محاولة استيراد من وحدة محظورة أمنياً: {node.module}")
+                        return False
                 
                 # فحص الدوال الخطرة
-         elif isinstance(node, ast.Call):
-          if isinstance(node.func, ast.Name) and node.func.id in forbidden_funcs:
-          logger.error(f"🚨 [Security Violation]: محاولة استخدام دالة خطرة محظورة: {node.func.id}")
-          return False
+                elif isinstance(node, ast.Call):
+                    if isinstance(node.func, ast.Name) and node.func.id in forbidden_funcs:
+                        logger.error(f"🚨 [Security Violation]: محاولة استخدام دالة خطرة محظورة: {node.func.id}")
+                        return False
 
             return True
         except Exception as e:
-        logger.error(f"❌ [AST Analysis Error]: فشل التحليل الشجري للأمان: {e}")
-        return False
+            logger.error(f"❌ [AST Analysis Error]: فشل التحليل الشجري للأمان: {e}")
+            return False
       
-            async def analyze_and_synthesize_feature(self, prompt: str, module_name: str = "dynamic_addon") -> Dict[str, Any]:
+    async def analyze_and_synthesize_feature(self, prompt: str, module_name: str = "dynamic_addon") -> Dict[str, Any]:
         """
         الوكيل الإدراكي لتخليق وبناء الميزات البرمجية طياراً مع صياغة آمنة تماماً:
         """
@@ -117,13 +117,14 @@ class SovereignMegaMetaEngine:
             "    }\n"
         )
         validation_result = await self.synthesize_and_validate_module(sanitized_module_name, synthesized_code)
-        return)
+        return {
             "status": validation_result.get("status"),
             "agent_message": "تم تحليل الطلب، اجتياز الفحص الأمني، وبناء الميزة الهندسية وتفعيلها بنجاح.",
             "module_target": sanitized_module_name,
             "generated_code_preview": synthesized_code,
             "deployment_telemetry": validation_result
         }
+
     async def synthesize_and_validate_module(self, module_name: str, code_content: str) -> Dict[str, Any]:
         """
         بيئة الاختبار النحوي، الفحص الأمني الشجري، والحقن المتزامن الآمن (Hot-Reloading Sandbox):
@@ -185,5 +186,5 @@ class SovereignMegaMetaEngine:
         logger.warning(f"⚠️ [Dynamic Execution]: الوحدة أو الوظيفة المطلوبة [{module_name}.{function_name}] غير متاحة.")
         return None
         
-          # تهيئة النسخة العامة للمحرك المدمج لاستخدامها في النظام المركزي
-       sovereign_mega_meta = SovereignMegaMetaEngine()
+# تهيئة النسخة العامة للمحرك المدمج لاستخدامها في النظام المركزي
+sovereign_mega_meta = SovereignMegaMetaEngine()
