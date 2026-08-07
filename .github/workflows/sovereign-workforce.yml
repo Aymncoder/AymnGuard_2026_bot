@@ -6,8 +6,8 @@ on:
   pull_request:
     branches: [ "main", "master" ]
 
-# 🛡️ تصريح سيادي: السماح للوكيل الرقمي بكتابة الإصلاحات وإدارة طلبات السحب
-permissions:
+# تصريح سيادي: السماح للوكيل الرقمي بكتابة الإصلاحات وإدارة طلبات السحب 🛡️
+
   contents: write
   pull-requests: write
 
