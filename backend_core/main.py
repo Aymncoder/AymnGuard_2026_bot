@@ -353,26 +353,40 @@ async def process_telegram_update(data: Dict[str, Any]):
             
             chat_id = msg["chat"]["id"]
             text = msg.get("text", "")
-            
-            # حفظ السجل عبر النواة المركزية
+            user_id = str(chat_id)
+
+            # 1. فحص ما إذا كان المستخدم في مرحلة تفاعلية (Workflow) داخل محرك النقل
+            response = await EnterpriseTransferEngine.handle_interactive_input(
+                license_key="DEFAULT_LICENSE",
+                user_id=user_id,
+                user_input=text
+            )
+
+            # إذا كان في مرحلة تفاعلية، أرسل رد الذكاء الاصطناعي وتوقف
+            if response and "البيئة غير مهيأة" not in response:
+                await send_telegram_response(chat_id, response)
+                return
+
+            # 2. إذا لم يكن في مرحلة تفاعلية، نفذ المعالجة العادية
             async with async_session() as session:
                 session.add(TelegramLogModel(update_id=update_id, chat_id=str(chat_id), text_content=text))
                 await session.commit()
 
             if text.startswith("/start"):
-                await send_telegram_response(chat_id, "🛡️ **أهلاً بك في AymnGuard Sovereign Enterprise Core**\nالنواة المركزية تسيطر بالكامل على الخدمات.")
+                await send_telegram_response(chat_id, "🛡️ **أهلاً بك في AymnGuard Sovereign Enterprise Core**\nاستخدم الأمر `/initialize_transfer` لبدء عملية النقل.")
+            
+            elif text.startswith("/initialize_transfer"):
+                response = await EnterpriseTransferEngine.initialize_interactive_workflow(
+                    license_key="DEFAULT_LICENSE",
+                    user_id=user_id,
+                    sessions_to_use=["session_1", "session_2"]
+                )
+                await send_telegram_response(chat_id, response)
+            
             else:
                 await send_telegram_response(chat_id, f"✅ تم استقبال الأمر ومعالجته عبر الـ Backend بنجاح: `{text}`")
     except Exception as e:
         logger.error(f"❌ خطأ في معالجة تليجرام الفرعية: {e}")
-
-async def send_telegram_response(chat_id: int, text: str):
-    try:
-        async with httpx.AsyncClient() as client:
-            await client.post(f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage", 
-                              json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"})
-    except Exception:
-        pass
 
 # ==============================================================================
 # 11. مسارات الـ API التشغيلية الأساسية للـ Master Hub
