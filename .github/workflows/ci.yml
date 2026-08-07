@@ -14,13 +14,14 @@ jobs:
       - name: 📥 Checkout Sovereign Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # استدعاء كامل التاريخ البرمجي لضمان دقة تحليل المسارات
-
+          fetch-depth: 
+          
+          # استدعاء كامل التاريخ البيرومي لضمان دقة تحليل المسارات#
       - name: 📦 Install Enterprise Dependencies & AI Scanners
         run: 
-        
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          
           # تثبيت أدوات الفحص المؤسسي للذكاء الاصطناعي وأمن النواة
           pip install flake8 bandit
 
