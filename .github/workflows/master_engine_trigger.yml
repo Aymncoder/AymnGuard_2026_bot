@@ -36,9 +36,13 @@ jobs:
       - name: 📦 Install Enterprise Core Dependencies & Libraries
         run: |
           echo "=== 📦 Loading Mega-Core Libraries ==="
-          # تثبيت الحزم بصمت نسبي لتخفيف الضغط على السجلات وتسريع العملية
-          python3 -m pip install --prefer-binary fastapi pydantic uvicorn httpx ccxt sqlalchemy --break-system-packages
+          # 1. تثبيت الحزم المرنة والأساسية أولاً لضمان عدم تعطل المحرك
+          python3 -m pip install --prefer-binary fastapi pydantic uvicorn httpx sqlalchemy --break-system-packages
           echo "✅ Core Dependencies Installed Successfully."
+          
+          # 2. عزل مكتبة ccxt لتفادي انهيار البناء المعماري (C-extensions) على Termux
+          echo "📦 Attempting to load ccxt (Heavy Crypto Library)..."
+          python3 -m pip install ccxt --break-system-packages || echo "⚠️ [Architecture Warning]: تم تخطي تثبيت ccxt مؤقتاً لتجنب تعارضات البناء على الهاتف. المحرك سيستمر في العمل."
 
       - name: 🧭 Pre-Flight Workspace Diagnostic & Path Resolution
         run: |
@@ -53,7 +57,7 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          # تفعيل خاصية التوقف الفوري مع اقتناص الأخطاء
+          # تفعيل خاصية التوقف الفوري مع اقتناص الأخطاء لتشخيص أسرع
           set -e
           trap 'echo "❌ [System Failure]: حدث انهيار غير متوقع أثناء تشغيل المحرك السيادي."' ERR
 
@@ -86,5 +90,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "👑 Sovereign Master Engine: إتمام التدقيق، الإصلاح المعماري، والربط المؤسسي بنجاح تام"
-          # تعديل جوهري: الرفع الديناميكي للفرع الحالي بدلاً من تثبيته على main لمنع أخطاء الدمج
           branch: ${{ github.head_ref || github.ref_name }}
