@@ -117,15 +117,13 @@ class SovereignMegaMetaEngine:
             "    }\n"
         )
         validation_result = await self.synthesize_and_validate_module(sanitized_module_name, synthesized_code)
-        
-        return {
+        return)
             "status": validation_result.get("status"),
             "agent_message": "تم تحليل الطلب، اجتياز الفحص الأمني، وبناء الميزة الهندسية وتفعيلها بنجاح.",
             "module_target": sanitized_module_name,
             "generated_code_preview": synthesized_code,
             "deployment_telemetry": validation_result
         }
-
     async def synthesize_and_validate_module(self, module_name: str, code_content: str) -> Dict[str, Any]:
         """
         بيئة الاختبار النحوي، الفحص الأمني الشجري، والحقن المتزامن الآمن (Hot-Reloading Sandbox):
@@ -186,7 +184,6 @@ class SovereignMegaMetaEngine:
             
         logger.warning(f"⚠️ [Dynamic Execution]: الوحدة أو الوظيفة المطلوبة [{module_name}.{function_name}] غير متاحة.")
         return None
-
-
-# تهيئة النسخة العامة للمحرك المدمج لاستخدامها في النظام المركزي
-sovereign_mega_meta = SovereignMegaMetaEngine()
+        
+          # تهيئة النسخة العامة للمحرك المدمج لاستخدامها في النظام المركزي
+       sovereign_mega_meta = SovereignMegaMetaEngine()
