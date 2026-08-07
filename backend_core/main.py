@@ -43,6 +43,7 @@ from pyrogram import Client as PyroClient
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column
 from sqlalchemy import String, Integer, DateTime, Text
+from sqlalchemy.future import select  # تم إضافة الاستدعاء الخاص بالخزنة هنا
 
 # ==============================================================================
 # 1. إعدادات التسجيل والبيئة المركزية (Logging & Config Settings)
@@ -128,6 +129,16 @@ class TelegramLogModel(Base):
     username: Mapped[str] = mapped_column(String(100), nullable=True)
     text_content: Mapped[str] = mapped_column(Text, nullable=True)
     event_type: Mapped[str] = mapped_column(String(50), default="message")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+class EnterpriseSessionModel(Base):
+    """خزنة الجلسات السيادية: تحفظ مفاتيح الحسابات وحالتها الصحية للأبد"""
+    __tablename__ = "enterprise_sessions"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    session_name: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+    session_string: Mapped[str] = mapped_column(Text)  # هنا يُحفظ الكنز (المفتاح المشفر)
+    status: Mapped[str] = mapped_column(String(50), default="ACTIVE")
+    health_score: Mapped[float] = mapped_column(default=100.0)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 # ==============================================================================
@@ -421,19 +432,44 @@ async def auth_send_code(request: AuthSendCodeRequest):
 
 @app.post("/api/v1/empire/auth/verify-code", tags=["Sovereign Auth"])
 async def auth_verify_code(request: AuthVerifyCodeRequest):
-    """إرسال الكود المستلم لتأكيد تسجيل الدخول."""
-    return await SovereignAuthManager.verify_code(
+    """إرسال الكود المستلم لتأكيد الدخول، وحفظ الجلسة أبدياً في قاعدة البيانات."""
+    result = await SovereignAuthManager.verify_code(
         session_name=request.session_name,
         phone_code=request.phone_code
     )
+    
+    # الذكاء السيادي: إذا نجح الدخول، احفظ الكنز في قاعدة البيانات!
+    if result.get("status") == "success":
+        async with async_session() as db:
+            new_session = EnterpriseSessionModel(
+                session_name=request.session_name,
+                session_string=result["session_string"]
+            )
+            db.add(new_session)
+            await db.commit()
+            logger.info(f"💾 [Database]: تم حفظ كنز الجلسة {request.session_name} في الخزنة الأبدية بنجاح.")
+            
+    return result
 
 @app.post("/api/v1/empire/auth/verify-2fa", tags=["Sovereign Auth"])
 async def auth_verify_2fa(request: AuthVerify2FARequest):
-    """إرسال كلمة المرور السري (2FA) إذا تطلب الأمر."""
-    return await SovereignAuthManager.verify_2fa_password(
+    """تخطي التحقق بخطوتين وحفظ الجلسة في قاعدة البيانات."""
+    result = await SovereignAuthManager.verify_2fa_password(
         session_name=request.session_name,
         password=request.password
     )
+    
+    if result.get("status") == "success":
+        async with async_session() as db:
+            new_session = EnterpriseSessionModel(
+                session_name=request.session_name,
+                session_string=result["session_string"]
+            )
+            db.add(new_session)
+            await db.commit()
+            logger.info(f"💾 [Database]: تم حفظ كنز الجلسة {request.session_name} في الخزنة الأبدية بعد تخطي 2FA.")
+            
+    return result
 
 # ==============================================================================
 # --- مسارات الإمبراطورية لإدارة الجلسات ونقل الأعضاء ---
