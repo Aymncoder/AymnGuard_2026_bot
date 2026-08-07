@@ -15,15 +15,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          # استدعاء كامل التاريخ البيرومي لضمان دقة تحليل المسارات
+         # استدعاء كامل التاريخ البيرومي لضمان دقة تحليل المسارات
           
-      - name: 📦 Install Enterprise Dependencies & AI Scanners
+          - name: 📦 Install Enterprise Dependencies & AI Scanners
         run: |
-          python -m pip install --upgrade pip
+          # تم إزالة سطر ترقية pip لتفادي انهيار بيئة Termux
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           
           # تثبيت أدوات الفحص المؤسسي للذكاء الاصطناعي وأمن النواة
-          pip install flake8 bandit
+          pip install flake8 bandit --break-system-packages
 
       - name: 🛡️ Sovereign AST & Syntax Validation (منع الأخطاء البرمجية)
         run: |
