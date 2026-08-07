@@ -29,52 +29,62 @@ jobs:
 
       - name: 🐍 Verify System Python & Pip
         run: |
+          echo "=== 🛡️ System Core Diagnostics ==="
           python3 --version
           python3 -m pip --version
 
       - name: 📦 Install Enterprise Core Dependencies & Libraries
         run: |
+          echo "=== 📦 Loading Mega-Core Libraries ==="
+          # تثبيت الحزم بصمت نسبي لتخفيف الضغط على السجلات وتسريع العملية
           python3 -m pip install --prefer-binary fastapi pydantic uvicorn httpx ccxt sqlalchemy --break-system-packages
+          echo "✅ Core Dependencies Installed Successfully."
 
       - name: 🧭 Pre-Flight Workspace Diagnostic & Path Resolution
         run: |
-          echo "=== Sovereign Workspace Diagnostics ==="
+          echo "=== 🧭 Sovereign Workspace Diagnostics ==="
           pwd
           ls -la
           # الطريقة الصحيحة والموثوقة لتمرير المتغيرات في GitHub Actions
           echo "PYTHONPATH=$PWD" >> $GITHUB_ENV
-          echo "PYTHONPATH set to $PWD"
+          echo "✅ PYTHONPATH dynamically mapped to: $PWD"
 
       - name: ⚙️ Execute Sovereign Master Engine (Mega-Core v17.0)
         env:
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          # تفعيل خاصية التوقف الفوري إذا فشل سكريبت البايثون لتسهيل اكتشاف الأخطاء  
+          # تفعيل خاصية التوقف الفوري مع اقتناص الأخطاء
           set -e
+          trap 'echo "❌ [System Failure]: حدث انهيار غير متوقع أثناء تشغيل المحرك السيادي."' ERR
+
+          echo "==================================================="
           echo "👑 Starting Sovereign Master Engine Execution..."
+          echo "==================================================="
           
           # مسح وتحديد المسار الديناميكي بمرونة فائقة لتفادي أي أخطاء مفقودة
           if [ -f "./scripts/sovereign_master_engine.py" ]; then
-            echo "-> Executing from standard ./scripts/ path..."
+            echo "✅ [Routing]: Executing from standard ./scripts/ path..."
             python3 ./scripts/sovereign_master_engine.py
           elif [ -f "./python_scripts/sovereign_master_engine.py" ]; then
-            echo "-> Executing from ./python_scripts/ path..."
+            echo "✅ [Routing]: Executing from ./python_scripts/ path..."
             python3 "./python_scripts/sovereign_master_engine.py"
           else
-            echo "-> Searching dynamically for Sovereign Engine..."
+            echo "⚠️ [Routing]: Standard paths missed. Searching dynamically for Sovereign Engine..."
             # بحث ذكي يستثني المجلدات المخفية (مثل .git) لتسريع العملية
             ENGINE_PATH=$(find . -not -path '*/\.*' -name "sovereign_master_engine.py" | head -n 1)
             if [ -n "$ENGINE_PATH" ]; then
-              echo "-> Found engine at: $ENGINE_PATH"
+              echo "🎯 [Routing]: Engine perfectly located at -> $ENGINE_PATH"
               python3 "$ENGINE_PATH"
             else
-              echo "❌ Critical Error: Sovereign Master Engine script could not be located anywhere in workspace!"
+              echo "❌ [Critical Error]: Sovereign Master Engine script could not be located anywhere in the workspace!"
               exit 1
             fi
           fi
+          echo "✅ [Execution Completed]: Sovereign Master Engine finished its cycle flawlessly."
 
       - name: 🚀 Commit & Push Synchronized Architecture Files
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "👑 Sovereign Master Engine: إتمام التدقيق، الإصلاح المعماري، والربط المؤسسي بنجاح تام"
-          branch: main
+          # تعديل جوهري: الرفع الديناميكي للفرع الحالي بدلاً من تثبيته على main لمنع أخطاء الدمج
+          branch: ${{ github.head_ref || github.ref_name }}
