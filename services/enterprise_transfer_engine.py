@@ -9,7 +9,7 @@ from pyrogram.errors import FloodWait, UserPrivacyRestricted, PeerFlood, UserCha
 logger = logging.getLogger("EnterpriseTransferEngine")
 
 class SovereignAIWorkerAgent:
-    """وكيل الذكاء الاصطناعي الخلفي (Autonomous AI Worker Agent) للإرشاد، التحسين الذاتي، والمراقبة الأمنية على مدار الساعة."""
+    """وكيل الذكاء الاصطناعي الخلفي للإرشاد، التحسين الذاتي، والمراقبة الأمنية على مدار الساعة."""
     
     @staticmethod
     async def analyze_and_optimize_transfer(session_id: str, source_chat: str, target_chat: str) -> Dict[str, Any]:
@@ -26,14 +26,15 @@ class SovereignAIWorkerAgent:
 
     @staticmethod
     async def provide_24_7_user_guidance(user_intent: str) -> str:
-        """محرك إرشادي شفهي وذاتي يعمل على مدار الساعة لتوجيه المستخدم وإدارته خطوة بخطوة في العمليات اللوجستية الضخمة."""
+        """محرك إرشادي ذاتي يعمل على مدار الساعة لتوجيه المستخدم وإدارته خطوة بخطوة في العمليات اللوجستية الضخمة."""
         intents = {
             "add_session": "لتثبيت جلسة جديدة، يرجى إدخال رقم الهاتف مع مفتاح الدولة وسيتم عزل الجلسة برمجياً بشكل تام ومحمي.",
             "start_transfer": "لبدء نقل الأعضاء الحقيقيين والمتصلين، تأكد من تحديد المجموعة المصدر والهدف، وسيقوم الوكيل الذكي بإدارة الفلاتر النشطة تلقائياً.",
             "safety_status": "جميع القنوات والمجموعات محمية بدرع الإمبراطورية مع مراقبة لحظية لمؤشرات الأمان وحظر البلاغات الكيدية.",
             "step_1_screening_done": "✅ تم الانتهاء من الفحص الاستباقي للجلسات وعزل الحسابات المقيدة وغير النشطة. الآن: يرجى إرسال روابط القنوات أو المجموعات التي تريد النقل منها (المصدر). عند الانتهاء من إضافة جميع الروابط، أرسل كلمة 'تم' للانتقال للخطوة التالية.",
             "step_2_ask_target": "ممتاز! تم حفظ المجموعات المصدر بنجاح في بيئتك المعزولة. الآن: يرجى إرسال رابط المجموعة التي تريد النقل إليها (الهدف).",
-            "step_3_start_execution": "🚀 اكتملت الإعدادات المؤسسية! جاري توجيه العمال الخلفيين (Background Workers) باستخدام مفاتيح الجلسات المشفرة لبدء عملية النقل الحقيقية والآمنة... يمكنك متابعة التقدم لحظياً عبر السجلات."
+            "step_3_ask_limit": "الاحترافية اللوجستية: كم عدد الأعضاء الذين تريد إضافتهم *لكل جلسة* كحد أقصى لتوزيع الأحمال وتجنب الحظر؟ (اكتب رقماً صحيحاً، مثلاً: 50).",
+            "step_4_start_execution": "🚀 اكتملت الإعدادات المؤسسية وضبط الأحمال! جاري توجيه العمال الخلفيين (Background Workers) باستخدام مفاتيح الجلسات المشفرة لبدء عملية النقل الحقيقية والآمنة... يمكنك متابعة التقدم لحظياً عبر السجلات."
         }
         return intents.get(user_intent, "النظام يعمل بكفاءة تامة على مدار الساعة لإدارة البنية التحتية اللوجستية.")
 
@@ -89,7 +90,8 @@ class EnterpriseTransferEngine:
                     "workflow_step": 0, 
                     "valid_sessions": [],
                     "source_chats": [],
-                    "target_chat": None
+                    "target_chat": None,
+                    "limit_per_session": 50  # القيمة الافتراضية للحد الأقصى لكل جلسة
                 }
             }
             logger.info(f"[Isolation Core] Created secure isolated container for tenant: {tenant_key}")
@@ -109,8 +111,9 @@ class EnterpriseTransferEngine:
         
         screening_result = await SovereignAIWorkerAgent.proactive_session_screening(sessions_to_use)
         
-        cls._tenant_sessions_registry[tenant_key]["isolated_storage"]["valid_sessions"] = screening_result["active_sessions"]
-        cls._tenant_sessions_registry[tenant_key]["isolated_storage"]["workflow_step"] = 1
+        storage = cls._tenant_sessions_registry[tenant_key]["isolated_storage"]
+        storage["valid_sessions"] = screening_result["active_sessions"]
+        storage["workflow_step"] = 1
         
         guidance = await SovereignAIWorkerAgent.provide_24_7_user_guidance("step_1_screening_done")
         
@@ -118,7 +121,7 @@ class EnterpriseTransferEngine:
 
     @classmethod
     async def handle_interactive_input(cls, license_key: str, user_id: str, user_input: str) -> str:
-        """محرك تفاعلي متطور يستقبل ردود المستخدم ويوجهه خطوة بخطوة حتى جاهزية التنفيذ الميداني."""
+        """محرك تفاعلي متطور يستقبل ردود المستخدم ويوجهه خطوة بخطوة حتى جاهزية التنفيذ الميداني وتحديد الحصص."""
         tenant_key = f"{license_key}_{user_id}"
         if tenant_key not in cls._tenant_sessions_registry:
             return "❌ البيئة غير مهيأة أو منتهية الصلاحية. يرجى البدء من جديد عبر تهيئة الترخيص."
@@ -139,7 +142,18 @@ class EnterpriseTransferEngine:
         elif step == 2:
             storage["target_chat"] = user_input.strip()
             storage["workflow_step"] = 3
-            return await SovereignAIWorkerAgent.provide_24_7_user_guidance("step_3_start_execution")
+            return await SovereignAIWorkerAgent.provide_24_7_user_guidance("step_3_ask_limit")
+
+        elif step == 3:
+            try:
+                limit_val = int(user_input.strip())
+                if limit_val <= 0:
+                    return "❌ يجب أن يكون العدد أكبر من الصفر. يرجى إدخال رقم صحيح."
+                storage["limit_per_session"] = limit_val
+                storage["workflow_step"] = 0  # اكتمال الإعدادات وتصفير مؤشر الخطوات
+                return await SovereignAIWorkerAgent.provide_24_7_user_guidance("step_4_start_execution")
+            except ValueError:
+                return "❌ يرجى إدخال رقم صحيح ومقبول لعدد الأعضاء لكل جلسة."
 
         return "✅ جاري معالجة طلباتك اللوجستية في الخلفية من قبل وكلاء الذكاء الاصطناعي..."
 
@@ -152,14 +166,15 @@ class EnterpriseTransferEngine:
         api_hash: str, 
         target_chat: str, 
         members_to_add: List[str],
+        limit_per_session: int = 50,
         target_active_only: bool = True,
         target_online_status: bool = True
     ) -> Dict[str, Any]:
         """
         القلب النابض الحقيقي للتنفيذ اللوجستي المؤسسي: يستخدم مفاتيح الجلسات المشفرة (Session Strings) 
-        للاتصال الصامت المتوازي، مع معالجة استباقية لأخطاء خوادم تيليجرام وفلترة الأعضاء الحقيقيين.
+        للاتصال الصامت المتوازي، مع الالتزام بالحصص المحددة لكل جلسة، ومعالجة استباقية لأخطاء خوادم تيليجرام.
         """
-        logger.info(f"🚀 [Transfer Execution]: Booting high-concurrency Pyrogram worker for session: {session_name}")
+        logger.info(f"🚀 [Transfer Execution]: Booting high-concurrency Pyrogram worker for session: {session_name} | Limit: {limit_per_session}")
         
         ai_optimization = await SovereignAIWorkerAgent.analyze_and_optimize_transfer(session_name, "Source_Collection", target_chat)
         
@@ -176,6 +191,7 @@ class EnterpriseTransferEngine:
         filtered_criteria = {
             "active_within": "last_24_hours" if target_active_only else "any",
             "online_status_required": target_online_status,
+            "limit_per_session": limit_per_session,
             "anti_flood_protection": True,
             "distributed_load_balancing": "enabled"
         }
@@ -191,10 +207,15 @@ class EnterpriseTransferEngine:
                 logger.warning(f"⚠️ [Worker {session_name}]: Target chat join notice (may already be a member): {e}")
 
             for user in members_to_add:
+                # التحقق الاستباقي من الحصة المحددة لكل جلسة لمنع إرهاق الحساب
+                if added_count >= limit_per_session:
+                    logger.info(f"🏁 [Worker {session_name}]: Reached designated session limit of {limit_per_session} members. Safely halting worker.")
+                    break
+                
                 try:
                     await client.add_chat_members(target_chat, [user])
                     added_count += 1
-                    logger.info(f"➕ [Worker {session_name}]: Successfully added user {user} to target {target_chat}")
+                    logger.info(f"➕ [Worker {session_name}]: Successfully added user {user} to target {target_chat} (Total added: {added_count})")
                     await asyncio.sleep(ai_optimization.get("recommended_delay", 4.5))
                     
                 except FloodWait as e:
@@ -228,7 +249,7 @@ class EnterpriseTransferEngine:
                 "filtering_applied": filtered_criteria,
                 "ai_optimization_metrics": ai_optimization,
                 "group_safety_status": "100_PERCENT_SECURE",
-                "message": "انتهت دورة النقل اللوجستية الحقيقية بنجاح تام وفق معايير السيادة المؤسسية."
+                "message": f"انتهت دورة النقل اللوجستية للجلسة {session_name} بنجاح تام بإضافة {added_count} عضواً."
             }
 
         except Exception as e:
