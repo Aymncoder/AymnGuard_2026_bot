@@ -16,7 +16,7 @@ jobs:
   # الطبقة الأولى: محرك الشفاء الذاتي والفحص النحوي المفرط (Auto-Healing & AST)
   # ==============================================================================
   Sovereign_Heal_And_Validate:
-    name: ⚡ الشفاء الذاتي والتحليل الهيكلي (Hyper-Static Healing)
+    name:  #الشفاء الذاتي والتحليل الهيكلي #(Hyper-Static Healing)
     runs-on: self-hosted
     steps:
       - name: 🛡️ Checkout Sovereign Repository
@@ -30,8 +30,9 @@ jobs:
         - name: 🤖 Install Auto-Healing Workforce & Dependencies
       run: |
         python3 -m pip install --upgrade pip --break-system-packages
-        python3 -m pip install --prefer-binary fastapi pydantic httpx ccxt sqlalchemy --break-system-packages
-        #قائمة استثناءات سيادية لضمان عدم تعطل أنظمة FastAPI أو قواعد البيانات
+    python3 -m pip install --prefer-binary fastapi pydantic httpx ccxt sqlalchemy --break-system-packages
+
+   #قائمة استثناءات سيادية لضمان عدم تعطل أنظمة FastAPI أو قواعد البيانات
       
      - name: 🔍 Sovereign AST & Syntax Validation (الفحص النحوي المتقدم)
         # فحص شجري صارم للتأكد من سلامة النواة البرمجية بعد الإصلاح
@@ -71,9 +72,10 @@ jobs:
       - name: 📜 Install Slither & Solidity Compiler (Solidity 0.8.34 Analyzer)
         run: |
           python3 -m pip install slither-analyzer solc-select --break-system-packages
-          # تهيئة بيئة المترجم الخاص بالعقود الذكية
-          solc-select install 0.8.34 || echo "⚠️ الإصدار قد يتطلب ترجمة محلية، سيتم استخدام المتاح."
-          solc-select use 0.8.34 || true
+     
+      #تهيئة بيئة المترجم الخاص بالعقود الذكية
+      solc-select install 0.8.34 || echo "⚠️ الإصدار قد يتطلب ترجمة محلية، سيتم استخدام المتاح."
+      solc-select use 0.8.34 || true
 
       - name: 💎 Audit Token Contracts & Marketing Wallets
         run: |
@@ -88,7 +90,7 @@ jobs:
   # الطبقة الثالثة: المراجعة الإدراكية عبر الذكاء الاصطناعي (AI Cognitive Review)
   # ==============================================================================
   Cognitive_AI_Review:
-    name: 🧠 المراجعة الإدراكية للمنطق المالي (AI Core Reviewer)
+    name: 🧠 المراجعة الإدراكية للمنطق المالي #(AI Core Reviewer)
     runs-on: self-hosted
     needs: Hyper_Security_And_Smart_Contracts
     if: github.event_name == 'pull_request' # يعمل الوكيل الإدراكي بشكل أساسي على طلبات السحب
