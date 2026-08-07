@@ -1,4 +1,4 @@
-name: 👑 Sovereign Master Engine Mega-Core Pipeline
+name: #Sovereign Master Engine Mega-Core Pipeline👑
 
 on:
   workflow_dispatch:
@@ -12,17 +12,18 @@ on:
 concurrency:
   group: sovereign-master-engine-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
   run_master_engine:
-    name: 🚀 تنفيذ المحرك السيادي الشامل بمعايير العمالقة العالمية
+    name: 
+     
+     🚀 #تنفيذ المحرك السيادي الشامل بمعايير العمالقة العالمية
     runs-on: self-hosted
     permissions:
       contents: write
       actions: read
     
     steps:
-      - name: 🛡️ Checkout Sovereign Repository
+      - name: 🛡️Checkout Sovereign Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -42,7 +43,7 @@ jobs:
           echo "=== Sovereign Workspace Diagnostics ==="
           pwd
           ls -la
-          # الطريقة الصحيحة والموثوقة لتمرير المتغيرات في GitHub Actions
+#الطريقة الصحيحة والموثوقة لتمرير المتغيرات في GitHub Actions
           echo "PYTHONPATH=$PWD" >> $GITHUB_ENV
           echo "PYTHONPATH set to $PWD"
 
@@ -50,12 +51,12 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          # تفعيل خاصية التوقف الفوري إذا فشل سكريبت البايثون لتسهيل اكتشاف الأخطاء
+        
+#تفعيل خاصية التوقف الفوري إذا فشل سكريبت البايثون لتسهيل اكتشاف الأخطاء  
           set -e
-          
           echo "👑 Starting Sovereign Master Engine Execution..."
           
-          # مسح وتحديد المسار الديناميكي بمرونة فائقة لتفادي أي أخطاء مفقودة
+#مسح وتحديد المسار الديناميكي بمرونة فائقة لتفادي أي أخطاء مفقودة
           if [ -f "./scripts/sovereign_master_engine.py" ]; then
             echo "-> Executing from standard ./scripts/ path..."
             python3 ./scripts/sovereign_master_engine.py
@@ -64,7 +65,7 @@ jobs:
             python3 "./python_scripts/sovereign_master_engine.py"
           else
             echo "-> Searching dynamically for Sovereign Engine..."
-            # بحث ذكي يستثني المجلدات المخفية (مثل .git) لتسريع العملية
+بحث ذكي يستثني المجلدات المخيه(مثل.git)لتسريع العملية#
             ENGINE_PATH=$(find . -not -path '*/\.*' -name "sovereign_master_engine.py" | head -n 1)
             if [ -n "$ENGINE_PATH" ]; then
               echo "-> Found engine at: $ENGINE_PATH"
