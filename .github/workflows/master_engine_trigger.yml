@@ -32,9 +32,10 @@ jobs:
           python3 --version
           python3 -m pip --version
 
-      - name: 📦 Install Enterprise Core Dependencies & Libraries
-        run: 
-          python3 -m pip install fastapi pydantic uvicorn httpx ccxt sqlalchemy --break-system-packages
+    - name: 📦 Install Enterprise Core Dependencies & Libraries
+  run: |
+    python3 -m pip install --prefer-binary fastapi pydantic uvicorn httpx ccxt sqlalchemy --break-system-packages
+
 
       - name: 🧭 Pre-Flight Workspace Diagnostic & Path Resolution
         run: |
