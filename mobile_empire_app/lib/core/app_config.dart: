@@ -1,0 +1,36 @@
+import 'package:flutter/material.dart';
+
+// ==============================================================================
+// 1. التكوين المركزي والسيادي (Central Configuration & Theming)
+// ==============================================================================
+
+/// كلاس الإعدادات الأساسية للتطبيق
+abstract class AppConfig {
+  /// الرابط الأساسي للسيرفر (API Base URL)
+  static const String serverUrl = "http://135.181.86.199:10050";
+  
+  /// إصدار التطبيق الحالي
+  static const String appVersion = "21.0.0 Enterprise";
+  
+  /// التحكم المركزي في صلاحيات المالك (لتفعيل ميزات لوحة القيادة السيادية)
+  static const bool isOwnerStatus = true; 
+}
+
+/// كلاس ألوان الإمبراطورية المعتمدة (App Theme Colors)
+abstract class AppColors {
+  /// لون الخلفية الأساسي للتطبيق
+  static const Color background = Color(0xFF151E27);
+  
+  /// لون الأسطح (البطاقات، الأشرطة العلوية والسفلية)
+  static const Color surface = Color(0xFF1E293B);
+  
+  /// اللون الرئيسي (الهوية البصرية - أزرق سماوي)
+  static const Color primary = Color(0xFF0EA5E9);
+  
+  /// لون التميز والخدمات السيادية (ذهبي)
+  static const Color accentGold = Color(0xFFFFD700);
+  
+  /// لون خلفية المحادثات
+  static const Color chatBackground = Color(0xFF0F172A);
+}
+
