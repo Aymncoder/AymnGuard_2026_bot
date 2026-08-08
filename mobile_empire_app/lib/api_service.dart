@@ -10,7 +10,9 @@ import 'bot_model.dart';
 // ==============================================================================
 
 class SovereignApiService {
-  /// دالة لجلب قائمة البوتات من السيرفر
+  // ------------------------------------------------------------------
+  // 1. دوال جلب وتثبيت البوتات من السيرفر
+  // ------------------------------------------------------------------
   static Future<List<SovereignBotModel>> fetchBots() async {
     try {
       final response = await http
@@ -55,7 +57,6 @@ class SovereignApiService {
     ];
   }
 
-  /// دالة لمحاكاة تثبيت البوت على السيرفر
   static Future<bool> installBotOnServer(String botId) async {
     try {
       final response = await http.post(
@@ -72,5 +73,45 @@ class SovereignApiService {
       await Future.delayed(const Duration(milliseconds: 800));
       return true; 
     }
+  }
+
+  // ------------------------------------------------------------------
+  // 2. دوال الاتصال بالعمال الخلفيين ووكلاء الذكاء الاصطناعي (FastAPI & Celery)
+  // ------------------------------------------------------------------
+
+  /// إرسال عقد ذكي للتدقيق والحصول على رقم تتبع المهمة (Task ID)
+  static Future<String?> startSmartContractAudit(String contractAddress) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${AppConfig.serverUrl}/api/services/audit'),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({"contract_address": contractAddress}),
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        debugPrint("تم إرسال المهمة بنجاح. رقم التتبع: ${data['task_id']}");
+        return data['task_id']; // إعادة رقم التتبع للتطبيق
+      }
+    } catch (e) {
+      debugPrint("خطأ في إرسال طلب التدقيق: $e");
+    }
+    return null;
+  }
+
+  /// الاستعلام عن حالة المهمة باستخدام رقم التتبع
+  static Future<Map<String, dynamic>?> checkTaskStatus(String taskId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${AppConfig.serverUrl}/api/services/status/$taskId'),
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      }
+    } catch (e) {
+      debugPrint("خطأ في جلب حالة المهمة: $e");
+    }
+    return null;
   }
 }
