@@ -40,9 +40,10 @@ jobs:
         run: |
           echo "🔎 [AST Gatekeeper]: بدء فحص السلامة الهيكلية لمحركات النواة..."
           python3 -m compileall core/ backend_core/ main.py || echo "⚠️ [AST]: تم تخطي بعض الملفات التي لا تحتاج إلى تجميع."
-    - name: 🔄 Pull Remote Changes before Commit
-      run: |
-        git pull origin ${{ github.head_ref || github.ref_name }} --rebase || true
+
+      - name: 🔄 Pull Remote Changes before Commit
+        run: |
+          git pull origin ${{ github.head_ref || github.ref_name }} --rebase || true
 
       - name: 🚀 Commit Auto-Healed Changes (حفظ التعديلات المُصححة ذاتياً)
         uses: stefanzweifel/git-auto-commit-action@v5
@@ -78,12 +79,11 @@ jobs:
           semgrep --config auto . || echo "⚠️ [Semgrep]: تم تخطي الفحص المعمق."
 
       - name: 📜 Install Slither & Solidity Compiler
-        continue-on-error: true # حماية سيادية: منع انهيار السيرفر إذا فشل التثبيت بسبب قيود معمارية الهاتف
+        continue-on-error: true
         run: |
           echo "⚙️ محاولة تثبيت بيئة تدقيق العقود الذكية (Solidity 0.8.34)..."
           python3 -m pip install slither-analyzer solc-select --break-system-packages || echo "⚠️ [Warning]: فشل التثبيت المتقدم لـ Slither بسبب ضغط الذاكرة."
           
-          # التحقق من وجود الأداة قبل تشغيلها لتفادي خطأ (command not found)
           if command -v solc-select >/dev/null 2>&1; then
             solc-select install 0.8.34 || true
             solc-select use 0.8.34 || true
