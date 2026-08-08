@@ -494,7 +494,205 @@ class AdvancedToolsDrawer extends StatelessWidget {
 }
 
 // ==============================================================================
-// شاشات فارغة مكملة
+// 9. شاشات الإعدادات والخصوصية المتقدمة (Settings & Privacy UI)
 // ==============================================================================
-class AccountSettingsScreen extends StatelessWidget { const AccountSettingsScreen({super.key}); @override Widget build(BuildContext context) { return const Center(child: Text("إعدادات الحساب")); } }
-class ContactsScreen extends StatelessWidget { const ContactsScreen({super.key}); @override Widget build(BuildContext context) { return const Center(child: Text("جهات الاتصال")); } }
+class AccountSettingsScreen extends StatelessWidget {
+  const AccountSettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF151E27),
+      appBar: AppBar(
+        title: const Text("الإعدادات", style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFF1E293B),
+        actions: [
+          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
+          IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
+        ],
+      ),
+      body: ListView(
+        children: [
+          // 1. ترويسة الحساب الشخصي (Profile Header)
+          Container(
+            color: const Color(0xFF1E293B),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            child: Row(
+              children: [
+                const CircleAvatar(
+                  radius: 35,
+                  backgroundColor: Color(0xFF0EA5E9),
+                  child: Icon(Icons.person, size: 40, color: Colors.white),
+                ),
+                const SizedBox(width: 15),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("ابو يمان", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                    const SizedBox(height: 5),
+                    const Text("+91 9265035200", style: TextStyle(fontSize: 14, color: Colors.grey)),
+                    const SizedBox(height: 5),
+                    Text("@AymnGuard", style: TextStyle(fontSize: 14, color: Colors.grey.shade400)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          // 2. إعدادات AymnGuard المتقدمة (تحاكي إعدادات Graph/تليجراف)
+          _buildSettingsSection(
+            title: "إعدادات الإمبراطورية",
+            items: [
+              _buildSettingsTile(context, "إعدادات AymnGuard Plus", Icons.settings_suggest, Colors.green),
+              _buildSettingsTile(context, "الأقسام المخفية", Icons.visibility_off, Colors.blueGrey),
+              _buildSettingsTile(context, "مانع الإعلانات", Icons.block, Colors.redAccent, hasSwitch: true, switchValue: true),
+            ],
+          ),
+
+          // 3. الإعدادات العامة (General Settings)
+          _buildSettingsSection(
+            title: "الإعدادات العامة",
+            items: [
+              _buildSettingsTile(context, "إعدادات المحادثات", Icons.chat, Colors.greenAccent),
+              _buildSettingsTile(context, "الخصوصية والأمان", Icons.lock, Colors.lightBlueAccent, destination: const PrivacyAndSecurityScreen()),
+              _buildSettingsTile(context, "الإشعارات والأصوات", Icons.notifications, Colors.redAccent),
+              _buildSettingsTile(context, "البيانات والتخزين", Icons.pie_chart, Colors.blue),
+              _buildSettingsTile(context, "توفير الطاقة", Icons.battery_charging_full, Colors.orange),
+              _buildSettingsTile(context, "اللغة", Icons.language, Colors.purpleAccent, subtitle: "العربية"),
+            ],
+          ),
+
+          // 4. الخدمات المميزة (Premium Features)
+          _buildSettingsSection(
+            title: "المميزات",
+            items: [
+              _buildSettingsTile(context, "AymnGuard المُميَّز", Icons.star, Colors.purple),
+              _buildSettingsTile(context, "الأعمال (Business)", Icons.store, Colors.pinkAccent),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingsSection({required String title, required List<Widget> items}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(right: 16, top: 15, bottom: 5),
+          child: Text(title, style: const TextStyle(color: Color(0xFF0EA5E9), fontWeight: FontWeight.bold)),
+        ),
+        Container(
+          color: const Color(0xFF1E293B),
+          child: Column(children: items),
+        ),
+        const SizedBox(height: 10),
+      ],
+    );
+  }
+
+  Widget _buildSettingsTile(BuildContext context, String title, IconData icon, Color iconColor, {String? subtitle, bool hasSwitch = false, bool switchValue = false, Widget? destination}) {
+    return ListTile(
+      leading: CircleAvatar(
+        radius: 18,
+        backgroundColor: iconColor.withOpacity(0.2),
+        child: Icon(icon, size: 20, color: iconColor),
+      ),
+      title: Text(title, style: const TextStyle(color: Colors.white, fontSize: 15)),
+      subtitle: subtitle != null ? Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)) : null,
+      trailing: hasSwitch
+          ? Switch(value: switchValue, activeColor: const Color(0xFF0EA5E9), onChanged: (v) {})
+          : const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+      onTap: () {
+        if (destination != null) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => destination));
+        }
+      },
+    );
+  }
+}
+
+// ==============================================================================
+// 10. شاشة الخصوصية والأمان (Privacy & Security) مطابقة للصور
+// ==============================================================================
+class PrivacyAndSecurityScreen extends StatelessWidget {
+  const PrivacyAndSecurityScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF151E27),
+      appBar: AppBar(
+        title: const Text("الخصوصية والأمان"),
+        backgroundColor: const Color(0xFF1E293B),
+      ),
+      body: ListView(
+        children: [
+          _buildPrivacySection(
+            title: "الأمان",
+            items: [
+              _buildPrivacyTile("التحقق بخطوتين", "مفعّل", Icons.verified_user),
+              _buildPrivacyTile("الحذف التلقائي للرسائل", "معطّلة", Icons.auto_delete),
+              _buildPrivacyTile("رمز القفل أو النقش", "معطّلة", Icons.lock),
+              _buildPrivacyTile("المستخدمون المحظورون", "لا أحد", Icons.block),
+              _buildPrivacyTile("الأجهزة", "3", Icons.devices),
+            ],
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text("مراجعة قائمة الأجهزة التي قمت بتسجيل دخول حسابك على تليجرام فيها.", style: TextStyle(color: Colors.grey, fontSize: 12)),
+          ),
+          _buildPrivacySection(
+            title: "الخصوصية",
+            items: [
+              _buildPrivacyTile("رقم الهاتف", "لا أحد", Icons.phone),
+              _buildPrivacyTile("آخر ظهور و«متصل»", "الجميع", Icons.access_time),
+              _buildPrivacyTile("صور الملف الشخصي", "الجميع", Icons.photo_camera),
+              _buildPrivacyTile("الرسائل المحوّلة", "الجميع", Icons.forward),
+              _buildPrivacyTile("المكالمات", "الجميع", Icons.call),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPrivacySection({required String title, required List<Widget> items}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(right: 16, top: 15, bottom: 5),
+          child: Text(title, style: const TextStyle(color: Color(0xFF0EA5E9), fontWeight: FontWeight.bold)),
+        ),
+        Container(
+          color: const Color(0xFF1E293B),
+          child: Column(children: items),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPrivacyTile(String title, String status, IconData icon) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.grey),
+      title: Text(title, style: const TextStyle(color: Colors.white, fontSize: 15)),
+      trailing: Text(status, style: const TextStyle(color: Color(0xFF0EA5E9), fontSize: 14)),
+      onTap: () {},
+    );
+  }
+}
+
+// شاشة جهات الاتصال (مؤقتة لحين بنائها)
+class ContactsScreen extends StatelessWidget {
+  const ContactsScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      backgroundColor: Color(0xFF151E27),
+      body: Center(child: Text("جهات الاتصال الإمبراطورية\n(سيتم بناؤها لاحقاً)", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey))),
+    );
+  }
+}
