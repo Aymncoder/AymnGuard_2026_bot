@@ -1,5 +1,5 @@
 # =====================================================================
-# AymnGuard Enterprise : Advanced CI/CD Cloud Factory (v18.7.0)
+# AymnGuard Enterprise : Advanced CI/CD Cloud Factory (v18.8.0)
 # =====================================================================
 
 name: 👑 Sovereign Empire Super-App Builder
@@ -42,6 +42,10 @@ jobs:
 
       - name: 📦 جلب التبعيات والمكتبات البرمجية
         run: flutter pub get
+        working-directory: ./mobile_empire_app
+
+      - name: 🤖 توليد هيكل ونظام الـ Android وGradle التلقائي
+        run: flutter create . --platforms=android --org com.aymnguard.empire
         working-directory: ./mobile_empire_app
 
       - name: 🧪 تشغيل اختبارات الجودة والوحدة
