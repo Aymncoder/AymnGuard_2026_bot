@@ -52,7 +52,7 @@ class SovereignApiService {
   static Future<bool> installBotOnServer(String botId) async {
     try {
       final response = await http.post(
-        Uri.parse('${AppConfig.serverUrl}/api/bots/install'),
+        Uri.parse({AppConfig.serverUrl}/api/bots/install')
         headers: {"Content-Type": "application/json"},
         body: json.encode({"bot_id": botId, "timestamp": DateTime.now().toIso8601String()}),
       ).timeout(const Duration(seconds: 10));
