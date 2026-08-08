@@ -1,97 +1,184 @@
 // ==============================================================================
-// AymnGuard Enterprise : Sovereign Mobile App (Flutter Frontend - v18.0.0)
+// AymnGuard Enterprise : Sovereign Super App - Modular Engine Hub (v18.5.0)
 // ==============================================================================
-// واجهة التحكم السيادية: تتصل بخادم Python على السيرفر السحابي (VPS) 
-// وتمنح المالك تحكماً مطلقاً بجميع الميكروسيرفسات.
+// يدمج هذا الإصدار واجهات المراسلة مع "مركز تثبيت البوتات والخدمات" 
+// مما يسمح للمالك بإضافة محركات (حماية، نقل، تصميم، بحث) مستقبلاً بضغطة زر.
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 void main() {
-  runApp(const SovereignEmpireApp());
+  runApp(const SovereignSuperApp());
 }
 
-class SovereignEmpireApp extends StatelessWidget {
-  const SovereignEmpireApp({super.key});
+class SovereignSuperApp extends StatelessWidget {
+  const SovereignSuperApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'AymnGuard Sovereign Hub',
+      title: 'AymnGuard Super App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
-        primaryColor: const Color(0xFF38bdf8),
-        scaffoldBackgroundColor: const Color(0xFF0f172a), // لون خلفية فخم
-        cardColor: const Color(0xFF1e293b),
+        scaffoldBackgroundColor: const Color(0xFF1c242f), 
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF242f3d),
+          elevation: 0,
+        ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Color(0xFF242f3d),
+          selectedItemColor: Color(0xFF38bdf8),
+          unselectedItemColor: Colors.grey,
+        ),
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: Color(0xFF38bdf8),
+        ),
       ),
-      home: const LoginScreen(),
+      home: const MainSovereignScreen(),
+    );
+  }
+}
+
+class MainSovereignScreen extends StatefulWidget {
+  const MainSovereignScreen({super.key});
+
+  @override
+  State<MainSovereignScreen> createState() => _MainSovereignScreenState();
+}
+
+class _MainSovereignScreenState extends State<MainSovereignScreen> {
+  int _currentIndex = 4; // نبدأ من لوحة السيادة لاستعراض قوة الإدارة
+
+  final List<Widget> _screens = [
+    const ProfileScreenPreview(),   
+    const SettingsScreenPreview(),  
+    const Center(child: Text("جهات الاتصال")), 
+    const ChatListScreen(),         
+    const SovereignOwnerDashboard(),// لوحة السيادة ومركز التثبيت 👑
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('الإمبراطورية متصلة...', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('الخادم السحابي المستقل نشط', style: TextStyle(fontSize: 12, color: Colors.greenAccent)),
+          ],
+        ),
+        actions: [
+          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.more_vert),
+              onPressed: () => Scaffold.of(context).openEndDrawer(), 
+            ),
+          ),
+        ],
+      ),
+      
+      drawer: const AccountManagerDrawer(),
+      endDrawer: const AdvancedToolsDrawer(),
+      body: _screens[_currentIndex],
+
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _currentIndex,
+        onTap: (index) => setState(() => _currentIndex = index),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'الملف'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'الإعدادات'),
+          BottomNavigationBarItem(icon: Icon(Icons.perm_contact_calendar), label: 'الجهات'),
+          BottomNavigationBarItem(
+            icon: Badge(label: Text('١٣'), child: Icon(Icons.chat_bubble)), 
+            label: 'المحادثات'
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.admin_panel_settings, color: Colors.amber), label: 'السيادة'),
+        ],
+      ),
     );
   }
 }
 
 // ==============================================================================
-// 1. شاشة الدخول السيادية (تتطلب مفتاح المالك)
+// 2. لوحة القيادة السيادية للمالك + زر إضافة البوتات المستقبلي
 // ==============================================================================
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _keyController = TextEditingController();
-  final String serverIP = "192.168.X.X"; // سيتم تغييره إلى IP السيرفر السحابي (VPS)
-
-  void _authenticate() {
-    // المفتاح السري الذي برمجناه في السيرفر
-    if (_keyController.text == "AG-ABSOLUTE-OWNER-KEY-2026") {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => DashboardScreen(serverIP: serverIP, ownerKey: _keyController.text)),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('❌ مفتاح السيادة غير صالح! الوصول مرفوض.', style: TextStyle(color: Colors.red))),
-      );
-    }
-  }
+class SovereignOwnerDashboard extends StatelessWidget {
+  const SovereignOwnerDashboard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("👑 مركز السيطرة الإمبراطورية", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.amber)),
+                  SizedBox(height: 5),
+                  Text("إدارة الميكروسيرفسات والبوتات النشطة", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                ],
+              ),
+              // الزر الاستراتيجي لفتح "متجر التثبيت"
+              IconButton(
+                icon: const Icon(Icons.add_box, color: Color(0xFF38bdf8), size: 30),
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => const BotInstallerSheet(),
+                  );
+                },
+              )
+            ],
+          ),
+          const SizedBox(height: 20),
+          
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              children: [
+                _buildDashboardCard("بوت الحماية الشامل", "نشط | يحمي 45 مجموعة", Icons.security, Colors.green),
+                _buildDashboardCard("النقل الذكي", "وكلاء AI يعملون بالخلفية", Icons.group_add, Colors.blue),
+                _buildDashboardCard("مولد التصميمات", "جاهز لإصدار الإيصالات", Icons.brush, Colors.pink),
+                _buildDashboardCard("محركات البحث", "فهرسة استخباراتية نشطة", Icons.manage_search, Colors.teal),
+                _buildDashboardCard("تداول Web3", "تدقيق العقود الذكية", Icons.candlestick_chart, Colors.orange),
+                _buildDashboardCard("إدارة التراخيص", "18 ترخيص مفعل", Icons.vpn_key, Colors.purple),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDashboardCard(String title, String status, IconData icon, Color color) {
+    return Card(
+      color: const Color(0xFF242f3d),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 5,
+      child: InkWell(
+        onTap: () {}, 
         child: Padding(
-          padding: const EdgeInsets.all(30.0),
+          padding: const EdgeInsets.all(8.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.security, size: 100, color: Color(0xFF38bdf8)),
-              const SizedBox(height: 20),
-              const Text("AymnGuard Enterprise", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-              const Text("بوابة التحكم السيادية", style: TextStyle(color: Colors.grey)),
-              const SizedBox(height: 40),
-              TextField(
-                controller: _keyController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: "أدخل مفتاح المالك (Owner Key)",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.vpn_key),
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF38bdf8),
-                  foregroundColor: Colors.black,
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-                onPressed: _authenticate,
-                child: const Text("تأكيد الدخول الإمبراطوري", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              )
+              Icon(icon, size: 38, color: color),
+              const SizedBox(height: 10),
+              Text(title, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const SizedBox(height: 5),
+              Text(status, textAlign: TextAlign.center, style: TextStyle(color: Colors.grey.shade400, fontSize: 10)),
             ],
           ),
         ),
@@ -101,107 +188,140 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 // ==============================================================================
-// 2. لوحة القيادة التفاعلية (Dashboard) والمراقبة الحية
+// 3. واجهة تثبيت البوتات والخدمات (Future-Proof Bot Manager)
 // ==============================================================================
-class DashboardScreen extends StatefulWidget {
-  final String serverIP;
-  final String ownerKey;
-  
-  const DashboardScreen({super.key, required this.serverIP, required this.ownerKey});
-
-  @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
-}
-
-class _DashboardScreenState extends State<DashboardScreen> {
-  late WebSocketChannel channel;
-  String _liveStatus = "بانتظار الاتصال...";
-
-  @override
-  void initState() {
-    super.initState();
-    // الاتصال الحي بالسيرفر عبر WebSocket
-    channel = WebSocketChannel.connect(
-      Uri.parse('ws://${widget.serverIP}:8000/api/v1/empire/ws/live_monitor'),
-    );
-  }
-
-  @override
-  void dispose() {
-    channel.sink.close();
-    super.dispose();
-  }
-
-  // دالة إرسال الأوامر للسيرفر السحابي
-  Future<void> sendEmpireCommand(String engine, String action) async {
-    final url = Uri.parse('http://${widget.serverIP}:8000/api/v1/empire/execute');
-    try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          "owner_key": widget.ownerKey,
-          "target_engine": engine,
-          "action": action,
-          "parameters": {}
-        }),
-      );
-      if (response.statusCode == 200) {
-        setState(() => _liveStatus = "✅ تم تنفيذ أمر [$action] على [$engine]");
-      } else {
-        setState(() => _liveStatus = "❌ فشل التنفيذ: ${response.body}");
-      }
-    } catch (e) {
-      setState(() => _liveStatus = "❌ خطأ في الاتصال بالسيرفر: $e");
-    }
-  }
+class BotInstallerSheet extends StatelessWidget {
+  const BotInstallerSheet({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('👑 مركز القيادة الإمبراطوري'),
-        backgroundColor: const Color(0xFF090d16),
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.75,
+      decoration: const BoxDecoration(
+        color: Color(0xFF1c242f),
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // شاشة المراقبة الحية (WebSocket)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                border: Border.all(color: const Color(0xFF38bdf8)),
-                borderRadius: BorderRadius.circular(10),
+      child: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(15.0),
+            child: Center(
+              child: Container(width: 40, height: 5, decoration: BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.all(Radius.circular(10)))),
+            ),
+          ),
+          const Text("➕ متجر البوتات والخدمات السيادية", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+          const Text("تثبيت محركات جديدة دون تحديث التطبيق", style: TextStyle(color: Colors.grey, fontSize: 12)),
+          const Divider(color: Colors.white24, height: 30),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              children: [
+                _buildInstallableBot("بوت النقل العكسي الذكي", "أداة متقدمة لنقل الأعضاء باستخدام العمال الخلفيين.", Icons.swap_calls, isInstalled: true),
+                _buildInstallableBot("محرك التدقيق الجنائي", "فحص الثغرات الأمنية في الروابط والعقود.", Icons.policy, isInstalled: false),
+                _buildInstallableBot("بوت الترجمة المالية الآلي", "ترجمة فورية للمصطلحات والتقارير المالية.", Icons.translate, isInstalled: false),
+                _buildInstallableBot("خدمة API خارجية جديدة", "أضف رابط الـ Webhook لبوت مخصص.", Icons.add_link, isInstalled: false, isCustom: true),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInstallableBot(String name, String desc, IconData icon, {required bool isInstalled, bool isCustom = false}) {
+    return Card(
+      color: const Color(0xFF242f3d),
+      margin: const EdgeInsets.only(bottom: 10),
+      child: ListTile(
+        leading: CircleAvatar(backgroundColor: isCustom ? Colors.grey.shade800 : const Color(0xFF38bdf8).withOpacity(0.2), child: Icon(icon, color: isCustom ? Colors.white : const Color(0xFF38bdf8))),
+        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+        subtitle: Text(desc, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+        trailing: isInstalled 
+            ? const Icon(Icons.check_circle, color: Colors.green)
+            : ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF38bdf8), foregroundColor: Colors.black, minimumSize: const Size(60, 30)),
+                onPressed: () {},
+                child: const Text("تثبيت", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
               ),
+      ),
+    );
+  }
+}
+
+// ==============================================================================
+// 4. القائمة الجانبية اليمنى (الأدوات السريعة للمستخدمين)
+// ==============================================================================
+class AdvancedToolsDrawer extends StatelessWidget {
+  const AdvancedToolsDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      backgroundColor: const Color(0xFF242f3d),
+      child: SafeArea(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Color(0xFF1c242f)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Text("🔴 المراقبة الحية للسيرفر:", style: TextStyle(color: Colors.grey)),
-                  const SizedBox(height: 10),
-                  Text(_liveStatus, style: const TextStyle(color: Colors.greenAccent, fontFamily: 'monospace')),
+                  Icon(Icons.rocket_launch, color: Colors.blueAccent, size: 40),
+                  SizedBox(height: 10),
+                  Text("محركات الـ Super App", style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-            
-            // أزرار التحكم بالميكروسيرفسات
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
+            const ListTile(leading: Icon(Icons.manage_search, color: Colors.teal), title: Text("محرك البحث المتقدم")),
+            const ListTile(leading: Icon(Icons.group_add, color: Colors.blue), title: Text("أداة النقل الذكي")),
+            const ListTile(leading: Icon(Icons.design_services, color: Colors.pink), title: Text("استوديو التصميم وتوليد الإيصالات")),
+            const ListTile(leading: Icon(Icons.psychology, color: Colors.purple), title: Text("مساعد الذكاء الاصطناعي (AGI)")),
+            const Divider(color: Colors.grey),
+            const ListTile(leading: Icon(Icons.light_mode), title: Text("النمط النهاري/الليلي")),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ==============================================================================
+// 5. القائمة الجانبية اليسرى (إدارة الحسابات) و واجهات المراسلة
+// ==============================================================================
+class AccountManagerDrawer extends StatelessWidget {
+  const AccountManagerDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      backgroundColor: const Color(0xFF1c242f),
+      child: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildControlCard("درع الحماية", Icons.shield, () => sendEmpireCommand("sovereign_protection_bot", "force_lockdown")),
-                  _buildControlCard("نقل الأعضاء", Icons.group_add, () => sendEmpireCommand("sovereign_session_transfer", "start_transfer")),
-                  _buildControlCard("الذكاء الاصطناعي", Icons.psychology, () => sendEmpireCommand("sovereign_ai_forge", "train_bot")),
-                  _buildControlCard("مولد التصميمات", Icons.brush, () => sendEmpireCommand("design_engine", "generate_receipt")),
-                  _buildControlCard("تداول و Web3", Icons.candlestick_chart, () => sendEmpireCommand("web3_nexus", "audit_contract")),
-                  _buildControlCard("حالة الأسطول", Icons.memory, () => sendEmpireCommand("sovereign_session_transfer", "audit_fleet")),
+                  const Text('إدارة الحسابات', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  IconButton(icon: const Icon(Icons.info_outline), onPressed: () {}),
                 ],
               ),
+            ),
+            const Divider(color: Colors.grey),
+            Expanded(
+              child: ListView(
+                children: [
+                  _buildAccountTile("انا انا", "ان", true, badge: null),
+                  _buildAccountTile("AymnGuard Hub", "AG", false, badge: "VIP", isImage: true),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: FloatingActionButton(backgroundColor: const Color(0xFF38bdf8), onPressed: () {}, child: const Icon(Icons.add, color: Colors.black)),
             )
           ],
         ),
@@ -209,20 +329,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildControlCard(String title, IconData icon, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: const Color(0xFF38bdf8)),
-            const SizedBox(height: 10),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          ],
-        ),
+  Widget _buildAccountTile(String name, String initials, bool isFrozen, {String? badge, bool isImage = false}) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: Colors.blueGrey,
+        child: isImage ? const Icon(Icons.security, size: 20) : Text(initials, style: const TextStyle(color: Colors.white)),
       ),
+      title: Text(name),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (badge != null)
+            Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(12)), child: Text(badge, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold))),
+          if (isFrozen) const Padding(padding: EdgeInsets.only(left: 8.0), child: Icon(Icons.ac_unit, color: Colors.lightBlueAccent, size: 20)),
+          const SizedBox(width: 10),
+          const Icon(Icons.settings, color: Colors.grey, size: 20),
+        ],
+      ),
+      onTap: () {},
     );
   }
 }
+
+class ChatListScreen extends StatelessWidget {
+  const ChatListScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: [
+        const ListTile(
+          leading: CircleAvatar(backgroundColor: Colors.blue, child: Icon(Icons.security)),
+          title: Text("درع الأمان | AymnGuard"), 
+          subtitle: Text("💎 تم تشغيل درع الحماية بنجاح."),
+        ),
+      ],
+    );
+  }
+}
+class SettingsScreenPreview extends StatelessWidget { const SettingsScreenPreview({super.key}); @override Widget build(BuildContext context) { return const Center(child: Text("شاشة الإعدادات", style: TextStyle(color: Colors.grey))); } }
+class ProfileScreenPreview extends StatelessWidget { const ProfileScreenPreview({super.key}); @override Widget build(BuildContext context) { return const Center(child: Text("شاشة الملف الشخصي", style: TextStyle(color: Colors.grey))); } }
