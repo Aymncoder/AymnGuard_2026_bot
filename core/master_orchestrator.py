@@ -24,6 +24,7 @@ except ImportError:
 
 try:
     from core.trading_execution import SovereignTradingEngine
+    from core.sovereign_platform_hub import SovereignPlatformHub
     from core.linguistic_engine import LinguisticEngine
     from core.market_engine import SovereignMarketEngine
     from core.web3_nexus import SovereignWeb3Nexus
@@ -132,19 +133,26 @@ class MasterSovereignOrchestrator:
             "chat": {"id": int(telegram_id) if telegram_id.isdigit() else 1001}
         }
 
-        # 1. الدفاع السيبراني الاستباقي (الدرع السيادي وحماية المشرفين)
-        if self.protection:
-            security_inspection = await self.protection.inspect_incoming_message(mock_payload)
-            action = security_inspection.get("action", "allow")
-            
-            if action in ["delete_message_silently", "delete_and_block_sender", "mute_user"]:
-                logger.warning(f"🚨 [Security Intercept]: تم حظر المستخدم المخترق أو المسيء {telegram_id}")
-                return {
-                    "content": f"🛡️ **[الدرع السيادي مفعل]:** {security_inspection.get('message')}",
-                    "show_menu": False,
-                    "reply_markup": None,
-                    "status": "blocked_by_cyber_defense"
-                }
+        # 1. الدفاع السيبراني الاستباقي عبر ميكروسيرفس الحماية المستقل
+        protection_payload = {
+            "event_type": "inspect_message",
+            "message_payload": mock_payload
+        }
+        
+        protection_res = await SovereignPlatformHub.dispatch_request_to_service(
+            service_id="sovereign_protection_bot",
+            payload=protection_payload
+        )
+        
+        action_taken = protection_res.get("result", {}).get("action_taken", "allow")
+        if action_taken in ["delete_message_silently", "delete_and_block_sender", "mute_user"]:
+            logger.warning(f"🚨 [Security Intercept]: تم حظر الكيان المسيء ID: {telegram_id}")
+            return {
+                "content": f"🛡️ **[الدرع السيادي]:** {protection_res.get('result', {}).get('message', 'تم تحييد التهديد بنجاح.')}",
+                "show_menu": False,
+                "status": "blocked_by_cyber_defense"
+            }
+
 
         # 2. تحليل الأوامر والمسارات التشغيلية للوحة التحكم والخدمات
         text = message_text.strip()
