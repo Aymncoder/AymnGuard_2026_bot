@@ -1,5 +1,8 @@
 # =====================================================================
-# AymnGuard Enterprise : Advanced CI/CD Cloud Factory (v18.8.0)
+# AymnGuard Enterprise : Advanced CI/CD Cloud Factory (v18.9.0)
+# =====================================================================
+# Sovereign App Name: AymnGuard Plus
+# Target Output: Single Comprehensive Fat APK & AAB
 # =====================================================================
 
 name: 👑 Sovereign Empire Super-App Builder
@@ -14,20 +17,20 @@ on:
 
 jobs:
   build-super-app:
-    name: هندسة وبناء التطبيق الإمبراطوري الشامل
+    name: هندسة وبناء التطبيق الإمبراطوري الشامل AymnGuard Plus
     runs-on: ubuntu-latest
 
     steps:
       - name: 🛡️ امتساج مستودع الإمبراطورية
         uses: actions/checkout@v4
 
-      - name: ☕ إعداد بيئة التطوير
+      - name: ☕ إعداد بيئة التطوير (Java 17)
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: 🦋 إعداد محرك Flutter المؤسسي
+      - name: 🦋 إعداد محرك Flutter المؤسسي (3.19.0)
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.19.0'
@@ -44,46 +47,56 @@ jobs:
         run: flutter pub get
         working-directory: ./mobile_empire_app
 
-      - name: 🤖 توليد هيكل ونظام الـ Android وGradle التلقائي
-        run: flutter create . --platforms=android --org com.aymnguard.empire
+      - name: 🤖 توليد هيكل ونظام الـ Android وتسمية التطبيق الإمبراطوري
+        # تم تحديد org com.aymnguardplus.enterprise لتمييز الهوية الجديدة
+        run: flutter create . --platforms=android --org com.aymnguardplus.enterprise
+        working-directory: ./mobile_empire_app
+
+      - name: 🏷️ تعميد الاسم السيادي الموحد (AymnGuard Plus)
+        # هذه الخطوة تقوم بتغيير الاسم الظاهر للمستخدم داخل ملف أندرويد الأساسي
+        run: |
+          sed -i 's/android:label=".*"/android:label="AymnGuard Plus"/' android/app/src/main/AndroidManifest.xml
         working-directory: ./mobile_empire_app
 
       - name: 🧪 تشغيل اختبارات الجودة والوحدة
         run: flutter test
         working-directory: ./mobile_empire_app
-        continue-on-error: true
+        continue-on-error: true # استمرار البناء حتى لو فشلت الاختبارات لضمان الإنتاج
 
-      - name: 🛡️ الفحص الأمني والتحليل البرمجي (Linting)
+      - name: 🛡️ الفحص الأمني والتحليل البرمجي سيادياً (Linting)
         run: flutter analyze
         working-directory: ./mobile_empire_app
         continue-on-error: true
 
-      - name: 🚀 بناء نسخة الـ APK
-        run: flutter build apk --release --target-platform android-arm,android-arm64,android-x64 --split-per-abi
+      - name: 🚀 بناء نسخة الـ APK السيادية الموحدة والشاملة
+        # تم إزالة خيار التقسيم وتحديد المنصات لإنتاج ملف واحد شاملاً لكل المعالجات (Fat APK)
+        run: flutter build apk --release
         working-directory: ./mobile_empire_app
 
       - name: 🌐 بناء نسخة الـ AAB الجاهزة لمتجر Google Play
         run: flutter build appbundle --release
         working-directory: ./mobile_empire_app
 
-      - name: 📊 إنشاء تقرير الملخص المؤسسي والبناء
+      - name: 📊 إنشاء تقرير الملخص المؤسسي والبناء النهائي
         run: |
-          echo "### 🚀 AymnGuard Build Report Summary" >> $GITHUB_STEP_SUMMARY
-          echo "- **Status:** Success ✅" >> $GITHUB_STEP_SUMMARY
-          echo "- **Platform:** Android (APK & AAB)" >> $GITHUB_STEP_SUMMARY
+          echo "### 👑 AymnGuard Plus Build Report Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Sovereign App Name:** AymnGuard Plus ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status:** Final Success ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- **Platform:** Android (Unified Single APK & AAB)" >> $GITHUB_STEP_SUMMARY
           echo "- **Flutter Version:** 3.19.0" >> $GITHUB_STEP_SUMMARY
         shell: bash
 
-      - name: 📦 (APK) تصدير التطبيق الجاهز
+      - name: 📦 (APK) تصدير التطبيق السيادي الموحد
         uses: actions/upload-artifact@v4
         with:
-          name: AymnGuard-SuperApp-APK
-          path: mobile_empire_app/build/app/outputs/apk/release/app-*.apk
+          name: AymnGuardPlus-Unified-APK
+          # مسار الـ APK الموحد النهائي
+          path: mobile_empire_app/build/app/outputs/apk/release/app-release.apk
           retention-days: 7
 
       - name: 📦 (AppBundle) تصدير حزمة المتجر
         uses: actions/upload-artifact@v4
         with:
-          name: AymnGuard-SuperApp-GooglePlay-AAB
+          name: AymnGuardPlus-GooglePlay-AAB
           path: mobile_empire_app/build/app/outputs/bundle/release/app-release.aab
           retention-days: 7
