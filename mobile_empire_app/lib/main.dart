@@ -882,3 +882,170 @@ class ContactsScreen extends StatelessWidget {
     );
   }
 }
+      // ==============================================================================
+// 11. شاشة المحادثة الفعلية من الداخل (Chat Room UI)
+// ==============================================================================
+class ChatRoomScreen extends StatefulWidget {
+  final String chatName;
+  final String status;
+  final Color avatarColor;
+  final IconData avatarIcon;
+
+  const ChatRoomScreen({
+    super.key,
+    required this.chatName,
+    required this.status,
+    this.avatarColor = const Color(0xFF0EA5E9),
+    this.avatarIcon = Icons.person,
+  });
+
+  @override
+  State<ChatRoomScreen> createState() => _ChatRoomScreenState();
+}
+
+class _ChatRoomScreenState extends State<ChatRoomScreen> {
+  final TextEditingController _messageController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F172A), // لون خلفية المحادثة (أغمق قليلاً للتركيز)
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF1E293B),
+        titleSpacing: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Row(
+          children: [
+            CircleAvatar(
+              radius: 18,
+              backgroundColor: widget.avatarColor,
+              child: Icon(widget.avatarIcon, color: Colors.white, size: 20),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(widget.chatName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(widget.status, style: const TextStyle(fontSize: 12, color: Color(0xFF0EA5E9))), // حالة الاتصال
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(icon: const Icon(Icons.call), onPressed: () {}),
+          IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
+        ],
+      ),
+      body: Column(
+        children: [
+          // 1. منطقة عرض الرسائل (Chat History)
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                _buildDateBadge("اليوم"),
+                _buildMessageBubble("أهلاً بك في AymnGuard Plus! كيف يمكنني مساعدتك اليوم؟", "10:00 ص", isMe: false),
+                _buildMessageBubble("مرحباً، تم تفعيل درع الأمان السحابي بنجاح.", "10:05 ص", isMe: true, isRead: true),
+                _buildMessageBubble("ممتاز. الخوادم تعمل الآن بكفاءة 100%.", "10:06 ص", isMe: false),
+              ],
+            ),
+          ),
+          
+          // 2. منطقة الكتابة والمرفقات (Message Input Field)
+          _buildMessageInputArea(),
+        ],
+      ),
+    );
+  }
+
+  // ويدجت فقاعة الرسالة
+  Widget _buildMessageBubble(String message, String time, {required bool isMe, bool isRead = false}) {
+    return Align(
+      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: isMe ? const Color(0xFF0EA5E9) : const Color(0xFF1E293B),
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(15),
+            topRight: const Radius.circular(15),
+            bottomRight: Radius.circular(isMe ? 0 : 15),
+            bottomLeft: Radius.circular(isMe ? 15 : 0),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(message, style: const TextStyle(color: Colors.white, fontSize: 15)),
+            const SizedBox(height: 5),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(time, style: TextStyle(color: isMe ? Colors.white70 : Colors.grey, fontSize: 10)),
+                if (isMe) const SizedBox(width: 4),
+                if (isMe) Icon(isRead ? Icons.done_all : Icons.done, color: isRead ? Colors.amberAccent : Colors.white70, size: 14),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ويدجت تاريخ اليوم
+  Widget _buildDateBadge(String date) {
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+        decoration: BoxDecoration(color: const Color(0xFF1E293B).withOpacity(0.5), borderRadius: BorderRadius.circular(10)),
+        child: Text(date, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+      ),
+    );
+  }
+
+  // ويدجت مربع الإدخال
+  Widget _buildMessageInputArea() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      color: const Color(0xFF1E293B),
+      child: SafeArea(
+        child: Row(
+          children: [
+            IconButton(icon: const Icon(Icons.attach_file, color: Colors.grey), onPressed: () {}),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(25)),
+                child: TextField(
+                  controller: _messageController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    hintText: "مراسلة...",
+                    hintStyle: TextStyle(color: Colors.grey),
+                    border: InputBorder.none,
+                    icon: Icon(Icons.emoji_emotions_outlined, color: Colors.grey),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            CircleAvatar(
+              backgroundColor: const Color(0xFF0EA5E9),
+              radius: 22,
+              child: IconButton(icon: const Icon(Icons.mic, color: Colors.white), onPressed: () {}),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
