@@ -40,6 +40,9 @@ jobs:
         run: |
           echo "🔎 [AST Gatekeeper]: بدء فحص السلامة الهيكلية لمحركات النواة..."
           python3 -m compileall core/ backend_core/ main.py || echo "⚠️ [AST]: تم تخطي بعض الملفات التي لا تحتاج إلى تجميع."
+    - name: 🔄 Pull Remote Changes before Commit
+      run: |
+        git pull origin ${{ github.head_ref || github.ref_name }} --rebase || true
 
       - name: 🚀 Commit Auto-Healed Changes (حفظ التعديلات المُصححة ذاتياً)
         uses: stefanzweifel/git-auto-commit-action@v5
