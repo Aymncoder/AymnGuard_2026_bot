@@ -5,6 +5,7 @@
 // مما يسمح للمالك بإضافة محركات (حماية، نقل، تصميم، بحث) مستقبلاً بضغطة زر.
 
 import 'package:flutter/material.dart';
+const String kServerUrl = "http://135.181.86.199:10050";
 
 void main() {
   runApp(const SovereignSuperApp());
