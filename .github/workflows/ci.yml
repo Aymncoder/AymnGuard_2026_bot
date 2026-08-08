@@ -16,15 +16,16 @@ jobs:
         with:
           fetch-depth: 0
           # استدعاء كامل التاريخ البيرومي لضمان دقة تحليل المسارات
-
       - name: 📦 Install Enterprise Dependencies & AI Scanners
         run: |
-          # تفادي انهيار بيئة العمل أو البيئات المقيدة
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          # إنشاء بيئة افتراضية نظيفة وتفعيلها لتجاوز قيود النظام
+          python3 -m venv venv
+          source venv/bin/activate
           
-          # تثبيت أدوات الفحص المؤسسي للذكاء الاصطناعي وأمن النواة
-          pip install flake8 bandit --break-system-packages
-
+          # تحديث مدير الحزم وتثبيت المتطلبات وأدوات الفحص بأمان تام
+          pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install flake8 bandit
 
       - name: 🛡️ Sovereign AST & Syntax Validation (منع الأخطاء البرمجية)
         run: |
