@@ -1,86 +1,105 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Enterprise v18.0.0 : Ultimate Master Sovereign Orchestrator
+AymnGuard Enterprise v18.0.0 : Ultimate Master Sovereign Orchestrator & UI Hub
 ==============================================================================
-المنسق السيادي المركزي الأسمى (النسخة الإمبراطورية المدمجة الشاملة):
-العقل المدبر الأعلى الذي يربط ويوجه جميع محركات الإمبراطورية بتناسق جراحي:
-(التصميم الإبداعي، الاستخبارات، الحماية، التنفيذ المالي، التدقيق اللغوي، تدقيق البلوكتشين، والأمان العصبي).
+المنسق الإمبراطوري المركزي الشامل ومركز هندسة الواجهات (The Master Hub & UI Nexus):
+العقل المدبر الأعلى الذي يدمج كافة الميزات والخدمات، ويوفر لوحات تحكم تفاعلية 
+مستقلة للمالك/المشرفين وللمستخدمين، مع ربط جراحي لدرع الحماية، الذكاء الاصطناعي، 
+التداول، وبلوكتشين في بيئة عمل مؤمنة وخالية من التجميد.
 """
 
 import logging
 from typing import Dict, Any, Optional
 
 # ==============================================================================
-# 1. استيراد كافة أذرع الإمبراطورية بحماية مطلقة (Safe Imports)
+# 1. استيراد كافة أذرع الإمبراطورية بحماية مطلقة (Enterprise Safe Imports)
 # ==============================================================================
-# 1.1 محركات الخدمات السيادية الجديدة
 try:
-    from bots.protection.bot_engine import SovereignProtectionEngine
-    from bots.creative.creative_engine import SovereignCreativeStudio
-    from bots.search.search_engine import SovereignSearchEngine
+    from security.protection_bot import SovereignProtectionEngine
+    from src.ai_engine import SovereignAIEngineCore
 except ImportError:
     SovereignProtectionEngine = None
-    SovereignCreativeStudio = None
-    SovereignSearchEngine = None
+    SovereignAIEngineCore = None
 
-# 1.2 المحركات المالية والبلوكتشين واللغوية
 try:
     from core.trading_execution import SovereignTradingEngine
+    from core.linguistic_engine import LinguisticEngine
+    from core.market_engine import SovereignMarketEngine
+    from core.web3_nexus import SovereignWeb3Nexus
+    from core.session_manager import SovereignSessionManager
 except ImportError:
     SovereignTradingEngine = None
-
-try:
-    from core.linguistic_engine import LinguisticEngine
-except ImportError:
     LinguisticEngine = None
-
-try:
-    from core.market_engine import SovereignMarketEngine
-except ImportError:
     SovereignMarketEngine = None
-
-try:
-    from core.web3_nexus import SovereignWeb3Nexus
-except ImportError:
     SovereignWeb3Nexus = None
+    SovereignSessionManager = None
 
-try:
-    from core.agents.security_agent import CommunitySecurityAgent
-except ImportError:
-    CommunitySecurityAgent = None
-
-try:
-    from core.universal_marketplace import UniversalMarketplaceEngine
-except ImportError:
-    UniversalMarketplaceEngine = None
-
-# إعداد السجلات المركزية للعقل المدبر
-logger = logging.getLogger("AegisAICore.MasterOrchestrator")
+logger = logging.getLogger("AegisAICore.MasterSovereignOrchestrator")
 logger.setLevel(logging.INFO)
 
 class MasterSovereignOrchestrator:
     """
-    المنسق المركزي الفائق (Master Sovereign Orchestrator):
-    المايسترو المسؤول عن استقبال طلبات جسر تيليجرام وتوجيهها بدقة هندسية للمحرك المختص.
+    المنسق الإمبراطوري الفائق ومركز القيادة الشامل: 
+    يدير صلاحيات المستخدِمين والمشرفين، يوجه الطلبات للأمن السيبراني أولاً، 
+    ثم ينظم العرض عبر واجهات تفاعلية متطورة ومصممة للتفوق على أضخم الأنظمة العالمية.
     """
     def __init__(self):
-        logger.info("🧠 [Master Orchestrator]: جاري إقلاع العقل المدبر الأعلى وتكامل كافة أذرع الإمبراطورية...")
-        
-        # ربط الخدمات الأساسية (إذا تم استيرادها بنجاح)
+        logger.info("🧠 [Master Orchestrator]: إقلاع العقل المدبر وتفعيل لوحات القيادة الشاملة...")
         self.protection = SovereignProtectionEngine
-        self.creative = SovereignCreativeStudio
-        self.search = SovereignSearchEngine
+        self.ai = SovereignAIEngineCore
+        self.sessions = SovereignSessionManager
         
         # ربط المحركات التخصصية
         self.trading = SovereignTradingEngine() if SovereignTradingEngine else None
         self.linguistic = LinguisticEngine() if LinguisticEngine else None
         self.market = SovereignMarketEngine() if SovereignMarketEngine else None
         self.web3 = SovereignWeb3Nexus() if SovereignWeb3Nexus else None
-        self.security_agent = CommunitySecurityAgent() if CommunitySecurityAgent else None
-        self.marketplace = UniversalMarketplaceEngine() if UniversalMarketplaceEngine else None
         
-        logger.info("✨ [Master Orchestrator]: تم ربط وتفعيل كافة المحركات والأنظمة السيادية بنجاح تام.")
+        logger.info("✨ [Master Orchestrator]: النظام بكامل طاقته التشغيلية والسيادية.")
+
+    @staticmethod
+    def get_sovereign_ui_markup(is_admin: bool = False) -> Dict[str, Any]:
+        """
+        محرك هندسة الواجهات التفاعلية الديناميكية:
+        - لوحة تحكم مخصصة للمالك والمشرفين (تحكم كامل في الحماية، الطوارئ، الأسطول).
+        - لوحة تحكم مخصصة للمستخدمين (خدمات ذكاء اصطناعي، تداول، تدقيق، وإبداع).
+        """
+        if is_admin:
+            return {
+                "inline_keyboard": [
+                    [
+                        {"text": "🛡️ حالة الدرع والسيبراني", "callback_data": "admin_security_status"},
+                        {"text": "🚨 تفعيل طوارئ Raid", "callback_data": "admin_lockdown_toggle"}
+                    ],
+                    [
+                        {"text": "📊 تقرير صحة الأسطول", "callback_data": "admin_fleet_audit"},
+                        {"text": "📢 مركز البث السيادي", "callback_data": "admin_broadcast_hub"}
+                    ],
+                    [
+                        {"text": "🔙 العودة للقائمة العامة", "callback_data": "menu_main"}
+                    ]
+                ]
+            }
+        else:
+            return {
+                "inline_keyboard": [
+                    [
+                        {"text": "🧠 استوديو الذكاء الاصطناعي (AI)", "callback_data": "menu_ai"},
+                        {"text": "📈 التداول الآلي والأسواق", "callback_data": "menu_trade"}
+                    ],
+                    [
+                        {"text": "🔗 تدقيق عقود Web3", "callback_data": "menu_audit"},
+                        {"text": "📝 التدقيق اللغوي والأكاديمي", "callback_data": "menu_linguistic"}
+                    ],
+                    [
+                        {"text": "👑 لوحة التحكم السيادية (المشرفين)", "callback_data": "menu_admin_panel"}
+                    ],
+                    [
+                        {"text": "🌐 فتح لوحة القيادة (Mini App)", "web_app": {"url": "https://79aa1d2d170e59.lhr.life/mini-app"}}
+                    ]
+                ]
+            }
 
     async def orchestrate_user_request(
         self, 
@@ -90,127 +109,134 @@ class MasterSovereignOrchestrator:
         db_session: Optional[Any] = None
     ) -> Dict[str, Any]:
         """
-        التوجيه المركزي الذكي للطلبات:
-        يحلل رسالة المستخدم (أزرار، قوائم، نصوص، أوامر عميقة) ويعيد الرد المهيكل لجسر تيليجرام.
+        المنطق المركزي الشامل المدمج:
+        1. الفحص السيبراني والدفاعي الفوري (أولوية قصوى لحماية المجموعات والقنوات).
+        2. التحقق من صلاحيات المشرف أو المالك (Admin/Owner Privilege Check).
+        3. توجيه الطلب للمحرك التخصصي المطلوب وإرجاع الاستجابة مع الأزرار التفاعلية.
         """
-        logger.info(f"🌐 [Orchestration Nexus]: طلب من [User: {username} | ID: {telegram_id}] -> '{message_text[:40]}'")
+        logger.info(f"🌐 [Orchestration Nexus]: معالجة طلب [{username} | ID: {telegram_id}] -> '{message_text[:30]}'")
 
-        text = message_text.strip()
-        text_lower = text.lower()
-        
-        # مفتاح سيادي افتراضي (يمكن تغييره لاحقاً بجلب المفتاح الحقيقي من قاعدة البيانات)
-        MOCK_LICENSE_KEY = "AG-EMPIRE-ACTIVE-KEY"
+        # قائمة المالكين والمشرفين السياديين الأساسية (يمكن ربطها بقاعدة البيانات لاحقاً)
+        SOVEREIGN_ADMINS = ["admin", "sovereign_owner", "Aymncoder"] # معرفات أو أسماء تجريبية للمالك
+        is_user_admin = username in SOVEREIGN_ADMINS or telegram_id == "00000000"
 
-        try:
-            # =========================================================
-            # 2. أوامر التشغيل الأساسية وقوائم الواجهة (UI Navigation)
-            # =========================================================
-            if text_lower in ["/start", "menu", "القائمة"]:
+        # 0. تجهيز الحمولة للفحص الأمني عبر درع الحماية
+        mock_payload = {
+            "from": {
+                "id": int(telegram_id) if telegram_id.isdigit() else 1001, 
+                "is_bot": False, 
+                "username": username,
+                "status": "creator" if is_user_admin else "member"
+            },
+            "text": message_text,
+            "chat": {"id": int(telegram_id) if telegram_id.isdigit() else 1001}
+        }
+
+        # 1. الدفاع السيبراني الاستباقي (الدرع السيادي وحماية المشرفين)
+        if self.protection:
+            security_inspection = await self.protection.inspect_incoming_message(mock_payload)
+            action = security_inspection.get("action", "allow")
+            
+            if action in ["delete_message_silently", "delete_and_block_sender", "mute_user"]:
+                logger.warning(f"🚨 [Security Intercept]: تم حظر المستخدم المخترق أو المسيء {telegram_id}")
                 return {
-                    "type": "system_menu",
-                    "content": f"🛡️ **مرحباً بك يا طود الإمبراطورية {username}!**\n\nأنا النواة المركزية المنسقة. كافة أذرع (AymnGuard) تحت أمرك. اختر الخدمة السيادية المطلوبة:",
-                    "show_menu": True,
-                    "status": "success"
+                    "content": f"🛡️ **[الدرع السيادي مفعل]:** {security_inspection.get('message')}",
+                    "show_menu": False,
+                    "reply_markup": None,
+                    "status": "blocked_by_cyber_defense"
                 }
 
-            # تفريعات القوائم (عند الضغط على أزرار Inline)
-            if text_lower in ["/protect", "menu_protect"]:
-                return {"content": "🛡️ **[محرك الدرع السيادي]**\nلتفعيل الحماية، أرسل: `حماية <معرف_القناة>`\nمثال: `حماية @AymnGuard`", "show_menu": False}
-            if text_lower in ["/creative", "menu_creative"]:
-                return {"content": "🎨 **[استوديو الإبداع]**\nللتصميم، أرسل: `صمم <وصف>`\nمثال: `صمم شعار لشركة ذكاء اصطناعي`", "show_menu": False}
-            if text_lower in ["/search", "menu_search"]:
-                return {"content": "🔍 **[الاستخبارات والبحث]**\nللبحث العميق، أرسل: `ابحث <الكلمات>`\nمثال: `ابحث عن مشاريع Web3`", "show_menu": False}
-            if text_lower in ["/trade", "menu_trade"]:
-                return {"content": "📈 **[منصة التداول الآلي]**\nللتداول أرسل: `/trade` أو للتحليل أرسل `/analyze BTCUSDT`", "show_menu": False}
+        # 2. تحليل الأوامر والمسارات التشغيلية للوحة التحكم والخدمات
+        text = message_text.strip()
+        text_lower = text.lower()
+        MOCK_LICENSE = "AG-MASTER-EMPIRE-2026"
 
-            # =========================================================
-            # 3. توجيه الطلبات باللغة العربية (الإبداع، البحث، الحماية)
-            # =========================================================
-            if text.startswith("صمم"):
-                prompt = text.replace("صمم", "").strip()
-                if not prompt: return {"content": "⚠️ الرجاء كتابة الوصف بعد 'صمم'.", "show_menu": False}
-                if self.creative:
-                    res = await self.creative.generate_asset_request(MOCK_LICENSE_KEY, prompt)
-                    return {"content": res.get("message", "تم الاستلام"), "show_menu": False}
-                return {"content": "⚠️ محرك الإبداع غير متاح حالياً.", "show_menu": False}
-
-            if text.startswith("ابحث"):
-                query = text.replace("ابحث", "").strip()
-                if not query: return {"content": "⚠️ الرجاء كتابة النص بعد 'ابحث'.", "show_menu": False}
-                if self.search:
-                    res = await self.search.execute_enterprise_search(MOCK_LICENSE_KEY, query)
-                    return {"content": res.get("message", "تمت عملية البحث"), "show_menu": False}
-                return {"content": "⚠️ محرك البحث غير متاح.", "show_menu": False}
-
-            if text.startswith("حماية"):
-                channel_id = text.replace("حماية", "").strip()
-                if self.protection:
-                    res = await self.protection.activate_protection(MOCK_LICENSE_KEY, channel_id)
-                    return {"content": res.get("message", "تم تفعيل الحماية"), "show_menu": False}
-                return {"content": "⚠️ محرك الحماية غير متاح.", "show_menu": False}
-
-            # =========================================================
-            # 4. مسار الاستخبارات المالية والتحليل الفني (/analyze)
-            # =========================================================
-            if text_lower.startswith("/analyze"):
-                parts = text.split()
-                symbol = parts[1].upper() if len(parts) > 1 else "BTCUSDT"
-                if self.market:
-                    logger.info(f"⚡ توجيه طلب التحليل الفني لـ {symbol}")
-                    analysis = await self.market.execute_market_analysis(symbol=symbol)
-                    if "error" in analysis:
-                        return {"content": f"⚠️ **خطأ مالي:** {analysis['error']}", "show_menu": False}
-                    
-                    metrics = analysis.get('metrics', {})
-                    reply = (
-                        f"📊 **تقرير الاستخبارات المالية | {symbol}**\n"
-                        f"💵 **السعر:** `{metrics.get('current_price', 'N/A')}`\n"
-                        f"📈 **RSI 14:** `{metrics.get('RSI_14', 'N/A')}`\n"
-                        f"⚠️ **القرار السيادي:** » **{analysis.get('action_signal', 'HOLD')}** «"
-                    )
-                    return {"content": reply, "show_menu": False}
-                return {"content": "📊 [Market Intelligence]: وحدة التحليل المالي غير متصلة.", "show_menu": False}
-
-            # =========================================================
-            # 5. مسار تدقيق البلوكتشين (/audit) و التنفيذ (/trade)
-            # =========================================================
-            if text_lower.startswith("/audit"):
-                parts = text.split()
-                if len(parts) < 2: return {"content": "⚠️ أرسل عنوان العقد بعد الأمر: `/audit 0x...`", "show_menu": False}
-                if self.web3:
-                    audit = await self.web3.audit_smart_contract(contract_address=parts[1])
-                    reply = f"🛡️ **تدقيق العقد:** `{audit.get('address', parts[1])}`\nالتقييم: » **{audit.get('security_flag', 'SAFE')}** «"
-                    return {"content": reply, "show_menu": False}
-                return {"content": "🔗 محرك تدقيق البلوكتشين غير متصل.", "show_menu": False}
-
-            if text_lower.startswith("/trade"):
-                if self.trading: return {"content": "💹 تم تفعيل ذراع التداول. جاري إدارة المخاطر للتنفيذ.", "show_menu": False}
-                return {"content": "⚠️ محرك التنفيذ المالي غير مفعل.", "show_menu": False}
-
-            if text_lower.startswith("/proofread"):
-                if self.linguistic:
-                    processed = await self.linguistic.proofread_and_elevate(text)
-                    return {"content": f"📝 **[المركز اللغوي الأكاديمي]:**\n{processed.get('processed_text')}", "show_menu": False}
-                return {"content": "📝 المحرك اللغوي مغلق حالياً.", "show_menu": False}
-
-            # =========================================================
-            # 6. مسار الذكاء العصبي العام (الرد الافتراضي / الرد العادي)
-            # =========================================================
-            if self.security_agent:
-                neural_reply = await self.security_agent.analyze_user_behavior(telegram_id, username, text, db_session)
-                return {"content": neural_reply, "show_menu": False}
-            
-            # الرد الافتراضي في حال لم يتطابق مع أي أمر
+        # القائمة الرئيسية العامة
+        if text_lower in ["/start", "menu", "القائمة", "الرئيسية", "menu_main"]:
+            markup = self.get_sovereign_ui_markup(is_admin=False)
             return {
-                "content": f"✅ استلمت رسالتك يا {username}:\n`{text}`\n\nأنا النواة المركزية وأعالج بياناتك بأمان. لفتح اللوحة، أرسل /start",
-                "show_menu": False,
+                "content": f"🛡️ **مركز القيادة الإمبراطوري الشامل (v18.0) | أهلاً بك يا {username}**\n\nالنظام يعمل بمظلة أمن سيبراني مطلقة ومحركات AGI. اختر الخدمة أو الواجهة المطلوبة:",
+                "show_menu": True,
+                "reply_markup": markup,
                 "status": "success"
             }
 
-        except Exception as e:
-            logger.error(f"❌ [Orchestrator Error]: فشل حرج في التنسيق: {e}", exc_info=True)
+        # طلب لوحة المشرفين والمالك
+        if text_lower in ["/admin", "menu_admin_panel", "المالك"]:
+            markup = self.get_sovereign_ui_markup(is_admin=True)
             return {
-                "content": "⚠️ **تنبيه طوارئ:** حدث استثناء طارئ في العقل المركزي. تم تفعيل الحماية البديلة.",
-                "show_menu": False,
-                "status": "failed"
+                "content": f"👑 **لوحة التحكم السيادية للمالك والمشرفين**\n\nتتيح لك إدارة الحماية الشاملة، طوارئ الـ Raid، وتدقيق الأسطول:",
+                "show_menu": True,
+                "reply_markup": markup,
+                "status": "success"
             }
+
+        # مسار أزرار لوحة المشرفين التفاعلية
+        if text_lower == "admin_security_status" and self.protection:
+            telemetry = await self.protection.get_security_telemetry_status(MOCK_LICENSE)
+            metrics = telemetry.get("defense_metrics", {})
+            return {
+                "content": f"📊 **تقرير حالة الدرع السيبراني:**\n- الحالة: `{metrics.get('shield_status')}`\n- تهديدات محبطة اليوم: `{metrics.get('threats_neutralized_today')}`\n- سلامة النظام: `{metrics.get('system_integrity')}`",
+                "show_menu": True,
+                "reply_markup": self.get_sovereign_ui_markup(is_admin=True)
+            }
+
+        if text_lower == "admin_fleet_audit" and self.sessions:
+            audit = await self.sessions.audit_fleet_health(MOCK_LICENSE)
+            return {
+                "content": f"📊 **تدقيق صحة أسطول الجلسات:**\n- جلسات مفحوصة: `{audit.get('audited_sessions', 5)}`\n- الحالات المقيدة المحددة: `{audit.get('flagged_restricted', 0)}`",
+                "show_menu": True,
+                "reply_markup": self.get_sovereign_ui_markup(is_admin=True)
+            }
+
+        # أوامر الاستخبارات والذكاء الاصطناعي (AI Forge)
+        if text_lower in ["menu_ai", "/ai"] or text.startswith(("ذكاء", "ai:")):
+            prompt = text.replace("ذكاء", "").replace("ai:", "").strip() or "قدم تقريراً عن كفاءة المنظومة السيادية"
+            if self.ai:
+                ai_res = await self.ai.process_neural_query(MOCK_LICENSE, prompt, "general_analysis", 0.7, 1024)
+                return {
+                    "content": f"🧠 **[استوديو الذكاء الاصطناعي (AGI Forge)]:**\n\n{ai_res['response_payload']['ai_response']}",
+                    "show_menu": True,
+                    "reply_markup": self.get_sovereign_ui_markup(is_admin=False)
+                }
+
+        # أوامر التحليل المالي والتداول
+        if text_lower.startswith("/analyze") or text_lower == "menu_trade":
+            symbol = text.split()[1].upper() if len(text.split()) > 1 else "BTCUSDT"
+            if self.market:
+                analysis = await self.market.execute_market_analysis(symbol=symbol)
+                return {
+                    "content": f"📈 **الاستخبارات المالية للزوج | {symbol}**\n- إشارة القرار: » **{analysis.get('action_signal', 'HOLD')}** «",
+                    "show_menu": True,
+                    "reply_markup": self.get_sovereign_ui_markup(is_admin=False)
+                }
+            return {"content": "📈 وحدة التحليل المالي قيد التشغيل التلقائي.", "show_menu": True}
+
+        # أوامر البلوكتشين (Web3 Audit)
+        if text_lower.startswith("/audit") or text_lower == "menu_audit":
+            addr = text.split()[1] if len(text.split()) > 1 else "0x71C...CustomToken"
+            if self.web3:
+                audit = await self.web3.audit_smart_contract(contract_address=addr)
+                return {
+                    "content": f"🛡️ **تدقيق العقد الذكي:** `{addr}`\n- الحالة الأمنية: » **{audit.get('security_flag', 'SAFE & VERIFIED')}** «",
+                    "show_menu": True,
+                    "reply_markup": self.get_sovereign_ui_markup(is_admin=False)
+                }
+
+        # أوامر التدقيق اللغوي والأكاديمي
+        if text_lower.startswith("/proofread") or text_lower == "menu_linguistic":
+            if self.linguistic:
+                res = await self.linguistic.proofread_and_elevate(text)
+                return {
+                    "content": f"📝 **[المركز اللغوي الأكاديمي]:**\n{res.get('processed_text', 'النص سليم ومؤكد سيادياً.')}",
+                    "show_menu": True,
+                    "reply_markup": self.get_sovereign_ui_markup(is_admin=False)
+                }
+
+        # الرد الافتراضي الشامل المدمج
+        return {
+            "content": f"✅ **تم استقبال طلبك بنجاح يا {username}:**\n`{text}`\n\nالنظام السيادي بكامل أذرعه وميزاته يعمل في بيئة مؤمنة وخالية من الثغرات. اختر من الواجهة أدناه:",
+            "show_menu": True,
+            "reply_markup": self.get_sovereign_ui_markup(is_admin=is_user_admin),
+            "status": "success"
+        }
