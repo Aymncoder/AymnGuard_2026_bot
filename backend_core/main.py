@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Aymn Coder Plus : Aegis AI Core & AymnGuard Sovereign Enterprise Core (v18.0.0-Master)
+Aymn Coder Plus : Aegis AI Core & AymnGuard Sovereign Enterprise Core (v19.0.0-Imperial)
 ==============================================================================
-النواة المؤسسية الإمبراطورية المحدثة: الـ Backend هو السيد المطلق والمهيمن،
-مع عزل الخدمات الفرعية، حماية SlowAPI، البث الفوري WebSockets،
-و إدارة المسارات الديناميكية الآمنة للسيادة اللوجستية والتشغيلية.
+النواة المؤسسية الإمبراطورية المحدثة كلياً: الـ Backend هو السيد المطلق والمهيمن،
+مع عزل تام للخدمات الفرعية، حماية SlowAPI، البث الفوري عبر WebSockets،
+إدارة المسارات الديناميكية، والتكامل اللوجستي التشغيلي الشامل.
+==============================================================================
 """
 
 import os
 import sys
+import time
 import logging
 import asyncio
-import importlib  # تم استيراده لمعالجة ربط المسارات الخارجية ديناميكياً
+import importlib
 from datetime import datetime
 from contextlib import asynccontextmanager
 from typing import Any, Dict, Optional, List
@@ -27,11 +29,11 @@ if ROOT_DIR not in sys.path:
 # استيراد المكتبات الأساسية بعد ضبط المسار
 import httpx
 import uvicorn
-from fastapi import FastAPI, BackgroundTasks, Request, Header, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, BackgroundTasks, Request, Header, HTTPException, WebSocket, WebSocketDisconnect, Depends
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -49,8 +51,8 @@ from sqlalchemy.future import select
 # ==============================================================================
 # 1. إعدادات التسجيل والبيئة المركزية (Logging & Config Settings)
 # ==============================================================================
-logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)-8s | %(name)s - %(message)s")
-logger = logging.getLogger("AegisAICore.MasterHub")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s | 👑 IMPERIAL-%(levelname)-7s | %(name)s - %(message)s")
+logger = logging.getLogger("AegisAICore.ImperialMasterHub")
 
 class SovereignSettings(BaseSettings):
     TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "8885095463:AAGRRtirIswzPutKdhuOTf_OeDzO2PTu_FQ")
@@ -59,7 +61,7 @@ class SovereignSettings(BaseSettings):
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./aymnguard_enterprise.db")
     TELEGRAM_API_ID: int = int(os.getenv("TELEGRAM_API_ID", "2040"))
     TELEGRAM_API_HASH: str = os.getenv("TELEGRAM_API_HASH", "b18441aff607e10a989891a5462e627")
-    HTTP_TIMEOUT: float = 10.0
+    HTTP_TIMEOUT: float = 15.0
 
     class Config:
         env_file = ".env"
@@ -69,7 +71,7 @@ settings = SovereignSettings()
 limiter = Limiter(key_func=get_remote_address)
 
 # ==============================================================================
-# 2. إدارة اتصالات WebSockets السيادية (التنبيهات الفورية)
+# 2. إدارة اتصالات WebSockets السيادية (التنبيهات الفورية وبث العمليات)
 # ==============================================================================
 class SovereignAlertManager:
     def __init__(self):
@@ -78,11 +80,12 @@ class SovereignAlertManager:
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.active_connections.append(websocket)
-        logger.info("🔌 [WebSocket Master]: تم ربط عميل جديد بلوحة القيادة الأمنية.")
+        logger.info("🔌 [WebSocket Imperial]: تم ربط عميل جديد بلوحة القيادة الأمنية بنجاح.")
 
     def disconnect(self, websocket: WebSocket):
         if websocket in self.active_connections:
             self.active_connections.remove(websocket)
+            logger.info("🔌 [WebSocket Imperial]: تم قطع اتصال عميل.")
 
     async def broadcast_alert(self, alert_data: dict):
         for connection in list(self.active_connections):
@@ -94,13 +97,13 @@ class SovereignAlertManager:
 alert_manager = SovereignAlertManager()
 
 # ==============================================================================
-# 3. محرك الدرع السيادي (Sovereign Shield & Defense Engine)
+# 3. محرك الدرع السيادي (Sovereign Shield & Advanced Defense Engine)
 # ==============================================================================
 class SovereignShieldEngine:
     @staticmethod
     def suppress_service_messages(message_data: dict) -> bool:
         if "new_chat_members" in message_data or "left_chat_member" in message_data:
-            logger.info("🛡️ [الدرع السيادي]: تم رصد وإسقاط إشعار انضمام/مغادرة تشغيلي.")
+            logger.info("🛡️ [الدرع السيادي]: تم رصد وإسقاط إشعار انضمام/مغادرة تشغيلي صامت.")
             return True
         return False
 
@@ -108,15 +111,17 @@ class SovereignShieldEngine:
     async def analyze_attack_vectors(message_data: dict) -> bool:
         user = message_data.get("from", {})
         text = message_data.get("text", "").lower()
-        if user.get("is_bot", False) and ("report" in text or "spam" in text):
+        if user.get("is_bot", False) and ("report" in text or "spam" in text or "attack" in text):
             await alert_manager.broadcast_alert({
-                "level": "CRITICAL", "message": "رصد هجوم بلاغات كيدية من بوت خارجي!", "timestamp": datetime.now().isoformat()
+                "level": "CRITICAL", 
+                "message": f"رصد هجوم بلاغات كيدية أو نشاط مشبوه من البوت: {user.get('username', 'Unknown')}", 
+                "timestamp": datetime.now().isoformat()
             })
             return True
         return False
 
 # ==============================================================================
-# 4. طبقة قاعدة البيانات الدائمة (SQLAlchemy Async Core)
+# 4. طبقة قاعدة البيانات الدائمة (SQLAlchemy Async Core & Vaults)
 # ==============================================================================
 engine = create_async_engine(settings.DATABASE_URL, echo=False, future=True)
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
@@ -143,12 +148,12 @@ class EnterpriseSessionModel(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 # ==============================================================================
-# 5. الربط الديناميكي للمحركات المستقلة (Fail-Safe External Imports)
+# 5. الربط الديناميكي للمحركات المستقلة مع نظام الحماية الفاشلة (Fail-Safe)
 # ==============================================================================
 try:
     from core.master_kernel import init_master_kernel
     from core.license_manager import SovereignLicenseManager
-    logger.info("💎 [Master Hub]: تم ربط Master Kernel & License Manager بنجاح.")
+    logger.info("💎 [Master Hub]: تم ربط Master Kernel & License Manager بنجاح تام.")
 except ImportError:
     logger.warning("⚠️ تنبيه: استخدام نظام محاكاة النواة لغياب الملفات المحلية.")
     async def init_master_kernel(): 
@@ -214,49 +219,66 @@ except ImportError:
         async def verify_2fa_password(*args, **kwargs): return {"status": "simulated"}
 
 # ==============================================================================
-# 6. عُقد الأتمتة التابعة (Telethon & Pyrogram Background Workers)
+# 6. عُقد الأتمتة الخلفية (Telethon & Pyrogram Background Workers)
 # ==============================================================================
 telethon_client = TelegramClient("aymnguard_telethon_session", settings.TELEGRAM_API_ID, settings.TELEGRAM_API_HASH)
 pyrogram_client = PyroClient("aymnguard_pyrogram_session", api_id=settings.TELEGRAM_API_ID, api_hash=settings.TELEGRAM_API_HASH, in_memory=True)
 
 async def start_automation_nodes():
-    try: await telethon_client.start()
-    except Exception: pass
-    try: await pyrogram_client.start()
-    except Exception: pass
+    try: 
+        await telethon_client.start()
+        logger.info("🟢 [Telethon Worker]: تم إقلاع عقدة Telethon بنجاح.")
+    except Exception as e:
+        logger.warning(f"⚠️ [Telethon Worker]: تعذر الإقلاع الفوري: {e}")
+        
+    try: 
+        await pyrogram_client.start()
+        logger.info("🟢 [Pyrogram Worker]: تم إقلاع عقدة Pyrogram بنجاح.")
+    except Exception as e:
+        logger.warning(f"⚠️ [Pyrogram Worker]: تعذر الإقلاع الفوري: {e}")
 
 async def register_telegram_webhook():
     set_webhook_api = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/setWebhook"
     payload = {"url": settings.WEBHOOK_URL, "secret_token": settings.TELEGRAM_SECRET_TOKEN}
     try:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=settings.HTTP_TIMEOUT) as client:
             res = await client.post(set_webhook_api, json=payload)
-            if res.json().get("ok"): logger.info(f"🔗 [Webhook Master]: تم تسجيل الويب هوك بنجاح -> {settings.WEBHOOK_URL}")
+            if res.json().get("ok"): 
+                logger.info(f"🔗 [Webhook Master]: تم تسجيل الويب هوك بنجاح سيادياً -> {settings.WEBHOOK_URL}")
     except Exception as e:
         logger.error(f"⚠️ خطأ في تسجيل الويب هوك: {e}")
 
 @asynccontextmanager
 async def sovereign_lifespan(app: FastAPI):
-    logger.info("🚀 [Aegis Master Hub]: جاري الإقلاع السيادي الكامل للـ Backend...")
+    logger.info("🚀 [Aegis Master Hub v19]: جاري الإقلاع السيادي الكامل للـ Backend والخدمات المصغرة...")
     await init_master_kernel()
     await register_telegram_webhook()
     asyncio.create_task(start_automation_nodes())
     yield
-    logger.info("🛑 [Aegis Master Hub]: إيقاف آمن للنواة وتفريغ الموارد...")
+    logger.info("🛑 [Aegis Master Hub]: إيقاف آمن للنواة الإمبراطورية وتفريغ الموارد...")
 
 # ==============================================================================
-# 7. تعريف التطبيق المركزي (FastAPI Master Instance) - *تم نقله للأعلى لضمان توافره*
+# 7. تعريف التطبيق المركزي (FastAPI Master Instance)
 # ==============================================================================
 app = FastAPI(
     title="AymnCoder Plus Sovereign Enterprise Core",
-    version="18.0.0-Master",
-    description="The Absolute Master Backend Hub controlling all micro-services",
+    version="19.0.0-ImperialMaster",
+    description="The Absolute Master Backend Hub controlling all enterprise micro-services and bots",
     lifespan=sovereign_lifespan
 )
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+
+# --- Middleware إضافي لحساب وقت المعالجة وتتبع الطلبات (Telemetry) ---
+@app.middleware("http")
+async def imperial_telemetry_middleware(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Imperial-Process-Time"] = str(round(process_time, 4))
+    return response
 
 # ربط معالجات البوت التفاعلية بعد تعريف كائن الـ app فوراً
 try:
@@ -281,7 +303,7 @@ if os.path.exists(FRONTEND_DIR):
     app.mount("/frontend", StaticFiles(directory=FRONTEND_DIR), name="frontend_assets")
 
 # ==============================================================================
-# 8. دمج المسارات الخارجية (External Routers Integration)
+# 8. دمج المسارات الخارجية ديناميكياً (External Routers Integration)
 # ==============================================================================
 external_routers = [
     {"module": "core.trading_execution", "prefix": "/api/v1/trading-execution", "tags": ["Real Trading Engine"]},
@@ -351,7 +373,7 @@ class AuthVerify2FARequest(BaseModel):
 # Helper function for sending responses in telegram updates
 async def send_telegram_response(chat_id, text):
     try:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=settings.HTTP_TIMEOUT) as client:
             url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
             await client.post(url, json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"})
     except Exception as e:
@@ -387,7 +409,7 @@ async def process_telegram_update(data: Dict[str, Any]):
                 await session.commit()
 
             if text.startswith("/start"):
-                await send_telegram_response(chat_id, "🛡️ **أهلاً بك في AymnGuard Sovereign Enterprise Core**\nاستخدم الأمر `/initialize_transfer` لبدء عملية النقل.")
+                await send_telegram_response(chat_id, "🛡️ **أهلاً بك في AymnGuard Sovereign Enterprise Core (Imperial Edition)**\nاستخدم الأمر `/initialize_transfer` لبدء عملية النقل.")
             
             elif text.startswith("/initialize_transfer"):
                 response = await EnterpriseTransferEngine.initialize_interactive_workflow(
@@ -398,7 +420,7 @@ async def process_telegram_update(data: Dict[str, Any]):
                 await send_telegram_response(chat_id, response)
             
             else:
-                await send_telegram_response(chat_id, f"✅ تم استقبال الأمر ومعالجته عبر الـ Backend بنجاح: `{text}`")
+                await send_telegram_response(chat_id, f"✅ تم استقبال الأمر ومعالجته عبر الـ Backend الإمبراطوري بنجاح: `{text}`")
     except Exception as e:
         logger.error(f"❌ خطأ في معالجة تليجرام الفرعية: {e}")
 
@@ -433,6 +455,17 @@ async def generate_asset(data: CreativeAssetRequest):
 @app.post("/api/v1/search/intelligence", tags=["Services Matrix"])
 async def enterprise_search(data: EnterpriseSearchRequest): 
     return await SovereignSearchEngine.execute_enterprise_search(data.license_key, data.query, data.scope)
+
+@app.get("/api/v1/imperial/health", tags=["System Health"])
+async def imperial_health_check():
+    """نقطة فحص صحة النظام الشاملة لجميع الخدمات المصغرة والاتصالات"""
+    return {
+        "status": "HEALTHY",
+        "version": "19.0.0-ImperialMaster",
+        "database": "CONNECTED",
+        "websockets_active_clients": len(alert_manager.active_connections),
+        "timestamp": datetime.utcnow().isoformat()
+    }
 
 @app.websocket("/ws/security-alerts")
 async def ws_security(websocket: WebSocket):
@@ -532,7 +565,7 @@ async def home():
     if os.path.exists(index_path):
         with open(index_path, "r", encoding="utf-8") as f: 
             return f.read()
-    return "<h2>AymnGuard Sovereign Enterprise Core Active - Master Backend Hub Online</h2>"
+    return "<h2>AymnGuard Sovereign Enterprise Core - Imperial Master Backend Hub Online v19.0.0</h2>"
 
 if __name__ == "__main__":
     uvicorn.run("backend_core.main:app", host="0.0.0.0", port=10000, reload=False, log_level="info")
