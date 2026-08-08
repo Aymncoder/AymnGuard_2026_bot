@@ -1,5 +1,5 @@
 # =====================================================================
-# AymnGuard Enterprise : Advanced CI/CD Cloud Factory (v18.6.0)
+# AymnGuard Enterprise : Advanced CI/CD Cloud Factory (v18.7.0)
 # =====================================================================
 
 name: 👑 Sovereign Empire Super-App Builder
@@ -9,8 +9,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'mobile_empire_app/**'
 
 jobs:
   build-super-app:
@@ -42,25 +40,20 @@ jobs:
 
       - name: 📦 جلب التبعيات والمكتبات البرمجية
         run: flutter pub get
-        working-directory: ./mobile_empire_app
 
       - name: 🧪 تشغيل اختبارات الجودة والوحدة
         run: flutter test
-        working-directory: ./mobile_empire_app
         continue-on-error: true
 
       - name: 🛡️ الفحص الأمني والتحليل البرمجي (Linting)
         run: flutter analyze
-        working-directory: ./mobile_empire_app
         continue-on-error: true
 
       - name: 🚀 بناء نسخة الـ APK
         run: flutter build apk --release --target-platform android-arm,android-arm64,android-x64 --split-per-abi
-        working-directory: ./mobile_empire_app
 
       - name: 🌐 بناء نسخة الـ AAB الجاهزة لمتجر Google Play
         run: flutter build appbundle --release
-        working-directory: ./mobile_empire_app
 
       - name: 📊 إنشاء تقرير الملخص المؤسسي والبناء
         run: |
@@ -74,12 +67,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: AymnGuard-SuperApp-APK
-          path: mobile_empire_app/build/app/outputs/apk/release/app-*.apk
+          path: build/app/outputs/apk/release/app-*.apk
           retention-days: 7
 
       - name: 📦 (AppBundle) تصدير حزمة المتجر
         uses: actions/upload-artifact@v4
         with:
           name: AymnGuard-SuperApp-GooglePlay-AAB
-          path: mobile_empire_app/build/app/outputs/bundle/release/app-release.aab
+          path: build/app/outputs/bundle/release/app-release.aab
           retention-days: 7
