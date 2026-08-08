@@ -15,11 +15,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-         # استدعاء كامل التاريخ البيرومي لضمان دقة تحليل المسارات
-          
-          - name: 📦 Install Enterprise Dependencies & AI Scanners
+          # استدعاء كامل التاريخ لضمان دقة تحليل المسارات
+
+      - name: 📦 Install Enterprise Dependencies & AI Scanners
         run: |
-          # تم إزالة سطر ترقية pip لتفادي انهيار بيئة Termux
+          # تفادي انهيار بيئة العمل أو البيئات المقيدة
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           
           # تثبيت أدوات الفحص المؤسسي للذكاء الاصطناعي وأمن النواة
@@ -35,8 +35,7 @@ jobs:
       - name: 🧬 Intelligent Duplicate & Overlap Detection (الفحص الذكي للتكرار)
         run: |
           echo "🔍 تفعيل خوارزمية البصمة الذكية (Smart Hashing) لمنع التكرار..."
-          # التحديث الإبداعي: استثناء ملفات __init__.py والملفات الهيكلية الأصغر من 10 بايت
-          # هذا يضمن عدم توقف البناء بسبب الملفات التنظيمية، مع معاقبة تكرار الكود الفعلي!
+          # استثناء ملفات __init__.py والملفات الهيكلية الأصغر من 10 بايت
           find . -type f -name "*.py" ! -name "__init__.py" -size +10c -exec md5sum {} + | sort | uniq -w32 -dD > duplicates.txt
           
           if [ -s duplicates.txt ]; then
