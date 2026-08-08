@@ -2,12 +2,19 @@ version: '3.8'
 
 services:
   aymnguard_core:
-    build: .
+    build:
+      context: ./backend_core
     container_name: aymnguard_core_app
     restart: always
     ports:
-      - "10000:10000"  # مطابقة تامة للمنفذ التشغيلي المعتمد في الـ Dockerfile (10000)
+      - "10000:10000"
     env_file:
-      - .env          # استدعاء المتغيرات البيئية والأسرار بأمان تام من ملف .env
+      - .env
     volumes:
       - .:/app
+    networks:
+      - aymnguard-network
+
+networks:
+  aymnguard-network:
+    driver: bridge
