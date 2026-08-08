@@ -42,12 +42,11 @@ class SovereignApiService {
       debugPrint("API Error: $e");
     }
     // Fallback Data
-    return [
+    return {
       SovereignBotModel(id: 'bot_1', name: 'بوت النقل العكسي الذكي', description: 'نقل الأعضاء باستخدام وكلاء AI.', icon: Icons.swap_calls, isInstalled: true),
       SovereignBotModel(id: 'bot_2', name: 'محرك التدقيق الجنائي', description: 'فحص الثغرات الأمنية في العقود.', icon: Icons.policy, isInstalled: false),
-      SovereignBotModel(id: 'bot_3', name: 'الترجمة المالية الآلية', description: 'ترجمة فورية للتقارير المالية.', icon: Icons.translate, isInstalled: false),
-      SovereignBotModel(id: 'bot_4', name: 'خدمة Webhook خارجية', description: 'أضف رابط لبوت مخصص.', icon: Icons.add_link, isInstalled: false, isCustom: true),
-    ];
+      SovereignBotModel(id: 'bot_3', name: 'الترجمة المالية الآلية', description: 'ترجمة فورية للتقارير المالية.', icon: Icons.translate, isInstalled: false),       SovereignBotModel(id: 'bot_4', name: 'خدمة Webhook خارجية', description: 'أضف رابط لبوت مخصص.', icon: Icons.add_link, isInstalled: false, isCustom: true),
+    }
   }
 
   static Future<bool> installBotOnServer(String botId) async {
