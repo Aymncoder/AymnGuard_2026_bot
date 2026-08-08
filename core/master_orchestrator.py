@@ -158,6 +158,47 @@ class MasterSovereignOrchestrator:
         text = message_text.strip()
         text_lower = text.lower()
         MOCK_LICENSE = "AG-MASTER-EMPIRE-2026"
+        # تحليل الأوامر والمسارات التشغيلية العادية
+        text = message_text.strip()
+        text_lower = text.lower()
+        MOCK_LICENSE = "AG-MASTER-EMPIRE-2026"
+
+        # 2. استدعاء ميكروسيرفس الذكاء الاصطناعي العصبي المستقل (قم بإضافته هنا)
+        if text.startswith(("/ai", "ذكاء", "تحليل", "فحص")) or text_lower.startswith("ai:"):
+            ai_payload = {
+                "license_key": MOCK_LICENSE,
+                "prompt": text,
+                "task_type": "security_audit" if "فحص" in text else "general_analysis",
+                "temperature": 0.7,
+                "max_tokens": 1024
+            }
+            
+            ai_res = await SovereignPlatformHub.dispatch_request_to_service(
+                service_id="sovereign_ai_forge",
+                payload=ai_payload
+            )
+            
+            result_data = ai_res.get("result", {})
+            if result_data.get("status") == "success":
+                neural_output = result_data.get("neural_output", {})
+                response_payload = neural_output.get("response_payload", {})
+                ai_response_text = response_payload.get("ai_response", "تمت المعالجة العصبية بنجاح.")
+                
+                return {
+                    "content": f"🧠 **[AGI Forge Microservice Nexus]:**\n\n{ai_response_text}",
+                    "show_menu": True,
+                    "reply_markup": self.get_sovereign_ui_markup(is_admin=is_user_admin),
+                    "status": "success"
+                }
+            else:
+                return {
+                    "content": "⚠️ عذراً، واجه العقل العصبي استثناءً مؤقته أثناء المعالجة.",
+                    "show_menu": True,
+                    "reply_markup": self.get_sovereign_ui_markup(is_admin=is_user_admin),
+                    "status": "error"
+                }
+
+        # بعدها تاتي بقية الشروط مثل القائمة الرئيسية (if text_lower in ["/start", ...])
 
         # القائمة الرئيسية العامة
         if text_lower in ["/start", "menu", "القائمة", "الرئيسية", "menu_main"]:
