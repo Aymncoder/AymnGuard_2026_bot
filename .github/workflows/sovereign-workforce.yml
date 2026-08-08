@@ -36,14 +36,15 @@ jobs:
           echo "📦 Attempting to install Heavy Crypto Libraries (ccxt)..."
           python3 -m pip install ccxt --break-system-packages || echo "⚠️ [Termux Architecture Warning]: تم تخطي تثبيت ccxt."
 
-      - name: 🔍 Sovereign AST & Syntax Validation (الفحص النحوي المتقدم)
-        run: |
-          echo "🔎 [AST Gatekeeper]: بدء فحص السلامة الهيكلية لمحركات النواة..."
-          python3 -m compileall core/ backend_core/ main.py || echo "⚠️ [AST]: تم تخطي بعض الملفات التي لا تحتاج إلى تجميع."
-
-      - name: 🔄 Pull Remote Changes before Commit
-        run: |
-          git pull origin ${{ github.head_ref || github.ref_name }} --rebase || true
+         - name: 🛡️ Sovereign AST & Syntax Validation (منع الأخطاء البرمجية)
+          run: |
+          echo "🔍 بدء الفحص النحوي المتقدم عبر محركات الذكاء (AST)..."
+          # التأكد من توفر الأداة في بيئة التنفيذ الحالية
+          pip install flake8 --break-system-packages || true
+          
+          # فحص صارم للأخطاء القاتلة والتداخل
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          echo "✅ [AST Validation]: البنية النحوية والمسارات متطابقة 100% وخالية من التداخل."
 
       - name: 🚀 Commit Auto-Healed Changes (حفظ التعديلات المُصححة ذاتياً)
         uses: stefanzweifel/git-auto-commit-action@v5
