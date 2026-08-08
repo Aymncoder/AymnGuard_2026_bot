@@ -12,6 +12,7 @@ import os
 import sys
 import logging
 import asyncio
+import importlib  # تم استيراده لمعالجة ربط المسارات الخارجية ديناميكياً
 from datetime import datetime
 from contextlib import asynccontextmanager
 from typing import Any, Dict, Optional, List
@@ -43,7 +44,7 @@ from pyrogram import Client as PyroClient
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column
 from sqlalchemy import String, Integer, DateTime, Text
-from sqlalchemy.future import select  # تم إضافة الاستدعاء الخاص بالخزنة هنا
+from sqlalchemy.future import select
 
 # ==============================================================================
 # 1. إعدادات التسجيل والبيئة المركزية (Logging & Config Settings)
@@ -136,7 +137,7 @@ class EnterpriseSessionModel(Base):
     __tablename__ = "enterprise_sessions"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     session_name: Mapped[str] = mapped_column(String(100), unique=True, index=True)
-    session_string: Mapped[str] = mapped_column(Text)  # هنا يُحفظ الكنز (المفتاح المشفر)
+    session_string: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(50), default="ACTIVE")
     health_score: Mapped[float] = mapped_column(default=100.0)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -180,7 +181,6 @@ except ImportError:
         @staticmethod
         async def execute_enterprise_search(k, q, s="all"): return {"status": "success", "message": "Search Executed (Simulated)"}
 
-# --- ربط المحركات الإمبراطورية الجديدة (الجلسات ونقل الأعضاء والمصادقة) ---
 try:
     from core.session_manager import SovereignSessionManager
     logger.info("🧠 [Master Hub]: تم ربط مدير الجلسات (Session Manager) بنجاح.")
@@ -212,7 +212,6 @@ except ImportError:
         async def verify_code(*args, **kwargs): return {"status": "simulated"}
         @staticmethod
         async def verify_2fa_password(*args, **kwargs): return {"status": "simulated"}
-
 
 # ==============================================================================
 # 6. عُقد الأتمتة التابعة (Telethon & Pyrogram Background Workers)
@@ -246,7 +245,7 @@ async def sovereign_lifespan(app: FastAPI):
     logger.info("🛑 [Aegis Master Hub]: إيقاف آمن للنواة وتفريغ الموارد...")
 
 # ==============================================================================
-# 7. تعريف التطبيق المركزي (FastAPI Master Instance)
+# 7. تعريف التطبيق المركزي (FastAPI Master Instance) - *تم نقله للأعلى لضمان توافره*
 # ==============================================================================
 app = FastAPI(
     title="AymnCoder Plus Sovereign Enterprise Core",
@@ -258,6 +257,16 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+
+# ربط معالجات البوت التفاعلية بعد تعريف كائن الـ app فوراً
+try:
+    from bots.telegram_bot import register_bot_handlers
+    @app.on_event("startup")
+    async def startup_event():
+        register_bot_handlers(pyrogram_client)
+        logger.info("🚀 [Master Hub]: Bot handlers successfully bound to the operational pipeline.")
+except ImportError:
+    logger.warning("⚠️ [Master Hub]: ملف telegram_bot غير محمل حالياً، سيتم تجاوزه.")
 
 # --- ربط الواجهات الأمامية والـ Mini App كخدمات تابعة للـ Backend ---
 FRONTEND_DIR = os.path.join(ROOT_DIR, "frontend_core")
@@ -308,7 +317,6 @@ class ProtectionSlotRequest(BaseModel): license_key: str; channel_id: str
 class CreativeAssetRequest(BaseModel): license_key: str; prompt: str; asset_type: Optional[str] = "logo"; aspect_ratio: Optional[str] = "1:1"
 class EnterpriseSearchRequest(BaseModel): license_key: str; query: str; scope: Optional[str] = "all"
 
-# --- نماذج محركات الإمبراطورية الجديدة ---
 class SessionInitRequest(BaseModel):
     license_key: str
     session_name: str
@@ -340,6 +348,15 @@ class AuthVerify2FARequest(BaseModel):
     session_name: str
     password: str
 
+# Helper function for sending responses in telegram updates
+async def send_telegram_response(chat_id, text):
+    try:
+        async with httpx.AsyncClient() as client:
+            url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
+            await client.post(url, json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"})
+    except Exception as e:
+        logger.error(f"Failed to send telegram response: {e}")
+
 # ==============================================================================
 # 10. معالجة تليجرام كخدمة فرعية تابعة للنواة (Telegram Microservice Handler)
 # ==============================================================================
@@ -355,19 +372,16 @@ async def process_telegram_update(data: Dict[str, Any]):
             text = msg.get("text", "")
             user_id = str(chat_id)
 
-            # 1. فحص ما إذا كان المستخدم في مرحلة تفاعلية (Workflow) داخل محرك النقل
             response = await EnterpriseTransferEngine.handle_interactive_input(
                 license_key="DEFAULT_LICENSE",
                 user_id=user_id,
                 user_input=text
             )
 
-            # إذا كان في مرحلة تفاعلية، أرسل رد الذكاء الاصطناعي وتوقف
             if response and "البيئة غير مهيأة" not in response:
                 await send_telegram_response(chat_id, response)
                 return
 
-            # 2. إذا لم يكن في مرحلة تفاعلية، نفذ المعالجة العادية
             async with async_session() as session:
                 session.add(TelegramLogModel(update_id=update_id, chat_id=str(chat_id), text_content=text))
                 await session.commit()
@@ -436,7 +450,6 @@ async def ws_security(websocket: WebSocket):
 # ==============================================================================
 @app.post("/api/v1/empire/auth/send-code", tags=["Sovereign Auth"])
 async def auth_send_code(request: AuthSendCodeRequest):
-    """طلب إرسال كود التحقق (OTP) إلى رقم الهاتف."""
     return await SovereignAuthManager.send_verification_code(
         session_name=request.session_name,
         phone_number=request.phone_number,
@@ -446,13 +459,10 @@ async def auth_send_code(request: AuthSendCodeRequest):
 
 @app.post("/api/v1/empire/auth/verify-code", tags=["Sovereign Auth"])
 async def auth_verify_code(request: AuthVerifyCodeRequest):
-    """إرسال الكود المستلم لتأكيد الدخول، وحفظ الجلسة أبدياً في قاعدة البيانات."""
     result = await SovereignAuthManager.verify_code(
         session_name=request.session_name,
         phone_code=request.phone_code
     )
-    
-    # الذكاء السيادي: إذا نجح الدخول، احفظ الكنز في قاعدة البيانات!
     if result.get("status") == "success":
         async with async_session() as db:
             new_session = EnterpriseSessionModel(
@@ -462,17 +472,14 @@ async def auth_verify_code(request: AuthVerifyCodeRequest):
             db.add(new_session)
             await db.commit()
             logger.info(f"💾 [Database]: تم حفظ كنز الجلسة {request.session_name} في الخزنة الأبدية بنجاح.")
-            
     return result
 
 @app.post("/api/v1/empire/auth/verify-2fa", tags=["Sovereign Auth"])
 async def auth_verify_2fa(request: AuthVerify2FARequest):
-    """تخطي التحقق بخطوتين وحفظ الجلسة في قاعدة البيانات."""
     result = await SovereignAuthManager.verify_2fa_password(
         session_name=request.session_name,
         password=request.password
     )
-    
     if result.get("status") == "success":
         async with async_session() as db:
             new_session = EnterpriseSessionModel(
@@ -482,7 +489,6 @@ async def auth_verify_2fa(request: AuthVerify2FARequest):
             db.add(new_session)
             await db.commit()
             logger.info(f"💾 [Database]: تم حفظ كنز الجلسة {request.session_name} في الخزنة الأبدية بعد تخطي 2FA.")
-            
     return result
 
 # ==============================================================================
@@ -490,7 +496,6 @@ async def auth_verify_2fa(request: AuthVerify2FARequest):
 # ==============================================================================
 @app.post("/api/v1/empire/sessions/register", tags=["Sovereign Sessions"])
 async def register_new_session(request: SessionInitRequest):
-    """تهيئة جلسة تليجرام جديدة وربطها بمحرك المراقبة الذاتية."""
     return await SovereignSessionManager.initialize_session(
         license_key=request.license_key,
         session_name=request.session_name,
@@ -501,12 +506,10 @@ async def register_new_session(request: SessionInitRequest):
 
 @app.get("/api/v1/empire/sessions/analytics", tags=["Sovereign Sessions"])
 async def get_session_analytics(license_key: str):
-    """جلب تقرير مفصل حول صحة الجلسات، الأخطاء، وسرعة النقل."""
     return await SovereignSessionManager.get_enterprise_analytics_report(license_key)
 
 @app.post("/api/v1/empire/transfer/start-workflow", tags=["Sovereign Transfer"])
 async def start_transfer_workflow(request: TransferInitRequest):
-    """بدء الفحص الاستباقي للجلسات وتفعيل وكيل الذكاء الاصطناعي لتوجيه المستخدم."""
     response_msg = await EnterpriseTransferEngine.initialize_interactive_workflow(
         license_key=request.license_key,
         user_id=request.user_id,
@@ -516,7 +519,6 @@ async def start_transfer_workflow(request: TransferInitRequest):
 
 @app.post("/api/v1/empire/transfer/interactive-input", tags=["Sovereign Transfer"])
 async def handle_transfer_input(request: InteractiveInputRequest):
-    """استقبال روابط المصدر والهدف من المستخدم والتفاعل معها خطوة بخطوة."""
     response_msg = await EnterpriseTransferEngine.handle_interactive_input(
         license_key=request.license_key,
         user_id=request.user_id,
