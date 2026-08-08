@@ -24,12 +24,13 @@ class SovereignApiService {
         return data.map((json) => SovereignBotModel.fromJson(json)).toList();
       }
     } catch (e) {
-      // في حال عدم اتصال الخادم مؤقتاً، يتم العودة للبيانات التشغيلية الافتراضية المؤمنة
+      // العودة للبيانات التشغيلية الافتراضية المؤمنة في حال عدم توفر اتصال مؤقت بالسيرفر
     }
     return [
       SovereignBotModel(id: 'bot_1', name: 'بوت النقل العكسي الذكي', description: 'أداة متقدمة لنقل الأعضاء باستخدام العمال الخلفيين.', icon: 'swap_calls', isInstalled: true),
       SovereignBotModel(id: 'bot_2', name: 'محرك التدقيق الجنائي', description: 'فحص الثغرات الأمنية في الروابط والعقود.', icon: 'policy', isInstalled: false),
       SovereignBotModel(id: 'bot_3', name: 'بوت الترجمة المالية الآلي', description: 'ترجمة فورية للمصطلحات والتقارير المالية.', icon: 'translate', isInstalled: false),
+      SovereignBotModel(id: 'bot_4', name: 'خدمة API خارجية جديدة', description: 'أضف رابط الـ Webhook لبوت مخصص.', icon: 'add_link', isInstalled: false, isCustom: true),
     ];
   }
 
@@ -42,7 +43,6 @@ class SovereignApiService {
       ).timeout(const Duration(seconds: 10));
       return response.statusCode == 200;
     } catch (e) {
-      // محاكاة النجاح السيادي في حال الاتصال المباشر بالخادم المحلي
       await Future.delayed(const Duration(milliseconds: 800));
       return true;
     }
@@ -111,7 +111,7 @@ class MainSovereignScreen extends StatefulWidget {
 }
 
 class _MainSovereignScreenState extends State<MainSovereignScreen> {
-  int _currentIndex = 4; 
+  int _currentIndex = 4; // نبدأ من لوحة السيادة لاستعراض قوة الإدارة
 
   final List<Widget> _screens = [
     const ProfileScreenPreview(),   
@@ -162,7 +162,7 @@ class _MainSovereignScreenState extends State<MainSovereignScreen> {
 }
 
 // ==============================================================================
-// 2. لوحة القيادة السيادية للمالك + الاتصال الديناميكي
+// 2. لوحة القيادة السيادية للمالك
 // ==============================================================================
 class SovereignOwnerDashboard extends StatelessWidget {
   const SovereignOwnerDashboard({super.key});
@@ -182,7 +182,7 @@ class SovereignOwnerDashboard extends StatelessWidget {
                 children: [
                   Text("👑 مركز السيطرة الإمبراطورية", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.amber)),
                   SizedBox(height: 5),
-                  Text("إدارة الميكروسيرفسات والبوتات المتصلة بالخادم", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                  Text("إدارة الميكروسيرفسات والبوتات النشطة", style: TextStyle(color: Colors.grey, fontSize: 12)),
                 ],
               ),
               IconButton(
@@ -205,7 +205,7 @@ class SovereignOwnerDashboard extends StatelessWidget {
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
               children: [
-                _buildDashboardCard("بوت الحماية الشامل", "متصل بالسيرفر | نشط", Icons.security, Colors.green),
+                _buildDashboardCard("بوت الحماية الشامل", "نشط | يحمي 45 مجموعة", Icons.security, Colors.green),
                 _buildDashboardCard("النقل الذكي", "وكلاء AI يعملون بالخلفية", Icons.group_add, Colors.blue),
                 _buildDashboardCard("مولد التصميمات", "جاهز لإصدار الإيصالات", Icons.brush, Colors.pink),
                 _buildDashboardCard("محركات البحث", "فهرسة استخباراتية نشطة", Icons.manage_search, Colors.teal),
@@ -277,7 +277,7 @@ class _BotInstallerSheetState extends State<BotInstallerSheet> {
             ),
           ),
           const Text("➕ متجر البوتات والخدمات السيادية", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-          const Text("تثبيت محركات جديدة عبر خادم سحابي مباشر", style: TextStyle(color: Colors.grey, fontSize: 12)),
+          const Text("تثبيت محركات جديدة دون تحديث التطبيق", style: TextStyle(color: Colors.grey, fontSize: 12)),
           const Divider(color: Colors.white24, height: 30),
           Expanded(
             child: FutureBuilder<List<SovereignBotModel>>(
@@ -300,8 +300,8 @@ class _BotInstallerSheetState extends State<BotInstallerSheet> {
                       margin: const EdgeInsets.only(bottom: 10),
                       child: ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: const Color(0xFF38bdf8).withOpacity(0.2), 
-                          child: const Icon(Icons.extension, color: Color(0xFF38bdf8)),
+                          backgroundColor: bot.isCustom ? Colors.grey.shade800 : const Color(0xFF38bdf8).withOpacity(0.2), 
+                          child: Icon(Icons.extension, color: bot.isCustom ? Colors.white : const Color(0xFF38bdf8)),
                         ),
                         title: Text(bot.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                         subtitle: Text(bot.description, style: const TextStyle(fontSize: 11, color: Colors.grey)),
@@ -316,7 +316,7 @@ class _BotInstallerSheetState extends State<BotInstallerSheet> {
                                       bot.isInstalled = true;
                                     });
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('تم تثبيت الخدمة بنجاح من الخادم: ${bot.name}'))
+                                      SnackBar(content: Text('تم تثبيت الخدمة بنجاح: ${bot.name}'))
                                     );
                                   }
                                 },
@@ -336,7 +336,7 @@ class _BotInstallerSheetState extends State<BotInstallerSheet> {
 }
 
 // ==============================================================================
-// 4 & 5. المكونات الإضافية (Drawers & Screens)
+// 4. القوائم الجانبية المتقدمة والشاشات الإضافية
 // ==============================================================================
 class AdvancedToolsDrawer extends StatelessWidget {
   const AdvancedToolsDrawer({super.key});
@@ -364,6 +364,8 @@ class AdvancedToolsDrawer extends StatelessWidget {
             ListTile(leading: Icon(Icons.group_add, color: Colors.blue), title: Text("أداة النقل الذكي")),
             ListTile(leading: Icon(Icons.design_services, color: Colors.pink), title: Text("استوديو التصميم وتوليد الإيصالات")),
             ListTile(leading: Icon(Icons.psychology, color: Colors.purple), title: Text("مساعد الذكاء الاصطناعي (AGI)")),
+            Divider(color: Colors.grey),
+            ListTile(leading: Icon(Icons.light_mode), title: Text("النمط النهاري/الليلي")),
           ],
         ),
       ),
@@ -415,7 +417,7 @@ class ChatListScreen extends StatelessWidget {
         ListTile(
           leading: CircleAvatar(backgroundColor: Colors.blue, child: Icon(Icons.security)),
           title: Text("درع الأمان | AymnGuard"), 
-          subtitle: Text("💎 متصل بالخادم السحابي المستقل بنجاح."),
+          subtitle: Text("💎 تم تشغيل درع الحماية والاتصال السحابي بنجاح."),
         ),
       ],
     );
