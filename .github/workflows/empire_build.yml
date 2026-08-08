@@ -1,8 +1,6 @@
 # =====================================================================
-# AymnGuard Enterprise : Advanced CI/CD Cloud Factory (v18.1.0)
+# AymnGuard Enterprise : Advanced CI/CD Cloud Factory (v18.6.0)
 # =====================================================================
-# (Super Apps) مصدر البناء المؤسسي المتقدم: تم تصميمه للتعامل مع التطبيقات الفائقة
-# والتحليل الأمني والتدمير المزدوج (Caching). يحتوي على تقنيات للبناء السريع (APK & AAB)
 
 name: 👑 Sovereign Empire Super-App Builder
 
@@ -41,8 +39,6 @@ jobs:
           python3 -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
-          # أضف حزم بايثون أو متطلبات الفحص الأمني هنا عند الحاجة
-          # pip install -r requirements.txt
 
       - name: 📦 جلب التبعيات والمكتبات البرمجية
         run: flutter pub get
@@ -58,11 +54,11 @@ jobs:
         working-directory: ./mobile_empire_app
         continue-on-error: true
 
-      - name: 🚀 بناء نسخة الـ APK (للتثبيت المباشر على هاتفك)
+      - name: 🚀 بناء نسخة الـ APK
         run: flutter build apk --release --target-platform android-arm,android-arm64,android-x64 --split-per-abi
         working-directory: ./mobile_empire_app
 
-      - name: 🌐 بناء نسخة الـ AAB الجاهزة لمتجر (Google Play)
+      - name: 🌐 بناء نسخة الـ AAB الجاهزة لمتجر Google Play
         run: flutter build appbundle --release
         working-directory: ./mobile_empire_app
 
