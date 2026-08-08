@@ -22,17 +22,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: 🐍 Verify Sovereign Python Environment
         run: |
           echo "=== 🐍 Python Environment Info ==="
           python3 --version
 
-      - name: 🤖 Install Auto-Healing Workforce & Dependencies
+      - name: 📦 Install Auto-Healing Workforce & Dependencies
         run: |
           echo "📦 Installing Core Enterprise Dependencies..."
           python3 -m pip install --prefer-binary fastapi pydantic httpx sqlalchemy --break-system-packages
-          
+
           echo "📦 Attempting to install Heavy Crypto Libraries (ccxt)..."
           python3 -m pip install ccxt --break-system-packages || echo "⚠️ [Termux Architecture Warning]: تم تخطي تثبيت ccxt."
 
