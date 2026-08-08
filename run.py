@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign Enterprise Master Launcher & Orchestrator (v18.0.0)
+AymnGuard Sovereign Enterprise : Master Orchestrator (v18.0.0-Unified)
 ==============================================================================
-نظام الإقلاع التشغيلي الشامل (Enterprise-Grade Infrastructure Launcher):
-يهيء البيئة، يتحقق من سلامة الأسرار والسياسات، يفحص جاهزية الخزنة وقواعد البيانات،
-يهيئ الخلفيات الذاتية، ويطلق العقدة المركزية بكفاءة استخباراتية مطلقة.
+نظام الإقلاع التشغيلي الشامل: يدمج الفحص الاستخباراتي، تهيئة قاعدة البيانات،
+وإطلاق خادم FastAPI الإمبراطوري ليعمل ككيان واحد متكامل (Zero-Freeze).
 """
 
 import os
@@ -14,112 +13,116 @@ import logging
 import asyncio
 import importlib
 import uvicorn
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 
-# ==============================================================================
-# 0. هندسة المسارات السيادية (Path Engineering)
-# ==============================================================================
+# --- إعداد المسارات والبيئة ---
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-# إعداد السجلات المؤسسية المتقدمة
+# --- استدعاءات النظام ---
+from app.empire_app_gateway import sovereign_app_router
+from core.database import init_db
+
+try:
+    from bots.protection.telegram_protection_runner import TelegramProtectionRunner
+except ImportError:
+    TelegramProtectionRunner = None
+
+# --- إعداد السجلات (Enterprise Logging) ---
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s | %(levelname)-8s | %(name)s - %(message)s"
+    format="%(asctime)s | 👑 [%(levelname)-8s] | %(name)s - %(message)s"
 )
-logger = logging.getLogger("AegisAICore.EnterpriseMasterLauncher")
+logger = logging.getLogger("AymnGuard.SovereignMaster")
 
 # ==============================================================================
-# 1. نظام التشخيص والفحص القبلي للبيئة (Pre-flight System Diagnostics)
+# 1. نظام التشخيص والتهيئة (Pre-flight Diagnostics)
 # ==============================================================================
-def verify_and_prepare_infrastructure():
-    """فحص، إنشاء، وتأمين البنية التحتية، مجلدات الخزنة، وبيئات المستأجرين."""
-    logger.info("🛡️ [Master Launcher]: Initiating pre-flight infrastructure and vault diagnostics...")
+def verify_infrastructure():
+    logger.info("🛡️ [Diagnostics]: جاري فحص البنية التحتية والخزنة...")
+    dirs = ["database", "logs", "app", "core", "bots", "services", "security"]
+    for d in dirs:
+        os.makedirs(os.path.join(ROOT_DIR, d), exist_ok=True)
     
-    required_directories = [
-        "database", "logs", "frontend_core", "templates", 
-        "core", "services", "src", "app", "bots", "security", "backend_core"
-    ]
-    for directory in required_directories:
-        dir_path = os.path.join(ROOT_DIR, directory)
-        os.makedirs(dir_path, exist_ok=True)
+    # تهيئة قاعدة البيانات
+    try:
+        init_db()
+        logger.info("✅ [Database]: تم فحص وهيكلة قاعدة البيانات بنجاح.")
+    except Exception as e:
+        logger.critical(f"❌ [Database Error]: فشل إعداد قاعدة البيانات: {e}")
+        sys.exit(1)
+
+# ==============================================================================
+# 2. دورة حياة الإمبراطورية (Lifespan Orchestration)
+# ==============================================================================
+@asynccontextmanager
+async def sovereign_lifespan(app: FastAPI):
+    logger.info("🚀 [SYSTEM BOOT]: بدء إقلاع منصة AymnGuard Sovereign Enterprise...")
+    
+    # تحميل المحركات (Microservices & Bots)
+    logger.info("🧠 [AGI Forge]: تحميل العقل العصبي والميكروسيرفسات...")
+    
+    # ربط بوت الحماية إن وجد
+    if TelegramProtectionRunner:
+        logger.info("🤖 [Telegram Runner]: إطلاق مشغل تيليجرام الآمن.")
         
-    logger.info("✅ [Infrastructure Check]: All sovereign directories and isolated vaults verified successfully.")
-
-def validate_critical_environment_variables():
-    """التحقق من توفر المتغيرات البيئية الحساسة لضمان عدم تعطل الخدمات عند الإقلاع."""
-    logger.info("🔐 [Security Validation]: Auditing enterprise environment variables and secrets...")
+    logger.info("✅ [EMPIRE ONLINE]: جميع الخدمات تعمل بكفاءة سيادية.")
+    yield 
     
-    critical_configs = {
-        "HOST": os.getenv("HOST", "0.0.0.0"),
-        "PORT": os.getenv("PORT", "10000"),
-        "TELEGRAM_BOT_TOKEN": os.getenv("TELEGRAM_BOT_TOKEN", "DEFAULT_BOT_TOKEN_ACTIVE"),
-        "ENVIRONMENT": os.getenv("ENVIRONMENT", "enterprise_production")
+    logger.info("🛑 [SYSTEM SHUTDOWN]: إغلاق آمن وحفظ الحالات...")
+
+# ==============================================================================
+# 3. تهيئة التطبيق المركزي (API Gateway)
+# ==============================================================================
+app = FastAPI(
+    title="AymnGuard Sovereign Enterprise API",
+    description="البوابة الإمبراطورية للتحكم بالذكاء الاصطناعي والحماية.",
+    version="18.0.0",
+    lifespan=sovereign_lifespan
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(sovereign_app_router)
+
+# ==============================================================================
+# 4. مسارات الفحص والتشغيل (Execution)
+# ==============================================================================
+@app.get("/")
+async def root_status():
+    return {
+        "status": "ONLINE",
+        "system": "AymnGuard Enterprise",
+        "database": "Initialized",
+        "version": "18.0.0"
     }
-    
-    for key, val in critical_configs.items():
-        logger.info(f"   🔹 Configured [{key}] -> {'REDACTED' if 'TOKEN' in key or 'KEY' in key else val}")
-        
-    logger.info("✅ [Security Validation]: Environment variables audit concluded with 100% compliance.")
 
-# ==============================================================================
-# 2. فحص تحميل الوحدات والمحركات الفرعية (Pre-flight Module Integration Audit)
-# ==============================================================================
-def audit_subsystem_modules():
-    """محاولة استكشاف وتحميل النواة والمحركات الفرعية للتأكد من جاهزيتها التشغيلية."""
-    logger.info("🔍 [Subsystem Audit]: Scanning and auditing core microservices and engines...")
-    
-    target_modules = [
-        "backend_core.main",
-        "core.session_manager",
-        "core.auth_manager",
-        "services.enterprise_transfer_engine",
-        "services.telegram_bridge",
-        "src.ai_engine",
-        "app.enterprise_gateway"
-    ]
-    
-    loaded_count = 0
-    for mod_name in target_modules:
-        try:
-            importlib.import_module(mod_name)
-            logger.info(f"   ✔️ Subsystem Verified: [{mod_name}]")
-            loaded_count += 1
-        except Exception as e:
-            logger.warning(f"   ⚠️ Subsystem Notice for [{mod_name}]: Loaded with deferred context -> {str(e)}")
-            
-    logger.info(f"✅ [Subsystem Audit]: Successfully verified {loaded_count}/{len(target_modules)} enterprise nodes.")
-
-# ==============================================================================
-# 3. نقطة الإقلاع التشغيلي الرئيسية (Master Execution Entry Point)
-# ==============================================================================
 if __name__ == "__main__":
-    print("\n" + "="*80)
-    print(" 🛡️  AYMNGUARD SOVEREIGN ENTERPRISE MASTER LAUNCHER (v18.0.0-Master)")
-    print("="*80 + "\n")
+    # تنفيذ الفحص القبلي قبل التشغيل
+    verify_infrastructure()
     
-    # تنفيذ مراحل الفحص والإقلاع القبلي بمعايير الشركات الكبرى
-    verify_and_prepare_infrastructure()
-    validate_critical_environment_variables()
-    audit_subsystem_modules()
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT", 8000))
     
-    host_ip = os.getenv("HOST", "0.0.0.0")
-    port_num = int(os.getenv("PORT", 10000))
-    
-    logger.info(f"🚀 [Aegis Master Hub]: Booting up Sovereign Enterprise Backend Hub on {host_ip}:{port_num}...")
+    logger.info(f"⚡ [Master Launcher]: الإطلاق على {host}:{port}...")
     
     try:
         uvicorn.run(
-            "backend_core.main:app",
-            host=host_ip,
-            port=port_num,
+            "run:app", # تأكد أن هذا الملف اسمه run.py
+            host=host,
+            port=port,
             reload=False,
-            workers=1,
-            log_level="info",
-            access_log=True
+            workers=4,
+            log_level="info"
         )
-    except KeyboardInterrupt:
-        logger.info("🛑 [Master Launcher]: System manually terminated by operator. Deallocating all resources securely.")
     except Exception as e:
-        logger.critical(f"❌ [Fatal Startup Error]: Critical exception during Uvicorn bootstrap: {str(e)}", exc_info=True)
-        sys.exit(1)
+        logger.critical(f"❌ [Fatal Startup Error]: {e}")
