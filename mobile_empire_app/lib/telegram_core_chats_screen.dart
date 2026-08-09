@@ -69,7 +69,7 @@ class TelegramCoreChats extends StatelessWidget {
                 child: Text("قنواتك المشترك بها",
                     style: TextStyle(color: Colors.grey))),
             Center(
-                child: Text("البوتات الخدمية",
+                child: Text("بوتاتك الخدمية",
                     style: TextStyle(color: Colors.grey))),
             MyCommunitiesPortalWidget(), 
           ],
