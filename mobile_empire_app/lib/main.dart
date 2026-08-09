@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'app_config.dart';
 
 import 'package:mobile_empire_app/telegram_core_chats_screen.dart';
@@ -29,138 +31,151 @@ class AymnGuardPlusApp extends StatelessWidget {
           unselectedItemColor: Colors.grey,
         ),
       ),
-      // تبدأ التطبيق بشاشة تسجيل وإضافة الحساب السيادية الأولى
       home: const AccountLoginGatewayScreen(),
     );
   }
 }
 
-// ==============================================================================
-// 1. شاشة إضافة الحساب وتسجيل الدخول عند البداية
-// ==============================================================================
+class AccountLoginGatewayScreen extends StatefulWidget {
+  const AccountLoginGatewayScreen({super.key});
 
-     // تأكد من إضافة هذه الاستدعاءات في أعلى ملف main.dart
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-// ... داخل زر "إطلاق الشرارة" أو "إضافة الحساب":
-// تأكد من وجود هذه الاستدعاءات في أعلى ملف main.dart
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-// ... داخل زر "إضافة الحساب وبدء الجلسة":
-onPressed: () async {
-  String phoneInput = _accountController.text.trim();
-  if (phoneInput.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("يرجى إدخال رقم الهاتف لبدء الجلسة")),
-    );
-    return;
-  }
-
-  // إظهار مؤشر التحميل السيادي
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) => const Center(
-      child: CircularProgressIndicator(color: AppColors.accentGold),
-    ),
-  );
-
-  try {
-    // إرسال الطلب الفعلي إلى بوابة FastAPI التي بنيتها
-    // تنبيه: ضع الـ IP الخاص بسيرفرك بدلاً من 127.0.0.1
-    final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/api/v1/sessions/register'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        "license_key": "AYMN-PREMIUM-LICENSE-2026", // مفتاح سيادي تجريبي
-        "session_name": "Sovereign_Mobile_Session",
-        "api_id": 2040, // ضع الـ API ID الحقيقي الخاص بك هنا لاحقاً
-        "api_hash": "b18441a1ff607e10a989891a5462e627", // ضع الـ API Hash الحقيقي
-        "phone_number": phoneInput
-      }),
-    );
-
-    // إخفاء مؤشر التحميل
-    Navigator.pop(context);
-
-    // تحليل رد النواة التشغيلية
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("تم ربط الجلسة بالنواة بنجاح 🚀", style: TextStyle(color: Colors.greenAccent))),
-      );
-
-      // الانتقال للواجهة الرئيسية وتمرير رقم الحساب المسجل
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MainSovereignScreen(userAccount: phoneInput),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("رفض النواة: ${response.statusCode} - ${response.body}")),
-      );
-    }
-  } catch (e) {
-    Navigator.pop(context); // إخفاء التحميل
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("فشل الاتصال بالبوابة المؤسسية: $e")),
-    );
-  }
+  @override
+  State<AccountLoginGatewayScreen> createState() => _AccountLoginGatewayScreenState();
 }
 
+class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
+  final TextEditingController _accountController = TextEditingController();
 
-  // 1. عرض مؤشر التحميل (حتى نعرف أن التطبيق يتصل بالسيرفر)
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) => const Center(child: CircularProgressIndicator()),
-  );
+  // دالة الاتصال بالباكن إند سيادياً
+  Future<void> _loginAndConnect() async {
+    String phoneInput = _accountController.text.trim();
+    if (phoneInput.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("يرجى إدخال رقم الهاتف لبدء الجلسة")),
+      );
+      return;
+    }
 
-  try {
-    // 2. إرسال الطلب الحقيقي إلى الباكن إند الخاص بك (سنقوم بتجهيز مسار البايثون تالياً)
-    // استبدل 'YOUR_SERVER_IP' بـ IP سيرفرك الحقيقي
-    final response = await http.post(
-      Uri.parse('http://YOUR_SERVER_IP:8000/api/v1/session/start'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'account_identifier': sessionInput}),
+    // إظهار التحميل
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(color: AppColors.accentGold),
+      ),
     );
 
-    // إخفاء مؤشر التحميل
-    Navigator.pop(context);
+    try {
+      // إرسال الطلب إلى بوابة المؤسسة (API Gateway) الخاصة بك
+      final response = await http.post(
+        Uri.parse('http://135.181.86.199:8000/api/v1/sessions/register'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          "license_key": "AYMN-PREMIUM-LICENSE-2026",
+          "session_name": "Sovereign_Mobile_Session",
+          "api_id": 2040,
+          "api_hash": "b18441a1ff607e10a989891a5462e627",
+          "phone_number": phoneInput
+        }),
+      );
 
-    // 3. التحقق من رد خادم البايثون الخاص بك
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
-      // إذا نجح الاتصال، ننتقل للوحة القيادة الإمبراطورية ونمرر البيانات الحقيقية
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SovereignCommandCenter(
-            sessionName: responseData['session_token'] ?? sessionInput,
+      // إخفاء التحميل
+      if (mounted) Navigator.pop(context);
+
+      if (response.statusCode == 200) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("تم ربط الجلسة بالنواة بنجاح 🚀", style: TextStyle(color: Colors.greenAccent))),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MainSovereignScreen(userAccount: phoneInput),
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("رفض النواة: ${response.statusCode}")),
+          );
+          // انتقال مؤقت لضمان عمل الواجهة حتى لو كان سيرفر البايثون مغلقاً
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MainSovereignScreen(userAccount: phoneInput),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // إخفاء التحميل
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("تعذر الاتصال بالسيرفر، تأكد من تشغيل النواة")),
+        );
+        // انتقال مؤقت لضمان عمل الواجهة
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MainSovereignScreen(userAccount: phoneInput),
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.shield_rounded, size: 80, color: AppColors.primary),
+              const SizedBox(height: 20),
+              const Text("بوابة AymnGuard السيادية", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+              const SizedBox(height: 30),
+              Directionality(
+                textDirection: TextDirection.ltr,
+                child: TextField(
+                  controller: _accountController,
+                  textAlign: TextAlign.right,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: AppColors.surface,
+                    hintText: "أدخل رقم الهاتف (+967...)",
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                icon: const Icon(Icons.power_settings_new, color: Colors.white),
+                label: const Text("إطلاق الشرارة وبدء الجلسة 🚀", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                onPressed: _loginAndConnect,
+              ),
+            ],
           ),
         ),
-      );
-    } else {
-      // إذا رفض الباكن إند الطلب (مثلاً الحساب غير مصرح له)
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("فشل الاتصال بالنواة: ${response.statusCode}")),
-      );
-    }
-  } catch (e) {
-    Navigator.pop(context); // إخفاء التحميل
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("خطأ في الاتصال بالسيرفر، تأكد من عمل الباكن إند")),
+      ),
     );
   }
 }
 
 class MainSovereignScreen extends StatefulWidget {
-  const MainSovereignScreen({super.key});
+  final String userAccount;
+  const MainSovereignScreen({super.key, required this.userAccount});
   
   @override
   State<MainSovereignScreen> createState() => _MainSovereignScreenState();
@@ -169,8 +184,8 @@ class MainSovereignScreen extends StatefulWidget {
 class _MainSovereignScreenState extends State<MainSovereignScreen> {
   int _currentIndex = 3; 
 
-  final List<Widget> _screens = [
-    const AccountSettingsScreen(), 
+  late final List<Widget> _screens = [
+    AccountSettingsScreen(userAccount: widget.userAccount), 
     const EmpirePremiumStore(),    
     const ContactsScreen(),        
     const CommunitiesScreenTab(), 
@@ -209,9 +224,7 @@ class CommunitiesScreenTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text("إدارة مجتمعاتي وأدواتي 👑", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-      ),
+      appBar: AppBar(title: const Text("إدارة مجتمعاتي وأدواتي 👑", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [
@@ -240,11 +253,9 @@ class CommunitiesScreenTab extends StatelessWidget {
   }
 }
 
-// ==============================================================================
-// 2. شاشة الإعدادات مع زر "إضافة حساب جديد" داخل التطبيق بعد الجلسة
-// ==============================================================================
 class AccountSettingsScreen extends StatelessWidget {
-  const AccountSettingsScreen({super.key});
+  final String userAccount;
+  const AccountSettingsScreen({super.key, required this.userAccount});
 
   @override
   Widget build(BuildContext context) {
@@ -258,52 +269,23 @@ class AccountSettingsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                const CircleAvatar(radius: 30, backgroundColor: AppColors.primary, child: Icon(Icons.person, size: 35)),
+                const CircleAvatar(radius: 30, backgroundColor: AppColors.primary, child: Icon(Icons.person, size: 35, color: Colors.white)),
                 const SizedBox(width: 15),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("ابو يمان", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                    const Text("الحساب المؤسسي", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                     const SizedBox(height: 5),
                     Directionality(
                       textDirection: TextDirection.ltr,
                       child: Container(
                         alignment: Alignment.centerLeft,
-                        child: const Text("+91 9265035200", style: TextStyle(color: Colors.grey)),
+                        child: Text(userAccount, style: const TextStyle(color: Colors.greenAccent, fontSize: 14, fontWeight: FontWeight.w500)),
                       ),
                     ),
                   ],
                 ),
               ],
-            ),
-          ),
-          const SizedBox(height: 15),
-          // زر إضافة حساب داخل التطبيق بعد تسجيل الجلسة
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.surface,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: const BorderSide(color: AppColors.primary)),
-              ),
-              icon: const Icon(Icons.person_add, color: AppColors.primary),
-              label: const Text("إضافة حساب إمبراطوري جديد", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              onPressed: () {
-                // فتح نافذة إضافة حساب إضافي
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    backgroundColor: AppColors.surface,
-                    title: const Text("إضافة حساب جديد", style: TextStyle(color: Colors.white)),
-                    content: const Text("أدخل بيانات الحساب الجديد المراد ربطه بالتطبيق.", style: TextStyle(color: Colors.grey)),
-                    actions: [
-                      TextButton(onPressed: () => Navigator.pop(context), child: const Text("إلغاء")),
-                      ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text("ربط الحساب")),
-                    ],
-                  ),
-                );
-              },
             ),
           ),
         ],
