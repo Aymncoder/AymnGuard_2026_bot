@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-import 'package:mobile_empire_app/core/app_config.dart';
+import 'package:mobile_empire_app/core/app_config.dart'; // مسار الألوان الصحيح
 
 // ==============================================================================
 // شاشة الدفع بالعملات الرقمية (Crypto Checkout Screen)
