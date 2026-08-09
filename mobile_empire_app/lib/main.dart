@@ -77,9 +77,6 @@ class _MainSovereignScreenState extends State<MainSovereignScreen> {
   }
 }
 
-// ==============================================================================
-// شاشة الإعدادات المدمجة
-// ==============================================================================
 class AccountSettingsScreen extends StatelessWidget {
   const AccountSettingsScreen({super.key});
 
