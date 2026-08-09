@@ -13,6 +13,10 @@ dependencies:
     sdk: flutter
   http: ^1.2.0
   qr_flutter: ^4.1.0
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0  # أضف هذا السطر لتمكين الاتصال بالباكن إند
 
 dev_dependencies:
   flutter_test:
