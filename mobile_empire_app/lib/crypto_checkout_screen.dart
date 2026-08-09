@@ -1,3 +1,4 @@
+import 'package:mobile_empire_app/app_config.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
