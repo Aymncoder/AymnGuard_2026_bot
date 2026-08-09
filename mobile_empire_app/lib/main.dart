@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'app_config.dart';
+import 'core/backend_ecosystem.dart'; // استدعاء العقل المدبر للربط الشامل
 
 import 'package:mobile_empire_app/telegram_core_chats_screen.dart';
 import 'package:mobile_empire_app/premium_dashboard_screens.dart';
@@ -46,7 +47,7 @@ class AccountLoginGatewayScreen extends StatefulWidget {
 class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
   final TextEditingController _accountController = TextEditingController();
 
-  // دالة الاتصال بالباكن إند سيادياً
+  // دالة الاتصال المدمجة عبر العقل المدبر (BackendCoreEcosystem)
   Future<void> _loginAndConnect() async {
     String phoneInput = _accountController.text.trim();
     if (phoneInput.isEmpty) {
@@ -66,40 +67,28 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
     );
 
     try {
-      // إرسال الطلب إلى بوابة المؤسسة (API Gateway) الخاصة بك
-      final response = await http.post(
-        Uri.parse('http://135.181.86.199:8000/api/v1/sessions/register'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          "license_key": "AYMN-PREMIUM-LICENSE-2026",
-          "session_name": "Sovereign_Mobile_Session",
-          "api_id": 2040,
-          "api_hash": "b18441a1ff607e10a989891a5462e627",
-          "phone_number": phoneInput
-        }),
+      // 🚀 الاتصال الفعلي بـ auth_manager.py عبر النظام البيئي الموحد
+      var response = await BackendCoreEcosystem.requestTelegramOtp(
+        "Sovereign_Mobile_Session",
+        phoneInput,
+        2040,
+        "b18441a1ff607e10a989891a5462e627"
       );
 
       // إخفاء التحميل
       if (mounted) Navigator.pop(context);
 
-      if (response.statusCode == 200) {
+      if (response['error'] == true) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("تم ربط الجلسة بالنواة بنجاح 🚀", style: TextStyle(color: Colors.greenAccent))),
-          );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MainSovereignScreen(userAccount: phoneInput),
-            ),
+            SnackBar(content: Text("تعذر الاتصال أو رفض النواة: ${response['message']}")),
           );
         }
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("رفض النواة: ${response.statusCode}")),
+            SnackBar(content: Text("تم إرسال كود التحقق عبر: ${response['delivery_method']} 🚀", style: const TextStyle(color: Colors.greenAccent))),
           );
-          // انتقال مؤقت لضمان عمل الواجهة حتى لو كان سيرفر البايثون مغلقاً
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -112,14 +101,7 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
       if (mounted) {
         Navigator.pop(context); // إخفاء التحميل
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("تعذر الاتصال بالسيرفر، تأكد من تشغيل النواة")),
-        );
-        // انتقال مؤقت لضمان عمل الواجهة
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MainSovereignScreen(userAccount: phoneInput),
-          ),
+          SnackBar(content: Text("عطل في الشبكة أو السيرفر مغلق: $e")),
         );
       }
     }
