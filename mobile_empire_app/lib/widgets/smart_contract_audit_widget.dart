@@ -1,12 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-import 'package:mobile_empire_app/core/app_config.dart';
+import 'package:mobile_empire_app/app_config.dart';
 import 'package:mobile_empire_app/api_service.dart';
-
-// ==============================================================================
-// 10. واجهة التدقيق الجنائي الذكي (Smart Contract Audit Widget)
-// ==============================================================================
 
 class SmartContractAuditWidget extends StatefulWidget {
   const SmartContractAuditWidget({super.key});
@@ -18,20 +14,19 @@ class SmartContractAuditWidget extends StatefulWidget {
 class _SmartContractAuditWidgetState extends State<SmartContractAuditWidget> {
   final TextEditingController _contractController = TextEditingController();
   
-  bool _isAuditing = false; // هل التدقيق جاري حالياً؟
-  String? _taskId; // رقم التتبع الخاص بالمهمة
-  String _auditStatusMessage = ""; // الرسالة التي تظهر للمستخدم
-  Map<String, dynamic>? _auditResult; // نتيجة الفحص النهائية
-  Timer? _statusTimer; // المؤقت الذي يسأل السيرفر
+  bool _isAuditing = false; 
+  String? _taskId; 
+  String _auditStatusMessage = ""; 
+  Map<String, dynamic>? _auditResult; 
+  Timer? _statusTimer; 
 
   @override
   void dispose() {
     _contractController.dispose();
-    _statusTimer?.cancel(); // إيقاف المؤقت عند الخروج من الشاشة لمنع تسرب الذاكرة
+    _statusTimer?.cancel(); 
     super.dispose();
   }
 
-  // الدالة التي تبدأ عملية التدقيق
   Future<void> _startAudit() async {
     final contractAddress = _contractController.text.trim();
     if (contractAddress.isEmpty) return;
@@ -42,7 +37,6 @@ class _SmartContractAuditWidgetState extends State<SmartContractAuditWidget> {
       _auditStatusMessage = "جاري تحويل العقد لوكلاء الذكاء الاصطناعي...";
     });
 
-    // 1. إرسال الطلب للسيرفر واستلام رقم التتبع
     final taskId = await SovereignApiService.startSmartContractAudit(contractAddress);
 
     if (taskId != null) {
@@ -51,21 +45,18 @@ class _SmartContractAuditWidgetState extends State<SmartContractAuditWidget> {
         _auditStatusMessage = "المهمة قيد التنفيذ (Task ID: ${_taskId!.substring(0, 8)}...)";
       });
 
-      // 2. تشغيل المؤقت لسؤال السيرفر كل 3 ثوانٍ
       _statusTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
         final statusData = await SovereignApiService.checkTaskStatus(_taskId!);
         
         if (statusData != null) {
           if (statusData['status'] == 'completed') {
-            // التدقيق انتهى!
-            timer.cancel(); // نوقف السؤال
+            timer.cancel(); 
             setState(() {
               _isAuditing = false;
               _auditStatusMessage = "تم الانتهاء من الفحص!";
-              _auditResult = statusData['result']; // حفظ النتيجة
+              _auditResult = statusData['result']; 
             });
           } else {
-            // التدقيق ما زال جارياً
             setState(() {
               _auditStatusMessage = statusData['message'] ?? "الوكيل يقوم بعمله...";
             });
@@ -73,7 +64,6 @@ class _SmartContractAuditWidgetState extends State<SmartContractAuditWidget> {
         }
       });
     } else {
-      // في حال فشل الاتصال بالسيرفر في البداية
       setState(() {
         _isAuditing = false;
         _auditStatusMessage = "فشل في إرسال المهمة للسيرفر. تأكد من الاتصال.";
@@ -108,7 +98,6 @@ class _SmartContractAuditWidgetState extends State<SmartContractAuditWidget> {
                 style: TextStyle(color: Colors.grey, fontSize: 12)),
             const SizedBox(height: 15),
             
-            // حقل إدخال عنوان العقد
             TextField(
               controller: _contractController,
               style: const TextStyle(color: Colors.white),
@@ -120,11 +109,10 @@ class _SmartContractAuditWidgetState extends State<SmartContractAuditWidget> {
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
               ),
-              enabled: !_isAuditing, // تعطيل الإدخال أثناء الفحص
+              enabled: !_isAuditing, 
             ),
             const SizedBox(height: 15),
             
-            // زر البدء أو مؤشر التحميل
             if (_isAuditing)
               Column(
                 children: [
@@ -143,7 +131,6 @@ class _SmartContractAuditWidgetState extends State<SmartContractAuditWidget> {
                 ),
               ),
 
-            // عرض نتيجة الفحص (إذا اكتملت)
             if (_auditResult != null)
               Container(
                 margin: const EdgeInsets.only(top: 15),
@@ -160,7 +147,6 @@ class _SmartContractAuditWidgetState extends State<SmartContractAuditWidget> {
                 ),
               ),
               
-            // رسالة الخطأ (إذا فشل الإرسال ولم يكن هناك فحص جاري)
             if (!_isAuditing && _auditResult == null && _auditStatusMessage.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 10),
