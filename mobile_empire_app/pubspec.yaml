@@ -1,3 +1,4 @@
+# force refresh build 2026
 name: mobile_empire_app
 description: AymnGuard Enterprise Sovereign Super App Engine.
 publish_to: 'none'
@@ -20,3 +21,4 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 # force refresh
+
