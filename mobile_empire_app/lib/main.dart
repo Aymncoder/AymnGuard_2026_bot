@@ -38,55 +38,62 @@ class AymnGuardPlusApp extends StatelessWidget {
 // ==============================================================================
 // 1. شاشة إضافة الحساب وتسجيل الدخول عند البداية
 // ==============================================================================
-class AccountLoginGatewayScreen extends StatelessWidget {
-  const AccountLoginGatewayScreen({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.shield_rounded, size: 80, color: AppColors.primary),
-              const SizedBox(height: 20),
-              const Text("بوابة AymnGuard السيادية", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
-              const SizedBox(height: 10),
-              const Text("أضف حسابك الإمبراطوري لبدء الجلسة السحابية", style: TextStyle(color: Colors.grey, fontSize: 14)),
-              const SizedBox(height: 30),
-              TextField(
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: AppColors.surface,
-                  labelText: "رقم الهاتف أو المعرف (@username)",
-                  labelStyle: const TextStyle(color: Colors.grey),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                style: const TextStyle(color: Colors.white),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                icon: const Icon(Icons.add_moderator, color: Colors.white),
-                label: const Text("إضافة الحساب وبدء الجلسة", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MainSovereignScreen()),
-                  );
-                },
-              ),
-            ],
+     // تأكد من إضافة هذه الاستدعاءات في أعلى ملف main.dart
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+// ... داخل زر "إطلاق الشرارة" أو "إضافة الحساب":
+onPressed: () async {
+  String sessionInput = _sessionController.text.trim();
+  if (sessionInput.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("يرجى إدخال المعرف أو الجلسة أولاً")),
+    );
+    return;
+  }
+
+  // 1. عرض مؤشر التحميل (حتى نعرف أن التطبيق يتصل بالسيرفر)
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => const Center(child: CircularProgressIndicator()),
+  );
+
+  try {
+    // 2. إرسال الطلب الحقيقي إلى الباكن إند الخاص بك (سنقوم بتجهيز مسار البايثون تالياً)
+    // استبدل 'YOUR_SERVER_IP' بـ IP سيرفرك الحقيقي
+    final response = await http.post(
+      Uri.parse('http://YOUR_SERVER_IP:8000/api/v1/session/start'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'account_identifier': sessionInput}),
+    );
+
+    // إخفاء مؤشر التحميل
+    Navigator.pop(context);
+
+    // 3. التحقق من رد خادم البايثون الخاص بك
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      // إذا نجح الاتصال، ننتقل للوحة القيادة الإمبراطورية ونمرر البيانات الحقيقية
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SovereignCommandCenter(
+            sessionName: responseData['session_token'] ?? sessionInput,
           ),
         ),
-      ),
+      );
+    } else {
+      // إذا رفض الباكن إند الطلب (مثلاً الحساب غير مصرح له)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("فشل الاتصال بالنواة: ${response.statusCode}")),
+      );
+    }
+  } catch (e) {
+    Navigator.pop(context); // إخفاء التحميل
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("خطأ في الاتصال بالسيرفر، تأكد من عمل الباكن إند")),
     );
   }
 }
