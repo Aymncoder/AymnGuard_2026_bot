@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-export 'app_config.dart';
+import 'app_config.dart';
 
 // مسارات الشاشات والقوائم المستخدمة في الواجهة الرئيسية
 import 'package:mobile_empire_app/telegram_core_chats_screen.dart';
