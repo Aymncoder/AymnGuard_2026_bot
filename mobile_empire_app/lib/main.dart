@@ -1,11 +1,15 @@
+// استدعاء جميع الملفات التي قمنا بتقسيمها
 import 'package:flutter/material.dart';
 
-// استدعاء جميع الملفات التي قمنا بتقسيمها
-import 'app_config.dart';
-import 'telegram_core_chats_screen.dart';
-import 'premium_dashboard_screens.dart';
-import 'settings_screens.dart';
-import 'app_drawers.dart';
+import 'package:mobile_empire_app/app_config.dart';
+import 'package:mobile_empire_app/models/bot_model.dart'; // مسار صحيح داخل مجلد models
+import 'package:mobile_empire_app/api_service.dart';
+import 'package:mobile_empire_app/widgets/smart_contract_audit_widget.dart'; // مسار صحيح داخل مجلد widgets
+import 'package:mobile_empire_app/telegram_core_chats_screen.dart';
+import 'package:mobile_empire_app/premium_dashboard_screens.dart';
+import 'package:mobile_empire_app/settings_screens.dart';
+import 'package:mobile_empire_app/app_drawers.dart';
+
 
 void main() {
   runApp(const AymnGuardPlusApp());
