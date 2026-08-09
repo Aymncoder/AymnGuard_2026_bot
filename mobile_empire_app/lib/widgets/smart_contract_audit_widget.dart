@@ -95,9 +95,9 @@ class _SmartContractAuditWidgetState extends State<SmartContractAuditWidget> {
         borderRadius: BorderRadius.circular(15),
         side: const BorderSide(color: Colors.orange, width: 0.5),
       ),
-      margin: const EdgeInsets.symmetric(vertical: 15),
+      margin: EdgeInsets.symmetric(vertical: 15),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding:EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -124,7 +124,7 @@ class _SmartContractAuditWidgetState extends State<SmartContractAuditWidget> {
                 filled: true,
                 fillColor: AppColors.background,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                contentPadding: cons EdgeInsets.symmetric(horizontal: 15, vertical: 10),
               ),
               enabled: !_isAuditing, // تعطيل الإدخال أثناء الفحص
             ),
@@ -152,8 +152,8 @@ class _SmartContractAuditWidgetState extends State<SmartContractAuditWidget> {
             // عرض نتيجة الفحص (إذا اكتملت)
             if (_auditResult != null)
               Container(
-                margin: const EdgeInsets.top(15),
-                padding: const EdgeInsets.all(12),
+                margin:EdgeInsets.top(15),
+                padding:EdgeInsets.all(12),
                 decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.green)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,7 +169,7 @@ class _SmartContractAuditWidgetState extends State<SmartContractAuditWidget> {
             // رسالة الخطأ (إذا فشل الإرسال ولم يكن هناك فحص جاري)
             if (!_isAuditing && _auditResult == null && _auditStatusMessage.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.only(top: 10),
+                padding:EdgeInsets.only(top: 10),
                 child: Text(_auditStatusMessage, style: const TextStyle(color: Colors.redAccent, fontSize: 12)),
               ),
           ],
