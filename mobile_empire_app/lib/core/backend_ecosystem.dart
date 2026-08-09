@@ -108,6 +108,19 @@ class BackendCoreEcosystem {
   static Future<Map<String, dynamic>> checkGatewayPulse() async {
     return _get('/health');
   }
+  // ===========================================================================
+  // 21. فحص النظام واختبارات الجودة (tests/ & .env)
+  // ===========================================================================
+  
+  /// فحص حالة الاختبارات والمايسترو عبر (tests/test_orchestrator.py)
+  static Future<Map<String, dynamic>> runSystemUnitTests() async {
+    return _get('/api/v1/system/tests/run');
+  }
+
+  /// التحقق من توافق إعدادات البيئة والاتصال العام
+  static Future<Map<String, dynamic>> verifyEnvironmentStatus() async {
+    return _get('/api/v1/system/environment/status');
+  }
 
   // ===========================================================================
   // 🛡️ دعم دالة GET المركزية (لجلب البيانات بدون إرسال Body)
