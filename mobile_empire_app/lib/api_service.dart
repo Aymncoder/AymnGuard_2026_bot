@@ -1,18 +1,10 @@
-import 'package:mobile_empire_app/app_config.dart';
-
-import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
 import 'package:mobile_empire_app/app_config.dart';
-
-import 'package:mobile_empire_app/models/bot_model.dart'; // مسار صحيح داخل مجلد models
-import 'package:mobile_empire_app/api_service.dart';
-import 'package:mobile_empire_app/widgets/smart_contract_audit_widget.dart'; // مسار صحيح داخل مجلد widgets
-import 'package:mobile_empire_app/telegram_core_chats_screen.dart';
-import 'package:mobile_empire_app/premium_dashboard_screens.dart';
-import 'package:mobile_empire_app/settings_screens.dart';
-import 'package:mobile_empire_app/app_drawers.dart';
-
+import 'package:mobile_empire_app/models/bot_model.dart';
 
 // ==============================================================================
 // طبقة الاتصال والخدمات الخلفية (Enterprise Service Layer)
@@ -109,7 +101,8 @@ class SovereignApiService {
   }
 
   /// الاستعلام عن حالة المهمة باستخدام رقم التتبع
-  static Future<Map<String, dynamic>?> checkTaskStatus(String taskId) async 
+  static Future<Map<String, dynamic>?> checkTaskStatus(String taskId) async {
+    try {
       final response = await http.get(
         Uri.parse('${AppConfig.serverUrl}/api/services/status/$taskId'),
       ).timeout(const Duration(seconds: 10));
