@@ -30,6 +30,40 @@ class BackendCoreEcosystem {
       "log_level": level // مثال: 'CRITICAL' أو 'WARNING'
     });
   }
+  // ===========================================================================
+  // 15. أنظمة التدقيق المعرفي والذكاء الاصطناعي (scripts/)
+  // ===========================================================================
+  /// تشغيل ai_cognitive_reviewer.py لمراجعة نص أو كود معين
+  static Future<Map<String, dynamic>> runCognitiveReview(String contentToReview) async {
+    return _post('/api/v1/scripts/cognitive/review', {
+      "content": contentToReview
+    });
+  }
+
+  /// تشغيل enterprise_cognitive_auditor.py للتدقيق المؤسسي
+  static Future<Map<String, dynamic>> runEnterpriseAudit(Map<String, dynamic> auditData) async {
+    return _post('/api/v1/scripts/cognitive/audit', {
+      "audit_data": auditData
+    });
+  }
+
+  // ===========================================================================
+  // 16. المحرك السيادي الأعلى (python scripts/sovereign_master_engine.py)
+  // ===========================================================================
+  /// إرسال أوامر تحكم عليا مباشرة للمحرك الماستر
+  static Future<Map<String, dynamic>> executeMasterEngineCommand(String commandAction) async {
+    return _post('/api/v1/master/execute', {
+      "command": commandAction
+    });
+  }
+
+  // ===========================================================================
+  // 17. التطبيقات المصغرة وبوابة الميديا (frontend_core/mini_app)
+  // ===========================================================================
+  /// جلب إعدادات وبحث التطبيقات المصغرة (Mini App Controller)
+  static Future<Map<String, dynamic>> fetchMiniAppConfig() async {
+    return _get('/api/v1/frontend/mini_app/config');
+  }
 
   /// تفعيل أو تعطيل وضع الحماية القصوى (Lockdown Mode)
   static Future<Map<String, dynamic>> toggleSystemLockdown(bool enable) async {
