@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'app_config.dart';
+import 'bot_model.dart';
+
 
 // ==============================================================================
 // 10. القوائم الجانبية (Drawers)
