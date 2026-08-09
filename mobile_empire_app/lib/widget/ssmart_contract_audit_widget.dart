@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'widgets/smart_contract_audit_widget.dart'; // مسار الاستدعاء يعتمد على مكان الملف
 
 import '../app_config.dart'; // إذا وضعته في مجلد widgets، تأكد من مسار الاستدعاء
 import '../api_service.dart';
