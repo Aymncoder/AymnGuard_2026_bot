@@ -196,7 +196,6 @@ class _MainSovereignScreenState extends State<MainSovereignScreen> {
   }
 }
 
-import 'package:flutter/material.dart';
 // تأكد من استيراد ملفات الألوان (AppColors) الخاصة بك هنا
 
 class CommunitiesScreenTab extends StatelessWidget {
@@ -353,7 +352,7 @@ class AccountSettingsScreen extends StatelessWidget {
             color: AppColors.surface,
             padding: const EdgeInsets.all(16),
             child: Row(
-              children: [
+              children: 
                 const CircleAvatar(radius: 30, backgroundColor: AppColors.primary, child: Icon(Icons.person, size: 35, color: Colors.white)),
                 const SizedBox(width: 15),
                 Column(
@@ -374,11 +373,6 @@ class AccountSettingsScreen extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
 /// 🏛️ مكون اللافتة المؤسسية السيادية
 class SovereignEnterpriseBanner extends StatelessWidget {
   const SovereignEnterpriseBanner({super.key});
@@ -451,7 +445,7 @@ class SovereignEnterpriseBanner extends StatelessWidget {
             ),
             child: const Row(
               mainAxisSize: MainAxisSize.min,
-              children: [
+              children: 
                 Icon(Icons.verified, size: 14, color: Colors.greenAccent),
                 SizedBox(width: 6),
                 Text(
