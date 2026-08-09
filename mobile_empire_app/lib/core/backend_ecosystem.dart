@@ -13,6 +13,22 @@ class BackendCoreEcosystem {
   static Future<Map<String, dynamic>> sendToGateway(String path, Map<String, dynamic> data) async {
     return _post('/api/v1/$path', data);
   }
+  // ===========================================================================
+  // إدارة المصادقة السيادية (Pyrogram OTP)
+  // ===========================================================================
+  static Future<Map<String, dynamic>> requestTelegramOtp(
+    String sessionName, 
+    String phoneNumber, 
+    int apiId, 
+    String apiHash
+  ) async {
+    return _post('/api/v1/core/auth/send_code', {
+      "session_name": sessionName,
+      "phone_number": phoneNumber,
+      "api_id": apiId,
+      "api_hash": apiHash
+    });
+  }
 
   // ===========================================================================
   // 2. الربط مع الخدمات الأساسية (Services & Meta Engine)
