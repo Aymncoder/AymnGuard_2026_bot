@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-export 'app_config.dart';
+import 'app_config.dart';
 
 // ==============================================================================
 // مكونات بوابة مجتمعاتي المستقلة (Community Portal Widgets)
