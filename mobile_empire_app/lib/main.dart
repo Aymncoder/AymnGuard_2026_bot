@@ -196,25 +196,127 @@ class _MainSovereignScreenState extends State<MainSovereignScreen> {
   }
 }
 
+import 'package:flutter/material.dart';
+// تأكد من استيراد ملفات الألوان (AppColors) الخاصة بك هنا
+
 class CommunitiesScreenTab extends StatelessWidget {
   const CommunitiesScreenTab({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // تم إصلاح وتثبيت قائمة الكيانات السيادية
+    final List<Map<String, dynamic>> sovereignGroups = [
+      {
+        'title': 'قنواتي ومجموعاتي السيادية',
+        'subtitle': 'أنت المالك • 5,430 عضو • مجموعة VIP',
+        'icon': Icons.group,
+        'color': Colors.amber,
+      },
+      {
+        'title': 'حملات AymnGuard',
+        'subtitle': 'أنت المالك • 12,000 مشترك • قناة ترويجية',
+        'icon': Icons.campaign,
+        'color': Colors.blueAccent,
+      },
+    ];
+
+    // قائمة فئات واجهات المراسلة وإدارة المنصة
+    final List<Map<String, dynamic>> communicationCategories = [
+      {
+        'title': 'الرسائل الخاصة',
+        'subtitle': 'تصل هنا كافة الرسائل المباشرة والمشفرة',
+        'icon': Icons.chat,
+        'color': Colors.green,
+      },
+      {
+        'title': 'واجهة البوتات (Bots)',
+        'subtitle': 'إدارة وتوجيه الروبوتات والذكاء الاصطناعي',
+        'icon': Icons.smart_toy,
+        'color': Colors.purple,
+      },
+      {
+        'title': 'واجهة المجموعات',
+        'subtitle': 'إدارة النقاشات والمجتمعات التفاعلية',
+        'icon': Icons.forum,
+        'color': Colors.orange,
+      },
+      {
+        'title': 'واجهة القنوات',
+        'subtitle': 'منصات البث المباشر والإعلانات السيادية',
+        'icon': Icons.cell_tower,
+        'color': Colors.redAccent,
+      },
+      {
+        'title': 'الرسائل المحفوظة (الملف الشخصي)',
+        'subtitle': 'مساحتك الخاصة لحفظ الرسائل والملفات المهمة',
+        'icon': Icons.bookmark,
+        'color': Colors.teal,
+      },
+      {
+        'title': 'المحادثات المؤرشفة',
+        'subtitle': 'سجل المحادثات والمجموعات المخفية مؤقتاً',
+        'icon': Icons.archive,
+        'color': Colors.grey,
+      },
+    ];
+
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text("إدارة مجتمعاتي وأدواتي 👑", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+      appBar: AppBar(
+        title: const Text('إدارة مجتمعاتي وأدواتي 👑', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [
-          const Text("قنواتي ومجموعاتي السيادية", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 15)),
+          // القسم الأول: المجموعات والقنوات الإدارية السيادية (تم تثبيتها)
+          const Text("القنوات والمجموعات النشطة", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 8),
-          _buildCard(context, "مجموعة التداول VIP", "أنت المالِك • 5,430 عضو", Icons.group, Colors.amber),
-          _buildCard(context, "قناة تحديثات AymnGuard", "أنت المالِك • 12,000 مشترِك", Icons.campaign, Colors.blueAccent),
+          ...sovereignGroups.map((group) => _buildCard(
+                context,
+                group['title'] ?? '',
+                group['subtitle'] ?? '',
+                group['icon'] ?? Icons.circle,
+                group['color'] ?? Colors.grey,
+              )),
+              
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.0),
+            child: Divider(color: Colors.white24, thickness: 1),
+          ),
+
+          // القسم الثاني: واجهات المراسلة المتكاملة والتصنيفات الجديدة
+          const Text("بوابات الاتصال والمراسلة", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 8),
+          ...communicationCategories.map((category) => _buildCard(
+                context,
+                category['title'] ?? '',
+                category['subtitle'] ?? '',
+                category['icon'] ?? Icons.chat,
+                category['color'] ?? Colors.grey,
+              )),
         ],
       ),
     );
   }
+
+  Widget _buildCard(BuildContext context, String title, String subtitle, IconData icon, Color color) {
+    return Card(
+      color: AppColors.surface, // تأكد من تعريف AppColors.surface
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        leading: CircleAvatar(backgroundColor: color.withOpacity(0.2), child: Icon(icon, color: color)),
+        title: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), // لون النص أبيض ليتناسب مع الوضع الداكن
+        subtitle: Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+        onTap: () {
+          // هنا يتم توجيه المستخدم إلى الشاشة المخصصة عند الضغط
+          // مثال: Navigator.push(context, MaterialPageRoute(builder: (context) => PrivateMessagesScreen()));
+        },
+      ),
+    );
+  }
+}
 
   Widget _buildCard(BuildContext context, String title, String subtitle, IconData icon, Color color) {
     return Card(
