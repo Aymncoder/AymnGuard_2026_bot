@@ -1,15 +1,4 @@
-import 'package:mobile_empire_app/app_config.dart';
-
 import 'package:flutter/material.dart';
-
-import 'package:mobile_empire_app/models/bot_model.dart'; // مسار صحيح داخل مجلد models
-import 'package:mobile_empire_app/api_service.dart';
-import 'package:mobile_empire_app/widgets/smart_contract_audit_widget.dart'; // مسار صحيح داخل مجلد widgets
-import 'package:mobile_empire_app/telegram_core_chats_screen.dart';
-import 'package:mobile_empire_app/premium_dashboard_screens.dart';
-import 'package:mobile_empire_app/settings_screens.dart';
-import 'package:mobile_empire_app/app_drawers.dart';
-
 
 // ==============================================================================
 // 1. التكوين المركزي والسيادي (Central Configuration & Theming)
@@ -19,29 +8,28 @@ import 'package:mobile_empire_app/app_drawers.dart';
 abstract class AppConfig {
   /// الرابط الأساسي للسيرفر (API Base URL)
   static const String serverUrl = "http://135.181.86.199:10050";
-  
+
   /// إصدار التطبيق الحالي
   static const String appVersion = "21.0.0 Enterprise";
-  
-  /// التحكم المركزي في صلاحيات المالك (لتفعيل ميزات لوحة القيادة السيادية)
-  static const bool isOwnerStatus = true; 
+
+  /// التحكم المركزي في صلاحيات المالك (تفعيل ميزات لوحة القيادة السيادية)
+  static const bool isOwnerStatus = true;
 }
 
 /// كلاس ألوان الإمبراطورية المعتمدة (App Theme Colors)
 abstract class AppColors {
   /// لون الخلفية الأساسي للتطبيق
   static const Color background = Color(0xFF151E27);
-  
+
   /// لون الأسطح (البطاقات، الأشرطة العلوية والسفلية)
   static const Color surface = Color(0xFF1E293B);
-  
-  /// اللون الرئيسي (الهوية البصرية - أزرق سماوي)
+
+  /// اللون الرئيسي (الهوية البصرية - أزرق سيادي)
   static const Color primary = Color(0xFF0EA5E9);
-  
+
   /// لون التميز والخدمات السيادية (ذهبي)
   static const Color accentGold = Color(0xFFFFD700);
-  
+
   /// لون خلفية المحادثات
   static const Color chatBackground = Color(0xFF0F172A);
 }
-
