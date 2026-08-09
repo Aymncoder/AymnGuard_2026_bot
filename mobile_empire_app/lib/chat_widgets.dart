@@ -1,4 +1,4 @@
-import 'app_config.dart';
+import 'package:mobile_empire_app/app_config.dart';
 import 'package:flutter/material.dart';
 import 'chat_room_screen.dart'; // نحتاجه للانتقال لشاشة المحادثة عند الضغط
 
