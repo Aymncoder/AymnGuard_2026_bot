@@ -3,7 +3,6 @@ import 'app_config.dart';
 
 import 'package:mobile_empire_app/telegram_core_chats_screen.dart';
 import 'package:mobile_empire_app/premium_dashboard_screens.dart';
-import 'package:mobile_empire_app/settings_screens.dart';
 import 'package:mobile_empire_app/app_drawers.dart';
 
 void main() {
@@ -60,6 +59,7 @@ class _MainSovereignScreenState extends State<MainSovereignScreen> {
       endDrawer: const AdvancedToolsDrawer(),
       body: IndexedStack(index: _currentIndex, children: _screens), 
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() {
@@ -74,5 +74,59 @@ class _MainSovereignScreenState extends State<MainSovereignScreen> {
         ],
       ),
     );
+  }
+}
+
+// ==============================================================================
+// شاشة الإعدادات المدمجة لضمان عدم ضياع أي ملف
+// ==============================================================================
+class AccountSettingsScreen extends StatelessWidget {
+  const AccountSettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text("الإعدادات", style: TextStyle(fontWeight: FontWeight.bold)),
+      ),
+      body: ListView(
+        children: [
+          Container(
+            color: AppColors.surface,
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            child: const Row(
+              children: [
+                CircleAvatar(
+                  radius: 35,
+                  backgroundColor: AppColors.primary,
+                  child: Icon(Icons.person, size: 40, color: Colors.white),
+                ),
+                SizedBox(width: 15),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("ابو يمان", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                    SizedBox(height: 5),
+                    Text("+91 9265035200", style: TextStyle(fontSize: 14, color: Colors.grey)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ContactsScreen extends StatelessWidget {
+  const ContactsScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+            child: Text("جهات الاتصال الإمبراطورية", style: TextStyle(color: Colors.grey))));
   }
 }
