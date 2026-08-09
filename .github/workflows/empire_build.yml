@@ -31,7 +31,7 @@ jobs:
           java-version: '17'
 
       - name: 🦋 إعداد محرك Flutter المؤسسي (3.19.0)
-        uses: subosito/flutter-action@v4
+        uses: subosito/flutter-action@v3
         with:
           flutter-version: '3.19.0'
           channel: 'stable'
