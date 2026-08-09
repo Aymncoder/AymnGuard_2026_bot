@@ -111,6 +111,52 @@ class BackendCoreEcosystem {
       return {"error": true, "message": "السيرفر لا يستجيب أو مغلق."};
     }
   }
+  // ===========================================================================
+  // 19. مملكة الخدمات المصغرة ومحركات التشغيل (services/)
+  // ===========================================================================
+  
+  /// تشغيل محرك النقل المؤسسي الذكي (enterprise_transfer_engine.py)
+  static Future<Map<String, dynamic>> executeEnterpriseTransfer({
+    required String sessionId,
+    required String sourceChat,
+    required String targetChat,
+  }) async {
+    return _post('/api/v1/services/transfer/execute', {
+      "session_id": sessionId,
+      "source_chat": sourceChat,
+      "target_chat": targetChat,
+    });
+  }
+
+  /// استدعاء استخبارات السوق والتحليل المتقدم (market_intelligence.py)
+  static Future<Map<String, dynamic>> getMarketIntelligenceData(String symbol) async {
+    return _post('/api/v1/services/market/intelligence', {
+      "symbol": symbol
+    });
+  }
+
+  /// معالجة المدفوعات والاشتراكات عبر (payment_engine.py)
+  static Future<Map<String, dynamic>> processEnterprisePayment(String planType, double amount) async {
+    return _post('/api/v1/services/payment/process', {
+      "plan": planType,
+      "amount": amount
+    });
+  }
+
+  /// التحكم بالعمال الخلفيين ومدير الطوابير (worker.py & queue_manager.py)
+  static Future<Map<String, dynamic>> controlWorkerQueue(String command) async {
+    return _post('/api/v1/services/worker/control', {
+      "command": command
+    });
+  }
+
+  /// مخاطبة جسر تيليجرام المركزي (telegram_bridge.py)
+  static Future<Map<String, dynamic>> bridgeTelegramAction(String action, Map<String, dynamic> data) async {
+    return _post('/api/v1/services/telegram/bridge', {
+      "action": action,
+      "payload": data
+    });
+  }
 
   // ===========================================================================
   // 6. قوات الروبوتات المستقلة (Bots Ecosystem: Creative, Protection, Search)
