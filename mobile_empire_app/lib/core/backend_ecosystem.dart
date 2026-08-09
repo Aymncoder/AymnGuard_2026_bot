@@ -6,6 +6,40 @@ import 'package:http/http.dart' as http;
 class BackendCoreEcosystem {
   static const String _baseUrl = 'http://135.181.86.199:8000';
   static const String _license = 'AYMN-PREMIUM-LICENSE-2026';
+  // ===========================================================================
+  // 6. قوات الروبوتات المستقلة (Bots Ecosystem: Creative, Protection, Search)
+  // ===========================================================================
+  
+  /// تشغيل روبوت الإبداع والتصميم
+  static Future<Map<String, dynamic>> runCreativeBot(String prompt, String type) async {
+    return _post('/api/v1/bots/creative/generate', {
+      "prompt": prompt, 
+      "type": type
+    });
+  }
+
+  /// تفعيل أو تعطيل روبوت الحماية لمجموعة معينة
+  static Future<Map<String, dynamic>> toggleProtectionBot(String chatId, bool isActive) async {
+    return _post('/api/v1/bots/protection/toggle', {
+      "chat_id": chatId, 
+      "status": isActive
+    });
+  }
+
+  /// تنفيذ بحث مؤسسي عميق عبر روبوت البحث
+  static Future<Map<String, dynamic>> executeEnterpriseSearch(String query) async {
+    return _post('/api/v1/bots/search/query', {
+      "search_query": query
+    });
+  }
+
+  /// إرسال أوامر مباشرة للروبوت المركزي
+  static Future<Map<String, dynamic>> sendTelegramBotCommand(String command, Map<String, dynamic> args) async {
+    return _post('/api/v1/bots/telegram/execute', {
+      "command": command, 
+      "args": args
+    });
+  }
 
   // 1. الربط مع ملفات API/V1 (البوابات والمسارات)
   static Future<Map<String, dynamic>> sendToGateway(String path, Map<String, dynamic> data) async {
