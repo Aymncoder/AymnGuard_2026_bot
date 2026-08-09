@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
-import 'crypto_checkout_screen.dart'; // تأكد من مسار الملف إذا وضعته في مجلد widgets
-import 'app_config.dart';
-import 'bot_model.dart';
-import 'api_service.dart';
+
+import 'package:mobile_empire_app/app_config.dart';
+import 'package:mobile_empire_app/models/bot_model.dart'; // مسار صحيح داخل مجلد models
+import 'package:mobile_empire_app/api_service.dart';
+import 'package:mobile_empire_app/widgets/smart_contract_audit_widget.dart'; // مسار صحيح داخل مجلد widgets
+import 'package:mobile_empire_app/telegram_core_chats_screen.dart';
+import 'package:mobile_empire_app/premium_dashboard_screens.dart';
+import 'package:mobile_empire_app/settings_screens.dart';
+import 'package:mobile_empire_app/app_drawers.dart';
+
 
 // ==============================================================================
 // 7. متجر الخدمات السيادية للمستخدمين (Premium Store)
