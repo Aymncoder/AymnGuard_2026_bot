@@ -120,7 +120,6 @@ class PremiumItemWidget extends StatelessWidget {
 // ==============================================================================
 // 8. لوحة تحكم المالك (Ultimate Owner Dashboard)
 // ==============================================================================
-
 class UltimateOwnerDashboard extends StatelessWidget {
   const UltimateOwnerDashboard({super.key});
 
@@ -182,7 +181,14 @@ class UltimateOwnerDashboard extends StatelessWidget {
                         icon: Icons.candlestick_chart,
                         color: Colors.orange),
                   ]),
+              
+              const SizedBox(height: 20), // مسافة بسيطة قبل البطاقة الجديدة
+
+              // === إدراج بطاقة التدقيق الجنائي هنا ===
+              const SmartContractAuditWidget(), 
+
               const Divider(color: Colors.white24, height: 40, thickness: 1),
+              
               const Text("إدارة الأسعار وجدار الدفع (Paywall)",
                   style: TextStyle(
                       fontSize: 16,
