@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_empire_app/core/app_config.dart';
-import 'package:mobile_empire_app/chat_widgets.dart'; // استدعاء هام جداً لفقاعات المحادثة
-
-// ==============================================================================
-// 6. شاشة المحادثة الفعلية (Chat Room UI)
-// ==============================================================================
+import 'package:mobile_empire_app/app_config.dart';
+import 'package:mobile_empire_app/chat_widgets.dart';
 
 class ChatRoomScreen extends StatefulWidget {
   final String chatName;
