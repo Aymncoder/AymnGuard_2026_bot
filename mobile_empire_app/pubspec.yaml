@@ -18,3 +18,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  dependencies:
+  flutter:
+    sdk: flutter
+  # أضف هذا السطر
+  qr_flutter: ^4.1.0 
+
