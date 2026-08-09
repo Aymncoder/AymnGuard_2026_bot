@@ -1,15 +1,10 @@
-import 'package:mobile_empire_app/app_config.dart';
-
 import 'package:flutter/material.dart';
 
-import 'package:mobile_empire_app/models/bot_model.dart'; // مسار صحيح داخل مجلد models
+import 'package:mobile_empire_app/core/app_config.dart';
+import 'package:mobile_empire_app/models/bot_model.dart';
 import 'package:mobile_empire_app/api_service.dart';
-import 'package:mobile_empire_app/widgets/smart_contract_audit_widget.dart'; // مسار صحيح داخل مجلد widgets
-import 'package:mobile_empire_app/telegram_core_chats_screen.dart';
-import 'package:mobile_empire_app/premium_dashboard_screens.dart';
-import 'package:mobile_empire_app/settings_screens.dart';
-import 'package:mobile_empire_app/app_drawers.dart';
-
+import 'package:mobile_empire_app/widgets/smart_contract_audit_widget.dart';
+import 'crypto_checkout_screen.dart'; // استدعاء هام جداً لعملية الدفع
 
 // ==============================================================================
 // 7. متجر الخدمات السيادية للمستخدمين (Premium Store)
@@ -81,63 +76,67 @@ class PremiumItemWidget extends StatelessWidget {
           side: const BorderSide(color: AppColors.accentGold, width: 0.5)),
       margin: const EdgeInsets.only(bottom: 15),
       child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(children: [
-                  Icon(icon, color: AppColors.accentGold, size: 30),
-                  const SizedBox(width: 10),
-                  Expanded(
-                      child: Text(title,
-                          style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white))),
-                  Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                          color: Colors.redAccent,
-                          borderRadius: BorderRadius.circular(8)),
-                      child: Text(price,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 12)))
-                ]),
-                const SizedBox(height: 10),
-                Text(desc,
-                    style:
-                        const TextStyle(color: Colors.grey, fontSize: 13)),
-                const SizedBox(height: 15),
-                              SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary),
-                        onPressed: () {
-                          // استخراج الرقم فقط من نص السعر
-                          double planPrice = double.tryParse(price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 10.0;
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              Icon(icon, color: AppColors.accentGold, size: 30),
+              const SizedBox(width: 10),
+              Expanded(
+                  child: Text(title,
+                      style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white))),
+              Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Text(price,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 12)))
+            ]),
+            const SizedBox(height: 10),
+            Text(desc,
+                style: const TextStyle(color: Colors.grey, fontSize: 13)),
+            const SizedBox(height: 15),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary),
+                onPressed: () {
+                  // استخراج الرقم فقط من نص السعر
+                  double planPrice = double.tryParse(price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 10.0;
 
-                          // الانتقال إلى شاشة الدفع
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CryptoCheckoutScreen(
-                                invoiceId: "INV_${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}",
-                                amount: planPrice,
-                                // ضع عنوان محفظتك هنا
-                                walletAddress: "0x55d398326f99059fF775485246999027B3197955", 
-                              ),
-                            ),
-                          );
-                        },
-                        child: const Text("اشتراك الآن",
-                            style: TextStyle(
+                  // الانتقال إلى شاشة الدفع
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CryptoCheckoutScreen(
+                        invoiceId: "INV_${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}",
+                        amount: planPrice,
+                        // ضع عنوان محفظتك هنا
+                        walletAddress: "0x55d398326f99059fF775485246999027B3197955", 
+                      ),
+                    ),
+                  );
+                },
+                child: const Text("اشتراك الآن",
+                    style: TextStyle(
                         color: Colors.white,
-                        fontWeight: FontWeight.bold)))),
-      
-               }
-            }
+                        fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 // ==============================================================================
 // 8. لوحة تحكم المالك (Ultimate Owner Dashboard)
