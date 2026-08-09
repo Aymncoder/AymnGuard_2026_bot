@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:mobile_empire_app/app_config.dart';
+import 'app_config.dart';
 import 'package:mobile_empire_app/models/bot_model.dart';
 import 'package:mobile_empire_app/api_service.dart';
 import 'package:mobile_empire_app/widgets/smart_contract_audit_widget.dart';
