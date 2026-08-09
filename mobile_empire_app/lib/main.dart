@@ -44,14 +44,75 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 // ... داخل زر "إطلاق الشرارة" أو "إضافة الحساب":
+// تأكد من وجود هذه الاستدعاءات في أعلى ملف main.dart
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+// ... داخل زر "إضافة الحساب وبدء الجلسة":
 onPressed: () async {
-  String sessionInput = _sessionController.text.trim();
-  if (sessionInput.isEmpty) {
+  String phoneInput = _accountController.text.trim();
+  if (phoneInput.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("يرجى إدخال المعرف أو الجلسة أولاً")),
+      const SnackBar(content: Text("يرجى إدخال رقم الهاتف لبدء الجلسة")),
     );
     return;
   }
+
+  // إظهار مؤشر التحميل السيادي
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => const Center(
+      child: CircularProgressIndicator(color: AppColors.accentGold),
+    ),
+  );
+
+  try {
+    // إرسال الطلب الفعلي إلى بوابة FastAPI التي بنيتها
+    // تنبيه: ضع الـ IP الخاص بسيرفرك بدلاً من 127.0.0.1
+    final response = await http.post(
+      Uri.parse('http://127.0.0.1:8000/api/v1/sessions/register'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        "license_key": "AYMN-PREMIUM-LICENSE-2026", // مفتاح سيادي تجريبي
+        "session_name": "Sovereign_Mobile_Session",
+        "api_id": 2040, // ضع الـ API ID الحقيقي الخاص بك هنا لاحقاً
+        "api_hash": "b18441a1ff607e10a989891a5462e627", // ضع الـ API Hash الحقيقي
+        "phone_number": phoneInput
+      }),
+    );
+
+    // إخفاء مؤشر التحميل
+    Navigator.pop(context);
+
+    // تحليل رد النواة التشغيلية
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("تم ربط الجلسة بالنواة بنجاح 🚀", style: TextStyle(color: Colors.greenAccent))),
+      );
+
+      // الانتقال للواجهة الرئيسية وتمرير رقم الحساب المسجل
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MainSovereignScreen(userAccount: phoneInput),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("رفض النواة: ${response.statusCode} - ${response.body}")),
+      );
+    }
+  } catch (e) {
+    Navigator.pop(context); // إخفاء التحميل
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("فشل الاتصال بالبوابة المؤسسية: $e")),
+    );
+  }
+}
+
 
   // 1. عرض مؤشر التحميل (حتى نعرف أن التطبيق يتصل بالسيرفر)
   showDialog(
