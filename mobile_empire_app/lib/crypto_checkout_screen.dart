@@ -2,12 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-
-import 'package:mobile_empire_app/core/app_config.dart'; // مسار الألوان الصحيح
-
-// ==============================================================================
-// شاشة الدفع بالعملات الرقمية (Crypto Checkout Screen)
-// ==============================================================================
+import 'package:mobile_empire_app/app_config.dart';
 
 class CryptoCheckoutScreen extends StatefulWidget {
   final String invoiceId;
@@ -26,7 +21,6 @@ class CryptoCheckoutScreen extends StatefulWidget {
 }
 
 class _CryptoCheckoutScreenState extends State<CryptoCheckoutScreen> {
-  // عداد 15 دقيقة (900 ثانية)
   int _remainingSeconds = 900; 
   Timer? _timer;
   bool _isPaid = false;
@@ -35,7 +29,7 @@ class _CryptoCheckoutScreenState extends State<CryptoCheckoutScreen> {
   void initState() {
     super.initState();
     _startTimer();
-    _simulatePaymentChecking(); // محاكاة لعملية تتبع البلوكتشين
+    _simulatePaymentChecking();
   }
 
   void _startTimer() {
@@ -50,7 +44,6 @@ class _CryptoCheckoutScreenState extends State<CryptoCheckoutScreen> {
     });
   }
 
-  // هذه الدالة ستقوم لاحقاً بالاتصال بالسيرفر كل 10 ثوانٍ لسؤاله: "هل تم الدفع؟"
   void _simulatePaymentChecking() {
     Future.delayed(const Duration(seconds: 15), () {
       if (mounted) {
@@ -59,7 +52,6 @@ class _CryptoCheckoutScreenState extends State<CryptoCheckoutScreen> {
           _timer?.cancel();
         });
         
-        // إظهار رسالة النجاح والعودة بعد ثانيتين
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             backgroundColor: Colors.green,
@@ -67,7 +59,7 @@ class _CryptoCheckoutScreenState extends State<CryptoCheckoutScreen> {
           )
         );
         Future.delayed(const Duration(seconds: 2), () {
-          Navigator.pop(context); // العودة للشاشة السابقة
+          Navigator.pop(context);
         });
       }
     });
@@ -103,8 +95,6 @@ class _CryptoCheckoutScreenState extends State<CryptoCheckoutScreen> {
               style: TextStyle(color: Colors.grey, fontSize: 14),
             ),
             const SizedBox(height: 20),
-            
-            // مربع تفاصيل المبلغ والشبكة
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -134,8 +124,6 @@ class _CryptoCheckoutScreenState extends State<CryptoCheckoutScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  
-                  // الباركود (QR Code)
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
@@ -149,14 +137,11 @@ class _CryptoCheckoutScreenState extends State<CryptoCheckoutScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  
                   const Text(
                     "عنوان المحفظة:",
                     style: TextStyle(color: Colors.grey, fontSize: 12),
                   ),
                   const SizedBox(height: 5),
-                  
-                  // حقل نسخ عنوان المحفظة
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                     decoration: BoxDecoration(
@@ -187,10 +172,7 @@ class _CryptoCheckoutScreenState extends State<CryptoCheckoutScreen> {
                 ],
               ),
             ),
-            
             const SizedBox(height: 30),
-            
-            // حالة الدفع والعداد التنازلي
             if (_isPaid)
               const Column(
                 children: [
@@ -217,7 +199,6 @@ class _CryptoCheckoutScreenState extends State<CryptoCheckoutScreen> {
                 "انتهت صلاحية الفاتورة. يرجى المحاولة مرة أخرى.",
                 style: TextStyle(color: Colors.redAccent, fontSize: 16),
               ),
-
             const SizedBox(height: 30),
             const Text(
               "⚠️ تحذير: أرسل عملة USDT فقط عبر شبكة BEP20 (BSC). إرسال أي عملة أخرى أو عبر شبكة مختلفة سيؤدي إلى فقدان أموالك ولن يتم تفعيل الاشتراك.",
