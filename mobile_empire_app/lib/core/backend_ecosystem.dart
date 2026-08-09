@@ -46,6 +46,21 @@ class BackendCoreEcosystem {
       "audit_data": auditData
     });
   }
+  // ===========================================================================
+  // 20. محرك ومكونات الواجهة الأمامية (src/)
+  // ===========================================================================
+  
+  /// استدعاء معالجة محرك الذكاء الاصطناعي للواجهة (src/ai_engine.py)
+  static Future<Map<String, dynamic>> processFrontendAiTask(String prompt) async {
+    return _post('/api/v1/frontend/ai/process', {
+      "prompt": prompt
+    });
+  }
+
+  /// جلب بيانات مكونات الويب وتوليد الميزات (FeatureForge)
+  static Future<Map<String, dynamic>> fetchFeatureForgeData() async {
+    return _get('/api/v1/frontend/feature_forge/config');
+  }
 
   // ===========================================================================
   // 16. المحرك السيادي الأعلى (python scripts/sovereign_master_engine.py)
