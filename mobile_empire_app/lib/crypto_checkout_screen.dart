@@ -1,5 +1,5 @@
 import 'dart:async';
-export 'app_config.dart';
+import 'app_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
