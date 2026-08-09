@@ -1,5 +1,4 @@
 # force-rebuild-timestamp-2026-08-09
-# force refresh build 2026
 name: mobile_empire_app
 description: AymnGuard Enterprise Sovereign Super App Engine.
 publish_to: 'none'
@@ -11,12 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # حزمة الاتصال بالخادم والباكن إند
   http: ^1.2.0
+  # حزمة توليد الباركود
   qr_flutter: ^4.1.0
-dependencies:
-  flutter:
-    sdk: flutter
-  http: ^1.2.0  # أضف هذا السطر لتمكين الاتصال بالباكن إند
 
 dev_dependencies:
   flutter_test:
@@ -25,5 +22,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-# force refresh
-
