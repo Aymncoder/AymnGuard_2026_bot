@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'app_config.dart';
 
-// مسارات الشاشات والقوائم المستخدمة في الواجهة الرئيسية
 import 'package:mobile_empire_app/telegram_core_chats_screen.dart';
 import 'package:mobile_empire_app/premium_dashboard_screens.dart';
 import 'package:mobile_empire_app/settings_screens.dart';
@@ -11,9 +10,6 @@ void main() {
   runApp(const AymnGuardPlusApp());
 }
 
-// ==============================================================================
-// النواة الأساسية (App Root)
-// ==============================================================================
 class AymnGuardPlusApp extends StatelessWidget {
   const AymnGuardPlusApp({super.key});
 
@@ -33,16 +29,12 @@ class AymnGuardPlusApp extends StatelessWidget {
           selectedItemColor: AppColors.primary,
           unselectedItemColor: Colors.grey,
         ),
-        fontFamily: 'Roboto',
       ),
       home: const MainSovereignScreen(),
     );
   }
 }
 
-// ==============================================================================
-// جهاز التحكم المركزي (Master Navigation Controller)
-// ==============================================================================
 class MainSovereignScreen extends StatefulWidget {
   const MainSovereignScreen({super.key});
   
@@ -51,7 +43,6 @@ class MainSovereignScreen extends StatefulWidget {
 }
 
 class _MainSovereignScreenState extends State<MainSovereignScreen> {
-  // بدء التطبيق على شاشة المحادثات (رقم 3 في المصفوفة)
   int _currentIndex = 3; 
 
   final List<Widget> _screens = [
@@ -59,7 +50,6 @@ class _MainSovereignScreenState extends State<MainSovereignScreen> {
     const EmpirePremiumStore(),    
     const ContactsScreen(),        
     const TelegramCoreChats(),     
-    // التحقق من صلاحيات المالك لعرض لوحة القيادة السيادية
     if (AppConfig.isOwnerStatus) const UltimateOwnerDashboard(),
   ];
 
@@ -68,19 +58,19 @@ class _MainSovereignScreenState extends State<MainSovereignScreen> {
     return Scaffold(
       drawer: const MultiAccountDrawer(),
       endDrawer: const AdvancedToolsDrawer(),
-      // استخدام IndexedStack للحفاظ على حالة الشاشات عند التنقل بينها
       body: IndexedStack(index: _currentIndex, children: _screens), 
       bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        items: [
-          const BottomNavigationBarItem(icon: Icon(Icons.settings), label: "الإعدادات"),
-          const BottomNavigationBarItem(icon: Icon(Icons.storefront, color: AppColors.accentGold), label: "المتجر"),
-          const BottomNavigationBarItem(icon: Icon(Icons.perm_contact_calendar), label: "جهات الاتصال"),
-          const BottomNavigationBarItem(icon: Badge(label: Text('w'), child: Icon(Icons.chat_bubble)), label: "محادثات"),
-          if (AppConfig.isOwnerStatus)
-            const BottomNavigationBarItem(icon: Icon(Icons.admin_panel_settings, color: Colors.redAccent), label: 'الإدارة'),
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "الإعدادات"),
+          BottomNavigationBarItem(icon: Icon(Icons.storefront, color: AppColors.accentGold), label: "المتجر"),
+          BottomNavigationBarItem(icon: Icon(Icons.perm_contact_calendar), label: "جهات الاتصال"),
+          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble), label: "محادثات"),
         ],
       ),
     );
