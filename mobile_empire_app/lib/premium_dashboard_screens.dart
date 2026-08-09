@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-
-import 'app_config.dart';
+import 'package:mobile_empire_app/app_config.dart';
 import 'package:mobile_empire_app/models/bot_model.dart';
 import 'package:mobile_empire_app/api_service.dart';
 import 'package:mobile_empire_app/widgets/smart_contract_audit_widget.dart';
-import 'crypto_checkout_screen.dart'; // استدعاء هام جداً لعملية الدفع
+import 'package:mobile_empire_app/crypto_checkout_screen.dart';
 
 // ==============================================================================
 // 7. متجر الخدمات السيادية للمستخدمين (Premium Store)
