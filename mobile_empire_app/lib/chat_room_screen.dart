@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'app_config.dart';
-import 'app_config.dart';
 import 'chat_widgets.dart';
+import 'package:mobile_empire_app/app_config.dart';
+import 'package:mobile_empire_app/bot_model.dart';
+import 'package:mobile_empire_app/api_service.dart';
+import 'package:mobile_empire_app/widgets/smart_contract_audit_widget.dart';
 
 // ==============================================================================
 // 6. شاشة المحادثة الفعلية (Chat Room UI)
