@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:mobile_empire_app/core/app_config.dart';
-import 'package:mobile_empire_app/chat_widgets.dart'; // لاستدعاء AllChatsListWidget
-import 'package:mobile_empire_app/community_widgets.dart'; // لاستدعاء MyCommunitiesPortalWidget
-
-// ==============================================================================
-// 5. نواة تليجرام المجانية المفتوحة (Telegram Core UI)
-// ==============================================================================
+import 'package:mobile_empire_app/app_config.dart';
+import 'package:mobile_empire_app/chat_widgets.dart'; 
+import 'package:mobile_empire_app/community_widgets.dart'; 
 
 class TelegramCoreChats extends StatelessWidget {
   const TelegramCoreChats({super.key});
@@ -62,7 +58,7 @@ class TelegramCoreChats extends StatelessWidget {
         ),
         body: const TabBarView(
           children: [
-            AllChatsListWidget(), // قادمة من chat_widgets.dart
+            AllChatsListWidget(), 
             Center(
                 child: Text("المراسلات الشخصية",
                     style: TextStyle(color: Colors.grey))),
@@ -75,7 +71,7 @@ class TelegramCoreChats extends StatelessWidget {
             Center(
                 child: Text("البوتات الخدمية",
                     style: TextStyle(color: Colors.grey))),
-            MyCommunitiesPortalWidget(), // قادمة من community_widgets.dart
+            MyCommunitiesPortalWidget(), 
           ],
         ),
         floatingActionButton: FloatingActionButton(
