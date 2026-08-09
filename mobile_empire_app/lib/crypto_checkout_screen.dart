@@ -1,10 +1,13 @@
-import 'package:mobile_empire_app/app_config.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'app_config.dart';
-import 'bot_model.dart';
+
+import 'package:mobile_empire_app/core/app_config.dart';
+
+// ==============================================================================
+// شاشة الدفع بالعملات الرقمية (Crypto Checkout Screen)
+// ==============================================================================
 
 class CryptoCheckoutScreen extends StatefulWidget {
   final String invoiceId;
