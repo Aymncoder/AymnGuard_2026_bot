@@ -15,7 +15,7 @@ class BackendCoreEcosystem {
   }
 
   // ===========================================================================
-  // إدارة المصادقة السيادية (Pyrogram OTP)
+  // إدارة المصادقة السيادية (Pyrogram OTP) - [تم التصحيح هنا]
   // ===========================================================================
   static Future<Map<String, dynamic>> requestTelegramOtp(
     String sessionName, 
