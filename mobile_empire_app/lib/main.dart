@@ -1,4 +1,4 @@
-حimport 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'app_config.dart';
 
 // مسارات الشاشات والقوائم المستخدمة في الواجهة الرئيسية
@@ -33,12 +33,13 @@ class AymnGuardPlusApp extends StatelessWidget {
           selectedItemColor: AppColors.primary,
           unselectedItemColor: Colors.grey,
         ),
-        fontFamily: 'Roboto', // يمكنك تغييره لاحقاً لخط عربي مخصص
+        fontFamily: 'Roboto',
       ),
       home: const MainSovereignScreen(),
     );
   }
 }
+
 class AppConfig {
   static const String serverUrl = "http://135.181.86.199:10050";
   static const String appVersion = "21.0.0 Enterprise";
@@ -88,12 +89,12 @@ class _MainSovereignScreenState extends State<MainSovereignScreen> {
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
         items: [
-          const BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'الإعدادات'),
-          const BottomNavigationBarItem(icon: Icon(Icons.storefront, color: AppColors.accentGold), label: 'المتجر'),
-          const BottomNavigationBarItem(icon: Icon(Icons.perm_contact_calendar), label: 'الجهات'),
-          const BottomNavigationBarItem(icon: Badge(label: Text('١٣'), child: Icon(Icons.chat_bubble)), label: 'المحادثات'),
-          if (AppConfig.isOwnerStatus) 
-            const BottomNavigationBarItem(icon: Icon(Icons.admin_panel_settings, color: Colors.redAccent), label: 'السيادة'),
+          const BottomNavigationBarItem(icon: Icon(Icons.settings), label: "الإعدادات"),
+          const BottomNavigationBarItem(icon: Icon(Icons.storefront, color: AppColors.accentGold), label: "المتجر"),
+          const BottomNavigationBarItem(icon: Icon(Icons.perm_contact_calendar), label: "جهات الاتصال"),
+          const BottomNavigationBarItem(icon: Badge(label: Text('w'), child: Icon(Icons.chat_bubble)), label: "محادثات"),
+          if (AppConfig.isOwnerStatus)
+            const BottomNavigationBarItem(icon: Icon(Icons.admin_panel_settings, color: Colors.redAccent), label: 'الإدارة'),
         ],
       ),
     );
