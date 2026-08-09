@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'app_config.dart';
-import 'core/backend_ecosystem.dart'; // استدعاء العقل المدبر للربط الشامل
+import 'core/backend_ecosystem.dart';
 
 import 'package:mobile_empire_app/telegram_core_chats_screen.dart';
 import 'package:mobile_empire_app/premium_dashboard_screens.dart';
@@ -47,7 +45,6 @@ class AccountLoginGatewayScreen extends StatefulWidget {
 class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
   final TextEditingController _accountController = TextEditingController();
 
-  // دالة الاتصال المدمجة عبر العقل المدبر (BackendCoreEcosystem)
   Future<void> _loginAndConnect() async {
     String phoneInput = _accountController.text.trim();
     if (phoneInput.isEmpty) {
@@ -56,52 +53,6 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
       );
       return;
     }
-class AccountSettingsScreen extends StatelessWidget {
-  final String userAccount;
-  const AccountSettingsScreen({super.key, required this.userAccount});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text("الإعدادات")),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // 👈 ضع اللافتة المؤسسية هنا في أعلى القائمة
-          const SovereignEnterpriseBanner(),
-          const SizedBox(height: 20),
-          
-          // ... (باقي محتوى شاشة الإعدادات القديم مثل الحساب المؤسسي) ...
-          Container(
-            color: AppColors.surface,
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                const CircleAvatar(radius: 30, backgroundColor: AppColors.primary, child: Icon(Icons.person, size: 35, color: Colors.white)),
-                const SizedBox(width: 15),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("الحساب المؤسسي", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-                    const SizedBox(height: 5),
-                    Directionality(
-                      textDirection: TextDirection.ltr,
-                      child: Container(
-                        alignment: Alignment.centerLeft,
-                        child: Text(userAccount, style: const TextStyle(color: Colors.greenAccent, fontSize: 14, fontWeight: FontWeight.w500)),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
     // إظهار التحميل
     showDialog(
@@ -291,7 +242,11 @@ class AccountSettingsScreen extends StatelessWidget {
       backgroundColor: AppColors.background,
       appBar: AppBar(title: const Text("الإعدادات")),
       body: ListView(
+        padding: const EdgeInsets.all(16),
         children: [
+          // 👈 اللافتة المؤسسية الفاخرة في أعلى شاشة الإعدادات
+          const SovereignEnterpriseBanner(),
+          const SizedBox(height: 20),
           Container(
             color: AppColors.surface,
             padding: const EdgeInsets.all(16),
@@ -312,6 +267,98 @@ class AccountSettingsScreen extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 🏛️ مكون اللافتة المؤسسية السيادية
+class SovereignEnterpriseBanner extends StatelessWidget {
+  const SovereignEnterpriseBanner({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24.0),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF0A192F), Color(0xFF050505)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.5), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0A192F).withOpacity(0.8),
+            blurRadius: 15,
+            spreadRadius: 2,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color(0xFFD4AF37).withOpacity(0.1),
+              border: Border.all(color: const Color(0xFFD4AF37), width: 2),
+            ),
+            child: const Icon(
+              Icons.shield_rounded,
+              size: 50,
+              color: Color(0xFFD4AF37),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            "AymnGuard Plus",
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            "Sovereign Enterprise Security & Core Architecture",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+              letterSpacing: 0.8,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.greenAccent.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: Colors.greenAccent.withOpacity(0.3)),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.verified, size: 14, color: Colors.greenAccent),
+                SizedBox(width: 6),
+                Text(
+                  "SECURE & OPERATIONAL 100%",
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.greenAccent,
+                  ),
                 ),
               ],
             ),
