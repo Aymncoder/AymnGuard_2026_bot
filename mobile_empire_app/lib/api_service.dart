@@ -1,9 +1,7 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-
-import 'app_config.dart';
-import 'bot_model.dart';
+import 'package:mobile_empire_app/app_config.dart';
+import 'package:mobile_empire_app/bot_model.dart';
+import 'package:mobile_empire_app/api_service.dart';
+import 'package:mobile_empire_app/widgets/smart_contract_audit_widget.dart';
 
 // ==============================================================================
 // طبقة الاتصال والخدمات الخلفية (Enterprise Service Layer)
@@ -100,8 +98,7 @@ class SovereignApiService {
   }
 
   /// الاستعلام عن حالة المهمة باستخدام رقم التتبع
-  static Future<Map<String, dynamic>?> checkTaskStatus(String taskId) async {
-    try {
+  static Future<Map<String, dynamic>?> checkTaskStatus(String taskId) async 
       final response = await http.get(
         Uri.parse('${AppConfig.serverUrl}/api/services/status/$taskId'),
       ).timeout(const Duration(seconds: 10));
