@@ -102,20 +102,35 @@ class PremiumItemWidget extends StatelessWidget {
                     style:
                         const TextStyle(color: Colors.grey, fontSize: 13)),
                 const SizedBox(height: 15),
-                SizedBox(
+                              SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary),
-                        onPressed: () {},
+                        onPressed: () {
+                          // استخراج الرقم فقط من نص السعر
+                          double planPrice = double.tryParse(price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 10.0;
+
+                          // الانتقال إلى شاشة الدفع
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CryptoCheckoutScreen(
+                                invoiceId: "INV_${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}",
+                                amount: planPrice,
+                                // ضع عنوان محفظتك هنا
+                                walletAddress: "0x55d398326f99059fF775485246999027B3197955", 
+                              ),
+                            ),
+                          );
+                        },
                         child: const Text("اشتراك الآن",
                             style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold)))),
-              ])),
-    );
-  }
-}
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold)))),
+                 );
+               }
+            }
 
 // ==============================================================================
 // 8. لوحة تحكم المالك (Ultimate Owner Dashboard)
