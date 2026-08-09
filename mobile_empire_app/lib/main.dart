@@ -56,6 +56,52 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
       );
       return;
     }
+class AccountSettingsScreen extends StatelessWidget {
+  final String userAccount;
+  const AccountSettingsScreen({super.key, required this.userAccount});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(title: const Text("الإعدادات")),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // 👈 ضع اللافتة المؤسسية هنا في أعلى القائمة
+          const SovereignEnterpriseBanner(),
+          const SizedBox(height: 20),
+          
+          // ... (باقي محتوى شاشة الإعدادات القديم مثل الحساب المؤسسي) ...
+          Container(
+            color: AppColors.surface,
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                const CircleAvatar(radius: 30, backgroundColor: AppColors.primary, child: Icon(Icons.person, size: 35, color: Colors.white)),
+                const SizedBox(width: 15),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("الحساب المؤسسي", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                    const SizedBox(height: 5),
+                    Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: Container(
+                        alignment: Alignment.centerLeft,
+                        child: Text(userAccount, style: const TextStyle(color: Colors.greenAccent, fontSize: 14, fontWeight: FontWeight.w500)),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
     // إظهار التحميل
     showDialog(
