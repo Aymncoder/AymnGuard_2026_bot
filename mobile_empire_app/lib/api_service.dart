@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:mobile_empire_app/core/app_config.dart';
+import 'package:mobile_empire_app/app_config.dart';
 import 'package:mobile_empire_app/models/bot_model.dart';
 
 // ==============================================================================
