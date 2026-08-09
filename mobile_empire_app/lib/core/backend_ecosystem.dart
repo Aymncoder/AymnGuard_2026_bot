@@ -56,6 +56,20 @@ class BackendCoreEcosystem {
       "command": commandAction
     });
   }
+  // ===========================================================================
+  // 18. درع الحماية الأمني المطلق (security/)
+  // ===========================================================================
+  /// التحقق من سلامة التوقيع الرقمي للطلب عبر hmac_security_guard.py
+  static Future<Map<String, dynamic>> verifySecurityToken(String token) async {
+    return _post('/api/v1/security/verify', {
+      "security_token": token
+    });
+  }
+
+  /// تفعيل أو فحص حالة الدرع الأمني (shield.py & protection_bot.py)
+  static Future<Map<String, dynamic>> checkSystemShieldStatus() async {
+    return _get('/api/v1/security/shield/status');
+  }
 
   // ===========================================================================
   // 17. التطبيقات المصغرة وبوابة الميديا (frontend_core/mini_app)
