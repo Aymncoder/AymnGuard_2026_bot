@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'crypto_checkout_screen.dart'; // تأكد من مسار الملف إذا وضعته في مجلد widgets
 
 import 'app_config.dart';
 
