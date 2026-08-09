@@ -6,6 +6,64 @@ import 'package:http/http.dart' as http;
 class BackendCoreEcosystem {
   static const String _baseUrl = 'http://135.181.86.199:8000';
   static const String _license = 'AYMN-PREMIUM-LICENSE-2026';
+   // ===========================================================================
+  // 12. السيطرة على العمال والمهام المجدولة (workers/ & scripts/)
+  // ===========================================================================
+  /// تشغيل سكربتات الصيانة والتحديث الآلي من الموبايل
+  static Future<Map<String, dynamic>> executeSystemScript(String scriptName) async {
+    return _post('/api/v1/system/scripts/run', {
+      "script_name": scriptName
+    });
+  }
+
+  /// مراقبة صحة العمال (Workers) والمهام الخلفية
+  static Future<Map<String, dynamic>> checkWorkersHealth() async {
+    return _get('/api/v1/system/workers/health');
+  }
+
+  // ===========================================================================
+  // 13. نظام الأمان والتدقيق الشامل (security/ & middlewares/)
+  // ===========================================================================
+  /// سحب سجلات الأمان (Security Logs) لمعرفة أي محاولة اختراق
+  static Future<Map<String, dynamic>> fetchSecurityAuditLogs(String level) async {
+    return _post('/api/v1/system/security/logs', {
+      "log_level": level // مثال: 'CRITICAL' أو 'WARNING'
+    });
+  }
+
+  /// تفعيل أو تعطيل وضع الحماية القصوى (Lockdown Mode)
+  static Future<Map<String, dynamic>> toggleSystemLockdown(bool enable) async {
+    return _post('/api/v1/system/security/lockdown', {
+      "enable_lockdown": enable
+    });
+  }
+
+  // ===========================================================================
+  // 14. فحص نبض البوابات الإمبراطورية (api_gateway.py & enterprise_gateway.py)
+  // ===========================================================================
+  /// دالة تفحص ما إذا كان الباكن إند بأكمله يعمل ويستجيب
+  static Future<Map<String, dynamic>> checkGatewayPulse() async {
+    return _get('/health');
+  }
+
+  // ===========================================================================
+  // 🛡️ دعم دالة GET المركزية (لجلب البيانات بدون إرسال Body)
+  // ===========================================================================
+  static Future<Map<String, dynamic>> _get(String endpoint) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl$endpoint'),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 429) {
+        return {"error": true, "message": "نظام الحماية نشط - يرجى التمهل"};
+      }
+      return jsonDecode(response.body);
+    } catch (e) {
+      return {"error": true, "message": "السيرفر لا يستجيب أو مغلق."};
+    }
+  }
+
   // ===========================================================================
   // 6. قوات الروبوتات المستقلة (Bots Ecosystem: Creative, Protection, Search)
   // ===========================================================================
