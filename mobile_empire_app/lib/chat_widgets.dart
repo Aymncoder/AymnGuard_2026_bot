@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'app_config.dart';
+import 'bot_model.dart';
+
 // ملاحظة: قمنا بتضمين chat_room_screen.dart هنا لأن ChatTileWidget تحتاج للانتقال إليه.
 // سيظهر لك خطأ مؤقت في المستودع بخصوص هذا الملف حتى نقوم بإنشائه في الخطوة القادمة.
 import 'chat_room_screen.dart';
