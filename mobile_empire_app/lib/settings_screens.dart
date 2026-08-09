@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_empire_app/app_config.dart';
+export 'app_config.dart';
 
 // ==============================================================================
 // شاشات الإعدادات والخصوصية (Settings & Privacy Screens)
