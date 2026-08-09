@@ -54,7 +54,6 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
       return;
     }
 
-    // إظهار التحميل
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -64,7 +63,6 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
     );
 
     try {
-      // 🚀 الاتصال الفعلي بـ auth_manager.py عبر النظام البيئي الموحد
       var response = await BackendCoreEcosystem.requestTelegramOtp(
         "Sovereign_Mobile_Session",
         phoneInput,
@@ -72,7 +70,6 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
         "b18441a1ff607e10a989891a5462e627"
       );
 
-      // إخفاء التحميل
       if (mounted) Navigator.pop(context);
 
       if (response['error'] == true) {
@@ -96,7 +93,7 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
       }
     } catch (e) {
       if (mounted) {
-        Navigator.pop(context); // إخفاء التحميل
+        Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("عطل في الشبكة أو السيرفر مغلق: $e")),
         );
@@ -196,14 +193,11 @@ class _MainSovereignScreenState extends State<MainSovereignScreen> {
   }
 }
 
-// تأكد من استيراد ملفات الألوان (AppColors) الخاصة بك هنا
-
 class CommunitiesScreenTab extends StatelessWidget {
   const CommunitiesScreenTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // تم إصلاح وتثبيت قائمة الكيانات السيادية
     final List<Map<String, dynamic>> sovereignGroups = [
       {
         'title': 'قنواتي ومجموعاتي السيادية',
@@ -219,7 +213,6 @@ class CommunitiesScreenTab extends StatelessWidget {
       },
     ];
 
-    // قائمة فئات واجهات المراسلة وإدارة المنصة
     final List<Map<String, dynamic>> communicationCategories = [
       {
         'title': 'الرسائل الخاصة',
@@ -267,7 +260,6 @@ class CommunitiesScreenTab extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [
-          // القسم الأول: المجموعات والقنوات الإدارية السيادية (تم تثبيتها)
           const Text("القنوات والمجموعات النشطة", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 8),
           ...sovereignGroups.map((group) => _buildCard(
@@ -283,7 +275,6 @@ class CommunitiesScreenTab extends StatelessWidget {
             child: Divider(color: Colors.white24, thickness: 1),
           ),
 
-          // القسم الثاني: واجهات المراسلة المتكاملة والتصنيفات الجديدة
           const Text("بوابات الاتصال والمراسلة", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 8),
           ...communicationCategories.map((category) => _buildCard(
@@ -297,25 +288,6 @@ class CommunitiesScreenTab extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildCard(BuildContext context, String title, String subtitle, IconData icon, Color color) {
-    return Card(
-      color: AppColors.surface, // تأكد من تعريف AppColors.surface
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        leading: CircleAvatar(backgroundColor: color.withOpacity(0.2), child: Icon(icon, color: color)),
-        title: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), // لون النص أبيض ليتناسب مع الوضع الداكن
-        subtitle: Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
-        onTap: () {
-          // هنا يتم توجيه المستخدم إلى الشاشة المخصصة عند الضغط
-          // مثال: Navigator.push(context, MaterialPageRoute(builder: (context) => PrivateMessagesScreen()));
-        },
-      ),
-    );
-  }
-}
 
   Widget _buildCard(BuildContext context, String title, String subtitle, IconData icon, Color color) {
     return Card(
@@ -345,14 +317,16 @@ class AccountSettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // 👈 اللافتة المؤسسية الفاخرة في أعلى شاشة الإعدادات
           const SovereignEnterpriseBanner(),
           const SizedBox(height: 20),
           Container(
-            color: AppColors.surface,
             padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: Row(
-              children: 
+              children: [
                 const CircleAvatar(radius: 30, backgroundColor: AppColors.primary, child: Icon(Icons.person, size: 35, color: Colors.white)),
                 const SizedBox(width: 15),
                 Column(
@@ -373,7 +347,11 @@ class AccountSettingsScreen extends StatelessWidget {
             ),
           ),
         ],
-/// 🏛️ مكون اللافتة المؤسسية السيادية
+      ),
+    );
+  }
+}
+
 class SovereignEnterpriseBanner extends StatelessWidget {
   const SovereignEnterpriseBanner({super.key});
 
@@ -445,7 +423,7 @@ class SovereignEnterpriseBanner extends StatelessWidget {
             ),
             child: const Row(
               mainAxisSize: MainAxisSize.min,
-              children: 
+              children: [
                 Icon(Icons.verified, size: 14, color: Colors.greenAccent),
                 SizedBox(width: 6),
                 Text(
