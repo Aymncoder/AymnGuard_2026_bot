@@ -27,7 +27,7 @@ jobs:
           python-version: "3.11"
           cache: 'pip'
 
-      # 3. تثبيت التبعيات واعتمادات الاتصال للإصدار v19.0.0 (النماذج الحية المعتمدة)
+      # 3. تثبيت التبعيات واعتمادات الاتصال للإصدار v20.0.0 (النماذج الحية المعتمدة)
       - name: Install Enterprise Dependencies
         run: |
           python -m pip install --upgrade pip
