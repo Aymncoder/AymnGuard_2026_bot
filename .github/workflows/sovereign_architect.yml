@@ -27,7 +27,7 @@ jobs:
           python-version: "3.11"
           cache: 'pip'
 
-      # 3. تثبيت التبعيات واعتمادات الاتصال للإصدار v20.0.0 (النماذج الحية المعتمدة)
+      # 3. تثبيت التبعيات واعتمادات الاتصال للإصدار v21.0.0 (الوضع الهجين الآمن)
       - name: Install Enterprise Dependencies
         run: |
           python -m pip install --upgrade pip
@@ -52,5 +52,5 @@ jobs:
           CURRENT_BRANCH=$(git branch --show-current)
           git pull origin $CURRENT_BRANCH --rebase || true
           git add .
-          git diff --staged --quiet || git commit -m "👑 [Sovereign Auto-Patch]: Autonomous ecosystem sync and v19.0 live models upgrade"
+          git diff --staged --quiet || git commit -m "👑 [Sovereign Auto-Patch]: Autonomous ecosystem sync and v21.0 hybrid mode upgrade"
           git push origin $CURRENT_BRANCH
