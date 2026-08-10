@@ -27,7 +27,7 @@ jobs:
           python-version: "3.11"
           cache: 'pip'
 
-      # 3. تثبيت التبعيات واعتمادات الاتصال للإصدار v22.0.0 (الدفعات المصغرة التراكمية)
+      # 3. تثبيت التبعيات واعتمادات الاتصال للإصدار v25.0.0 (نظام التدقيق الشامل والشفافية المطلقة)
       - name: Install Enterprise Dependencies
         run: |
           python -m pip install --upgrade pip
@@ -52,5 +52,5 @@ jobs:
           CURRENT_BRANCH=$(git branch --show-current)
           git pull origin $CURRENT_BRANCH --rebase || true
           git add .
-          git diff --staged --quiet || git commit -m "👑 [Sovereign Auto-Patch]: Autonomous ecosystem sync and v22.0 micro-batching upgrade"
+          git diff --staged --quiet || git commit -m "👑 [Sovereign Auto-Patch]: Autonomous ecosystem sync and v25.0 ultimate exhaustive audit upgrade"
           git push origin $CURRENT_BRANCH
