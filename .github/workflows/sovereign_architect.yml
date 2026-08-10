@@ -1,7 +1,7 @@
 # ==============================================================================
-# AymnGuard Sovereign Enterprise : Autonomous Architect CI/CD Pipeline v33.0
+# AymnGuard Sovereign Enterprise : Autonomous Architect CI/CD Pipeline v34.0
 # ==============================================================================
-name: 👑 Sovereign Supreme Architect & Stateful Delta Agent
+name: 👑 Sovereign Supreme Architect & AI Swarm Factory Agent
 
 on:
   push:
@@ -33,18 +33,19 @@ jobs:
           fi
           pip install google-genai sqlalchemy aiosqlite pydantic fastapi uvicorn
 
-      - name: Run Sovereign Stateful Delta Audit Agent
+      - name: Run Sovereign AI Swarm Agent
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python scripts/sovereign_architect_bot.py
 
-      - name: Auto-Commit & Push Sovereign State & Changes
+      - name: Auto-Commit & Push Sovereign State & Swarm Changes
         run: |
-          git config --global user.name "Sovereign Stateful Architect"
-          git config --global user.email "stateful@sovereign.bot"
+          git config --global user.name "Sovereign AI Swarm Architect"
+          git config --global user.email "aiswarm@sovereign.bot"
           CURRENT_BRANCH=$(git branch --show-current)
           git add .
-          git commit -m "👑 [Sovereign Stateful Delta]: v33.0 memory sync and delta execution upgrade" || true
+          git commit -m "👑 [Sovereign AI Swarm v34.0]: Autonomous intent processing and delta ecosystem sync" || true
           git pull origin $CURRENT_BRANCH --rebase --autostash || true
           git push origin $CURRENT_BRANCH
