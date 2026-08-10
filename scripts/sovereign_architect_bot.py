@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v34.0.0
+AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v34.1.0
 ==============================================================================
-المهندس الإمبراطوري الأسمى (الجيل الرابع والثلاثون - شركة الوكلاء المتعددة):
+المهندس الإمبراطوري الأسمى (الجيل 34.1 - محصن ضد ضغط الحصص والطلبات):
 - نظام النوايا السيادية (Intent-Driven Development).
-- محاكاة فريق متكامل (مهندس معماري، مطور خلفي، مصمم، مدقق).
-- نظام الذاكرة المستدامة (Stateful Ledger) والتنفيذ التفاضلي.
-- ربط عصبي ذاتي دون تدخل بشري.
+- محاكاة فريق متكامل مع إعادة محاولة ذكية عند بلوغ حدود الحصة (429 Quota Handling).
+- نظام الذاكرة المستدامة (Stateful Ledger) والتنفيذ التفاضلي الآمن.
 ==============================================================================
 """
 
@@ -20,6 +19,7 @@ from pathlib import Path
 import asyncio
 import ast
 import hashlib
+import time
 
 try:
     from google import genai
@@ -27,18 +27,17 @@ try:
 except ImportError:
     AI_MODULE_AVAILABLE = False
 
-# --- إعداد السجلات المؤسسية الهيكلية (Structured JSON Logging) ---
 class StructuredJsonFormatter(logging.Formatter):
     def format(self, record):
         log_record = {
             "timestamp": self.formatTime(record, self.datefmt),
             "level": record.levelname,
-            "engine": "SovereignSupremeEngine-v34",
+            "engine": "SovereignSupremeEngine-v34.1",
             "message": record.getMessage()
         }
         return json.dumps(log_record, ensure_ascii=False)
 
-logger = logging.getLogger("SovereignSupremeEngine34")
+logger = logging.getLogger("SovereignSupremeEngine341")
 handler = logging.StreamHandler(sys.stdout)
 handler.setFormatter(StructuredJsonFormatter())
 logger.addHandler(handler)
@@ -50,9 +49,9 @@ if str(ROOT_DIR) not in sys.path:
 
 TARGET_FOLDERS = ["core", "services", "bots", "security", "src", "app", "backend_core"]
 STATE_FILE_PATH = ROOT_DIR / ".sovereign_state.json"
-INTENT_FILE_PATH = ROOT_DIR / "sovereign_intent.txt"  # ملف المدخلات الرئاسي
+INTENT_FILE_PATH = ROOT_DIR / "sovereign_intent.txt"
 
-class SovereignSupremeEngineV34:
+class SovereignSupremeEngineV341:
     def __init__(self, root_path: Path):
         self.root_path = root_path
         self.all_python_files = []
@@ -93,17 +92,17 @@ class SovereignSupremeEngineV34:
                 hasher.update(f.read())
             return hasher.hexdigest()
         except Exception:
-            return ""
+            return {}
 
     async def orchestrate_multi_agent_swarm(self):
-        """غرفة عمليات الوكلاء المتعددة (الشركة الافتراضية)"""
+        """غرفة عمليات الوكلاء المتعددة مع معالجة ذكية لحصص الاستدعاء"""
         if not INTENT_FILE_PATH.exists():
             return
 
         with open(INTENT_FILE_PATH, "r", encoding="utf-8") as f:
             intent_text = f.read().strip()
 
-        if not intent_text or intent_text.lower() in ["", "none", "done", "تم"]:
+        if not intent_text or intent_text.lower() in ["", "none", "done", "تم الإنجاز بنجاح بواسطة فريق الوكلاء الذكي."]:
             return
 
         logger.info(f"🌐 [AI SWARM]: استلام نية/فكرة جديدة للتصنيع: '{intent_text[:50]}...'")
@@ -113,47 +112,53 @@ class SovereignSupremeEngineV34:
             return
 
         prompt = f"""
-أنت تمثل شركة برمجيات عالمية عملاقة تعمل كفريق واحد متكامل (مهندس معماري، مطور واجهات/هياكل، مطور خلفي متقدم، خبير عمال خلفيين ومزامنة، ومدقق جودة صارم).
+أنت تمثل شركة برمجيات عالمية عملاقة تعمل كفريق واحد متكامل (مهندس معماري، مطور واجهات/هياكل، مطور خلفي متقدم).
 المشروع هو نظام FastAPI سيادي ومتقدم.
 رغبة العميل والفكرة المطلوبة: "{intent_text}"
 
 قم بتوليد الأكواد اللازمة لتحقيق هذه الفكرة بالكامل. 
-مخرجاتك يجب أن تكون بصيغة JSON فقط، حيث يكون المفتاح هو مسار الملف (مثلاً services/new_feature.py) والقيمة هي الكود البرمجي الكامل بلغة بايثون. لا تكتب أي نصوص خارج الـ JSON.
+مخرجاتك يجب أن تكون بصيغة JSON فقط، حيث يكون المفتاح هو مسار الملف (مثلاً services/omega_fabric.py) والقيمة هي الكود البرمجي الكامل بلغة بايثون. لا تكتب أي نصوص خارج الـ JSON.
 يجب أن تحتوي الملفات على `APIRouter` إذا كانت تقدم خدمة ويب، وأن تكون متزامنة وخالية من الأخطاء النحوية المطلقة.
 """
-        try:
-            response = self.client.models.generate_content(
-                model='gemini-2.0-flash',
-                contents=prompt
-            )
-            response_text = response.text
-            
-            # استخراج كود JSON بذكاء لتفادي الأخطاء
-            json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', response_text, re.DOTALL)
-            if json_match:
-                json_str = json_match.group(1)
-            else:
-                json_str = response_text
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                response = self.client.models.generate_content(
+                    model='gemini-2.0-flash',
+                    contents=prompt
+                )
+                response_text = response.text
                 
-            generated_files = json.loads(json_str)
-            
-            for file_path_str, code_content in generated_files.items():
-                target_path = self.root_path / file_path_str
-                target_path.parent.mkdir(parents=True, exist_ok=True)
-                with open(target_path, "w", encoding="utf-8") as f:
-                    f.write(code_content)
-                logger.info(f"🏗️ [AI Architect]: فريق العمل أتم بناء الملف وتصميمه -> {file_path_str}")
-                self.telemetry["intents_processed"] += 1
-            
-            # مسح ملف النوايا بعد إنجازه بنجاح لمنع التكرار
-            with open(INTENT_FILE_PATH, "w", encoding="utf-8") as f:
-                f.write("تم الإنجاز بنجاح بواسطة فريق الوكلاء الذكي.")
+                json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', response_text, re.DOTALL)
+                if json_match:
+                    json_str = json_match.group(1)
+                else:
+                    json_str = response_text
+                    
+                generated_files = json.loads(json_str)
                 
-        except Exception as e:
-            logger.error(f"❌ فشل فريق العمل الذكي في توليد الفكرة: {e}")
+                for file_path_str, code_content in generated_files.items():
+                    target_path = self.root_path / file_path_str
+                    target_path.parent.mkdir(parents=True, exist_ok=True)
+                    with open(target_path, "w", encoding="utf-8") as f:
+                        f.write(code_content)
+                    logger.info(f"🏗️ [AI Architect]: فريق العمل أتم بناء الملف وتصميمه -> {file_path_str}")
+                    self.telemetry["intents_processed"] += 1
+                
+                with open(INTENT_FILE_PATH, "w", encoding="utf-8") as f:
+                    f.write("تم الإنجاز بنجاح بواسطة فريق الوكلاء الذكي.")
+                break
+                
+            except Exception as e:
+                logger.warning(f"⚠️ المحاولة {attempt + 1} واجهت ضغطاً في الحصة (429/Resource Exhausted): {e}")
+                if attempt < max_retries - 1:
+                    sleep_time = (attempt + 1) * 20  # انتظار تزايدي ذكي
+                    logger.info(f"⏳ جاري الانتظار لمدة {sleep_time} ثانية لإعادة المحاولة تلقائياً...")
+                    time.sleep(sleep_time)
+                else:
+                    logger.error("❌ فشل استدعاء الذكاء الاصطناعي بعد استنفاد محاولات إعادة الاتصال بسبب حدود الحصة.")
 
     def scan_ecosystem_with_delta(self):
-        """مسح راداري تفاضلي (Delta Scan)"""
         logger.info("🔍 بدء المسح الراداري التفاضلي (Delta Engine Scan)...")
         for folder in TARGET_FOLDERS:
             folder_path = self.root_path / folder
@@ -172,7 +177,6 @@ class SovereignSupremeEngineV34:
         self.telemetry["delta_processed"] = len(self.delta_files)
 
     def delta_enterprise_wiring(self):
-        """الربط العصبي التفاضلي والآمن بالنواة المركزية"""
         logger.info("🔗 تشغيل محرك الربط العصبي التفاضلي بالنواة المركزية (main.py)...")
         if not self.main_py_path.exists():
             return
@@ -202,7 +206,6 @@ class SovereignSupremeEngineV34:
             try:
                 with open(py_file, "r", encoding="utf-8") as f:
                     content = f.read()
-                # التأكد من صحة القواعد النحوية (QA Check)
                 ast.parse(content)
                 
                 if "router =" in content:
@@ -213,13 +216,11 @@ class SovereignSupremeEngineV34:
                         new_inclusions.append(f"app.include_router({router_alias})")
                         self.telemetry["routers_wired"] += 1
                         logger.info(f"⚡ ربط تفاضلي آمن للملف المستحدث بالنواة -> {mod_str}")
-            except SyntaxError as se:
-                logger.warning(f"⚠️ [QA Alert] تم تجاهل ربط {rel_path} بسبب خطأ نحوي: {se}")
             except Exception as e:
                 logger.error(f"⚠️ خطأ أثناء المعالجة لـ {rel_path}: {e}")
 
         if new_imports or new_inclusions:
-            injection_block = "\n# --- Sovereign Enterprise AI-Generated Bridges v34 ---\n" + "\n".join(new_imports) + "\n" + "\n".join(new_inclusions) + "\n"
+            injection_block = "\n# --- Sovereign Enterprise AI-Generated Bridges v34.1 ---\n" + "\n".join(new_imports) + "\n" + "\n".join(new_inclusions) + "\n"
             updated_main_code = injection_block + "\n" + main_code
             with open(self.main_py_path, "w", encoding="utf-8") as f:
                 f.write(updated_main_code)
@@ -234,11 +235,11 @@ class SovereignSupremeEngineV34:
 
     def run(self):
         print("="*85)
-        print("👑 AYMNGUARD SOVEREIGN ENTERPRISE : SUPREME ENGINE - v34.0.0 (AI SWARM FACTORY)")
+        print("👑 AYMNGUARD SOVEREIGN ENTERPRISE : SUPREME ENGINE - v34.1.0 (AI SWARM RESILIENT)")
         print("="*85)
         asyncio.run(self.async_run())
         print("\n" + "="*85)
-        print(f"📊 IMPERIAL AI SWARM REPORT (v34):")
+        print(f"📊 IMPERIAL AI SWARM REPORT (v34.1):")
         print(f"   * AI Intents Executed:     {self.telemetry['intents_processed']}")
         print(f"   * Total Ecosystem Files:   {self.telemetry['scanned_files']}")
         print(f"   * Delta Files Audited:     {self.telemetry['delta_processed']}")
@@ -247,5 +248,5 @@ class SovereignSupremeEngineV34:
         print("="*85 + "\n")
 
 if __name__ == "__main__":
-    engine = SovereignSupremeEngineV34(ROOT_DIR)
+    engine = SovereignSupremeEngineV341(ROOT_DIR)
     engine.run()
