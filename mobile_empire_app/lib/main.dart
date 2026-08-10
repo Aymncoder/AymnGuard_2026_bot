@@ -34,7 +34,7 @@ class AymnGuardPlusApp extends StatelessWidget {
     );
   }
 }
-
+   
 class AccountLoginGatewayScreen extends StatefulWidget {
   const AccountLoginGatewayScreen({super.key});
 
@@ -43,16 +43,88 @@ class AccountLoginGatewayScreen extends StatefulWidget {
 }
 
 class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
-  final TextEditingController _accountController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  String _selectedCountryName = "اليمن";
+  String _selectedCountryCode = "+967";
+  bool _syncContacts = false;
+
+  // قائمة الدول النموذجية للبحث والاختيار
+  final List<Map<String, String>> _countriesList = [
+    {'name': 'اليمن', 'code': '+967', 'flag': '🇾🇪'},
+    {'name': 'المملكة العربية السعودية', 'code': '+966', 'flag': '🇸🇦'},
+    {'name': 'مصر', 'code': '+20', 'flag': '🇪🇬'},
+    {'name': 'الإمارات العربية المتحدة', 'code': '+971', 'flag': '🇦🇪'},
+    {'name': 'الكويت', 'code': '+965', 'flag': '🇰🇼'},
+    {'name': 'القطر', 'code': '+974', 'flag': '🇶🇦'},
+    {'name': 'الولايات المتحدة', 'code': '+1', 'flag': '🇺🇸'},
+  ];
+
+  // دالة فتح نافذة البحث واختيار الدولة (مطابقة للصورة الثانية)
+  void _openCountryPicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.background,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.75,
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              // شريط البحث العلوي
+              TextField(
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: "ابحث عن الدولة...",
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  prefixIcon: const Icon(Icons.search, color: AppColors.accentGold),
+                  filled: true,
+                  fillColor: AppColors.surface,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _countriesList.length,
+                  itemBuilder: (context, index) {
+                    var country = _countriesList[index];
+                    return ListTile(
+                      leading: Text(country['flag']!, style: const TextStyle(fontSize: 24)),
+                      title: Text(country['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      trailing: Text(country['code']!, style: const TextStyle(color: AppColors.accentGold, fontWeight: FontWeight.bold)),
+                      onTap: () {
+                        setState(() {
+                          _selectedCountryName = country['name']!;
+                          _selectedCountryCode = country['code']!;
+                        });
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   Future<void> _loginAndConnect() async {
-    String phoneInput = _accountController.text.trim();
-    if (phoneInput.isEmpty) {
+    String rawPhone = _phoneController.text.trim();
+    if (rawPhone.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("يرجى إدخال رقم الهاتف لبدء الجلسة")),
       );
       return;
     }
+
+    if (rawPhone.startsWith('0')) rawPhone = rawPhone.substring(1);
+    String fullPhoneNumber = "$_selectedCountryCode$rawPhone";
 
     showDialog(
       context: context,
@@ -63,9 +135,10 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
     );
 
     try {
+      // ربط النواة السيادية مع تفعيل البروكسي والاتصال الآمن
       var response = await BackendCoreEcosystem.requestTelegramOtp(
-        "Sovereign_Mobile_Session",
-        phoneInput,
+        "AymnGuard_Sovereign_Proxy_Session",
+        fullPhoneNumber,
         2040,
         "b18441a1ff607e10a989891a5462e627"
       );
@@ -81,12 +154,12 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("تم إرسال كود التحقق عبر: ${response['delivery_method']} 🚀", style: const TextStyle(color: Colors.greenAccent))),
+            SnackBar(content: Text("تم إرسال كود التحقق بنجاح إلى: $fullPhoneNumber 🚀", style: const TextStyle(color: Colors.greenAccent))),
           );
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => MainSovereignScreen(userAccount: phoneInput),
+              builder: (context) => MainSovereignScreen(userAccount: fullPhoneNumber),
             ),
           );
         }
@@ -95,7 +168,7 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("عطل في الشبكة أو السيرفر مغلق: $e")),
+          SnackBar(content: Text("خطأ في الاتصال بالبروكسي أو السيرفر: $e")),
         );
       }
     }
@@ -105,42 +178,96 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.shield_rounded, size: 80, color: AppColors.primary),
-              const SizedBox(height: 20),
-              const Text("بوابة AymnGuard السيادية", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
-              const SizedBox(height: 30),
-              Directionality(
-                textDirection: TextDirection.ltr,
-                child: TextField(
-                  controller: _accountController,
-                  textAlign: TextAlign.right,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: AppColors.surface,
-                    hintText: "أدخل رقم الهاتف (+967...)",
-                    hintStyle: const TextStyle(color: Colors.grey),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  style: const TextStyle(color: Colors.white),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.security, color: AppColors.accentGold),
+            onPressed: () {
+              // زر إضافي للتحكم بالأمان والبروكسيات
+            },
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("رقم هاتفك", style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white)),
+            const SizedBox(height: 8),
+            const Text("يرجى تأكيد مفتاح بلدك وإدخال رقم هاتفك للاتصال بالمنصة السيادية.", style: TextStyle(color: Colors.grey, fontSize: 13)),
+            const SizedBox(height: 30),
+
+            // زر اختيار الدولة المنسدل (مطابق للصورة الأولى)
+            GestureDetector(
+              onTap: _openCountryPicker,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.accentGold.withOpacity(0.3)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("الدولة: $_selectedCountryName ($_selectedCountryCode)", style: const TextStyle(color: Colors.white, fontSize: 16)),
+                    const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.accentGold),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            const SizedBox(height: 16),
+
+            // حقل إدخال رقم الهاتف
+            Directionality(
+              textDirection: TextDirection.ltr,
+              child: TextField(
+                controller: _phoneController,
+                keyboardType: TextInputType.phone,
+                textAlign: TextAlign.right,
+                style: const TextStyle(color: Colors.white, fontSize: 18),
+                decoration: InputDecoration(
+                  labelText: "رقم الهاتف",
+                  labelStyle: const TextStyle(color: Colors.grey),
+                  filled: true,
+                  fillColor: AppColors.surface,
+                  prefixText: "$_selectedCountryCode ",
+                  prefixStyle: const TextStyle(color: AppColors.accentGold, fontSize: 18, fontWeight: FontWeight.bold),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                icon: const Icon(Icons.power_settings_new, color: Colors.white),
-                label: const Text("إطلاق الشرارة وبدء الجلسة 🚀", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                onPressed: _loginAndConnect,
               ),
+            ),
+            const SizedBox(height: 16),
+
+            // خيار مزامنة جهات الاتصال
+            Row(
+              children: [
+                Checkbox(
+                  value: _syncContacts,
+                  activeColor: AppColors.primary,
+                  onChanged: (val) {
+                    setState(() {
+                      _syncContacts = val ?? false;
+                    });
+                  },
+                ),
+                const Text("مزامنة جهات الاتصال", style: TextStyle(color: Colors.white70, fontSize: 14)),
+              ],
+            ),
+            const Spacer(),
+
+            // زر البدء والتسجيل السيادي
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: _loginAndConnect,
+              child: const Text("إطلاق الجلسة وبدء الاتصال 🚀", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
@@ -192,28 +319,170 @@ class _MainSovereignScreenState extends State<MainSovereignScreen> {
     );
   }
 }
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart'; // لتفعيل فتح الروابط الخارجية مباشرة
 
 class CommunitiesScreenTab extends StatelessWidget {
   const CommunitiesScreenTab({super.key});
+
+  // دالة ذكية لفتح الروابط الحقيقية (القنوات، المجموعات، والبوتات)
+  Future<void> _launchSovereignUrl(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw Exception('تعذر فتح الرابط: $urlString');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> sovereignGroups = [
       {
-        'title': 'قنواتي ومجموعاتي السيادية',
-        'subtitle': 'أنت المالك • 5,430 عضو • مجموعة VIP',
-        'icon': Icons.group,
+        'title': 'قناة التحديثات الرسمية',
+        'role': 'المالك • قناة البث السيادي',
+        'members': 'AymnGuardChat',
+        'type': 'قناة عامة',
+        'icon': Icons.campaign,
         'color': Colors.amber,
+        'link': 'https://t.me/AymnGuardChat',
       },
       {
-        'title': 'حملات AymnGuard',
-        'subtitle': 'أنت المالك • 12,000 مشترك • قناة ترويجية',
-        'icon': Icons.campaign,
+        'title': 'مجموعة الدعم الفني',
+        'role': 'المشرف العام • مجتمع النقاش',
+        'members': 'AymnGuard',
+        'type': 'مجموعة VIP',
+        'icon': Icons.group,
         'color': Colors.blueAccent,
+        'link': 'https://t.me/AymnGuard',
       },
     ];
 
     final List<Map<String, dynamic>> communicationCategories = [
+      {
+        'title': 'بوت الحماية والسيادة',
+        'subtitle': '@AymnGuard_2026_bot • إدارة العمليات والأمان',
+        'icon': Icons.smart_toy,
+        'color': Colors.purple,
+        'link': 'https://t.me/AymnGuard_2026_bot',
+      },
+      {
+        'title': 'الرسائل الخاصة والمشفرة',
+        'subtitle': 'تصل هنا كافة الرسائل المباشرة والمؤمنة',
+        'icon': Icons.chat,
+        'color': Colors.green,
+        'link': '',
+      },
+      {
+        'title': 'واجهة المجموعات',
+        'subtitle': 'إدارة النقاشات والمجتمعات التفاعلية',
+        'icon': Icons.forum,
+        'color': Colors.orange,
+        'link': '',
+      },
+      {
+        'title': 'واجهة القنوات',
+        'subtitle': 'منصات البث المباشر والإعلانات السيادية',
+        'icon': Icons.cell_tower,
+        'color': Colors.redAccent,
+        'link': '',
+      },
+    ];
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text('إدارة مجتمعاتي وأدواتي 👑', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(12),
+        children: [
+          const Text("القنوات والمجموعات الرسمية", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 8),
+          ...sovereignGroups.map((group) => _buildCustomCard(
+                context,
+                group['title'],
+                "${group['role']} • ${group['members']}",
+                group['icon'],
+                group['color'],
+                () => _launchSovereignUrl(group['link']),
+              )),
+              
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.0),
+            child: Divider(color: Colors.white24, thickness: 1),
+          ),
+
+          const Text("بوابات الاتصال والتحكم", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 8),
+          ...communicationCategories.map((category) => _buildCustomCard(
+                context,
+                category['title'],
+                category['subtitle'],
+                category['icon'],
+                category['color'],
+                () {
+                  if (category['link'].isNotEmpty) {
+                    _launchSovereignUrl(category['link']);
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TelegramCoreChatsScreen(),
+                      ),
+                    );
+                  }
+                },
+              )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCustomCard(BuildContext context, String title, String subtitle, IconData icon, Color color, VoidCallback onTapAction) {
+    return SovereignCard(
+      onTap: onTapAction,
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: color.withOpacity(0.2), 
+            child: Icon(icon, color: color),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title, 
+                  style: const TextStyle(
+                    color: Colors.white, 
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: Text(
+                    subtitle, 
+                    style: const TextStyle(
+                      color: Colors.grey, 
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(
+            Icons.arrow_forward_ios, 
+            size: 14, 
+            color: AppColors.accentGold,
+          ),
+        ],
+      ),
+    );
+  }
+  final List<Map<String, dynamic>> communicationCategories = [
       {
         'title': 'الرسائل الخاصة',
         'subtitle': 'تصل هنا كافة الرسائل المباشرة والمشفرة',
@@ -283,24 +552,67 @@ class CommunitiesScreenTab extends StatelessWidget {
                 category['subtitle'] ?? '',
                 category['icon'] ?? Icons.chat,
                 category['color'] ?? Colors.grey,
-              )),
+          )),
         ],
       ),
     );
   }
-
-  Widget _buildCard(BuildContext context, String title, String subtitle, IconData icon, Color color) {
-    return Card(
-      color: AppColors.surface,
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        leading: CircleAvatar(backgroundColor: color.withOpacity(0.2), child: Icon(icon, color: color)),
-        title: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        subtitle: Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
-        onTap: () {
-          // هنا السحر! قمنا بتفعيل الاستدعاء بنجاح لفتح واجهة التيليجرام
+  Widget _buildStructuredCard(BuildContext context, Map<String, dynamic> data) {
+    String subtitleText = "${data['role']} • ${data['members']} • ${data['type']}";
+    
+    return SovereignCard(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const TelegramCoreChatsScreen(),
+          ),
+        );
+      },
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: (data['color'] as Color).withOpacity(0.2), 
+            child: Icon(data['icon'], color: data['color']),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  data['title'], 
+                  style: const TextStyle(
+                    color: Colors.white, 
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                // استخدام Directionality لضمان عدم انعكاس الأرقام والرموز
+                Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: Text(
+                    subtitleText, 
+                    style: const TextStyle(
+                      color: Colors.grey, 
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(
+            Icons.arrow_forward_ios, 
+            size: 14, 
+            color: AppColors.accentGold,
+          ),
+        ],
+      ),
+    );
+  }
+    // هنا السحر! قمنا بتفعيل الاستدعاء بنجاح لفتح واجهة التيليجرام
           Navigator.push(
             context,
             MaterialPageRoute(
