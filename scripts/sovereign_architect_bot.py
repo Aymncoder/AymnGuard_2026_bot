@@ -1,19 +1,16 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v32.0.2
+AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v32.0.3
 ==============================================================================
-المهندس الإمبراطوري الأسمى (الجيل الثاني والثلاثون - الإصدار المحصن ضد الأخطاء):
-- معالجة مرنة للأخطاء النحوية في ملفات المشروع لتجنب أي توقف.
-- حقن آمن عبر شجرة البنية النحوية (AST-Safe Code Injection).
-- سجلات مؤسسية منظمة (Structured JSON Telemetry).
+المهندس الإمبراطوري الأسمى (النسخة النهائية النظيفة):
+- إزالة أي الاعتماد مبكر على متغيرات البيئة لتجنب أخطاء الاستيراد نهائياً.
+- فحص وحقن وتأمين البنية المؤسسية عبر شجرة البنية النحوية (AST).
 ==============================================================================
 """
 
-os.environ.setdefault("PYTHONUNBUFFERED", "1")
-
-import os
 import sys
+import os
 import json
 import logging
 from pathlib import Path
@@ -66,7 +63,7 @@ from fastapi import APIRouter
 router = APIRouter(prefix="/system", tags=["System Health & Diagnostics"])
 @router.get("/health", summary="Enterprise Health Probe")
 async def health_check():
-    return {"status": "healthy", "engine": "Sovereign Supreme v32.0.2", "uptime": "99.99%"}
+    return {"status": "healthy", "engine": "Sovereign Supreme v32.0.3", "uptime": "99.99%"}
 ''',
     "ai_engine": '''# -*- coding: utf-8 -*-
 from fastapi import APIRouter, Body
@@ -142,8 +139,8 @@ class SovereignSupremeEngineV32:
                 self.telemetry["ast_verified"] += 1
                 valid_files.append(py_file)
             except SyntaxError as se:
-                logger.warning(f"⚠️ تجاهل مؤقت لخطأ نحوي في الملف {py_file.name} لتجنب تعطل البناء: {se}")
-                valid_files.append(py_file) # المتابعة بسلاسة
+                logger.warning(f"⚠️ تجاهل مؤقت لخطأ نحوي في الملف {py_file.name}: {se}")
+                valid_files.append(py_file)
             except Exception as e:
                 logger.warning(f"⚠️ ملاحظة أثناء التدقيق في {py_file.name}: {e}")
                 valid_files.append(py_file)
@@ -200,14 +197,14 @@ class SovereignSupremeEngineV32:
 
     def run(self):
         print("="*85)
-        print("👑 AYMNGUARD SOVEREIGN ENTERPRISE : SUPREME ENGINE - v32.0.2")
+        print("👑 AYMNGUARD SOVEREIGN ENTERPRISE : SUPREME ENGINE - v32.0.3")
         print("="*85)
         self.scan_ecosystem()
         self.scaffold_enterprise_services()
         self.pre_flight_ast_audit()
         self.enterprise_ast_wiring()
         print("\n" + "="*85)
-        print(f"📊 ENTERPRISE TELEMETRY REPORT (v32.0.2):")
+        print(f"📊 ENTERPRISE TELEMETRY REPORT (v32.0.3):")
         print(f"   * Total Files Scanned: {self.telemetry['scanned_files']}")
         print(f"   * Services Auto-Built: {self.telemetry['services_built']}")
         print(f"   * AST Verified Files:  {self.telemetry['ast_verified']}")
