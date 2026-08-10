@@ -1,27 +1,8 @@
-name: Deploy to Production Server
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Executing Remote Server Update via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: root
-          password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             # 1. الدخول إلى مجلد المشروع
             cd /root/AymnGuard_2026_bot
             
-            # 2. سحب أحدث التعديلات وتجاوز أي تعارض في الملفات المؤقتة
+            # 2. سحب أحدث التعديلات بالقوة
             git fetch --all
             git reset --hard origin/main
             git clean -fd
@@ -29,10 +10,8 @@ jobs:
             # 3. إيقاف أي نسخة سابقة للبوت لمنع تداخل العمليات
             pkill -f "python" || true
             
-            # 4. تشغيل البوت في الخلفية 
-            # (تأكد أن run.py هو اسم ملف التشغيل الحقيقي لديك، وإلا غيره إلى main.py)
-            nohup python3 run.py > /dev/null 2>&1 &
+            # 4. تشغيل البوت في الخلفية مع فصله تماماً عن جلسة SSH (هنا التعديل الجديد)
+            nohup python3 run.py </dev/null>/dev/null 2>&1 &
             
-            # 5. إنهاء الاتصال بنجاح وتجنب أخطاء المهلة
+            # 5. إنهاء الاتصال بنجاح
             sleep 2
-            exit 0
