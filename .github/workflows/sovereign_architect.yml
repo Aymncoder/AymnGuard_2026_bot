@@ -27,14 +27,14 @@ jobs:
           python-version: "3.11"
           cache: 'pip'
 
-      # 3. تثبيت التبعيات واعتمادات الاتصال للإصدار v15.0.0
+      # 3. تثبيت التبعيات واعتمادات الاتصال للإصدار v17.0.0 (الاستقرار الفائق)
       - name: Install Enterprise Dependencies
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then
             pip install -r requirements.txt
           fi
-          # ضمان توفر مكتبة جوجل الرسمية للعمليات الذكية الحديثة
+          # ضمان توفر مكتبة جوجل الرسمية الجديدة للعمليات الذكية
           pip install google-genai
 
       # 4. إطلاق المهندس السيادي الآلي (التعديل والمحاكاة)
@@ -52,5 +52,5 @@ jobs:
           CURRENT_BRANCH=$(git branch --show-current)
           git pull origin $CURRENT_BRANCH --rebase || true
           git add .
-          git diff --staged --quiet || git commit -m "👑 [Sovereign Auto-Patch]: Autonomous ecosystem sync and v15.0 upgrade"
+          git diff --staged --quiet || git commit -m "👑 [Sovereign Auto-Patch]: Autonomous ecosystem sync and v17.0 stability upgrade"
           git push origin $CURRENT_BRANCH
