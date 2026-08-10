@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'app_config.dart';
 import 'core/backend_ecosystem.dart';
 import 'sovereign_card.dart';
@@ -34,7 +35,7 @@ class AymnGuardPlusApp extends StatelessWidget {
     );
   }
 }
-   
+
 class AccountLoginGatewayScreen extends StatefulWidget {
   const AccountLoginGatewayScreen({super.key});
 
@@ -48,19 +49,60 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
   String _selectedCountryCode = "+967";
   bool _syncContacts = false;
 
-  // قائمة الدول النموذجية للبحث والاختيار
+  // قائمة شاملة وموسعة لجميع دول العالم ومفتاح الاتصال والأعلام الرسمية
   final List<Map<String, String>> _countriesList = [
     {'name': 'اليمن', 'code': '+967', 'flag': '🇾🇪'},
     {'name': 'المملكة العربية السعودية', 'code': '+966', 'flag': '🇸🇦'},
     {'name': 'مصر', 'code': '+20', 'flag': '🇪🇬'},
     {'name': 'الإمارات العربية المتحدة', 'code': '+971', 'flag': '🇦🇪'},
     {'name': 'الكويت', 'code': '+965', 'flag': '🇰🇼'},
-    {'name': 'القطر', 'code': '+974', 'flag': '🇶🇦'},
+    {'name': 'قطر', 'code': '+974', 'flag': '🇶🇦'},
+    {'name': 'سلطنة عمان', 'code': '+968', 'flag': '🇴🇲'},
+    {'name': 'البحرين', 'code': '+973', 'flag': '🇧🇭'},
+    {'name': 'الأردن', 'code': '+962', 'flag': '🇯🇴'},
+    {'name': 'فلسطين', 'code': '+970', 'flag': '🇵🇸'},
+    {'name': 'العراق', 'code': '+964', 'flag': '🇮🇶'},
+    {'name': 'سوريا', 'code': '+963', 'flag': '🇸🇾'},
+    {'name': 'لبنان', 'code': '+961', 'flag': '🇱🇧'},
+    {'name': 'السودان', 'code': '+249', 'flag': '🇸🇩'},
+    {'name': 'ليبيا', 'code': '+218', 'flag': '🇱🇾'},
+    {'name': 'تونس', 'code': '+216', 'flag': '🇹🇳'},
+    {'name': 'الجزائر', 'code': '+213', 'flag': '🇩🇿'},
+    {'name': 'المغرب', 'code': '+212', 'flag': '🇲🇦'},
+    {'name': 'موريتانيا', 'code': '+222', 'flag': '🇲🇷'},
+    {'name': 'الصومال', 'code': '+252', 'flag': '🇸🇴'},
+    {'name': 'جيبوتي', 'code': '+253', 'flag': '🇩🇯'},
+    {'name': 'جزر القمر', 'code': '+269', 'flag': '🇰🇲'},
     {'name': 'الولايات المتحدة', 'code': '+1', 'flag': '🇺🇸'},
+    {'name': 'كندا', 'code': '+1', 'flag': '🇨🇦'},
+    {'name': 'المملكة المتحدة', 'code': '+44', 'flag': '🇬🇧'},
+    {'name': 'فرنسا', 'code': '+33', 'flag': '🇫🇷'},
+    {'name': 'ألمانيا', 'code': '+49', 'flag': '🇩🇪'},
+    {'name': 'إيطاليا', 'code': '+39', 'flag': '🇮🇹'},
+    {'name': 'إسبانيا', 'code': '+34', 'flag': '🇪🇸'},
+    {'name': 'تركيا', 'code': '+90', 'flag': '🇹🇷'},
+    {'name': 'روسيا', 'code': '+7', 'flag': '🇷🇺'},
+    {'name': 'الصين', 'code': '+86', 'flag': '🇨🇳'},
+    {'name': 'اليابان', 'code': '+81', 'flag': '🇯🇵'},
+    {'name': 'كوريا الجنوبية', 'code': '+82', 'flag': '🇰🇷'},
+    {'name': 'الهند', 'code': '+91', 'flag': '🇮🇳'},
+    {'name': 'باكستان', 'code': '+92', 'flag': '🇵🇰'},
+    {'name': 'إيران', 'code': '+98', 'flag': '🇮🇷'},
+    {'name': 'إندونيسيا', 'code': '+62', 'flag': '🇮🇩'},
+    {'name': 'ماليزيا', 'code': '+60', 'flag': '🇲🇾'},
+    {'name': 'سنغافورة', 'code': '+65', 'flag': '🇸🇬'},
+    {'name': 'البرازيل', 'code': '+55', 'flag': '🇧🇷'},
+    {'name': 'الأرجنتين', 'code': '+54', 'flag': '🇦🇷'},
+    {'name': 'المكسيك', 'code': '+52', 'flag': '🇲🇽'},
+    {'name': 'أستراليا', 'code': '+61', 'flag': '🇦🇺'},
+    {'name': 'نيوزيلندا', 'code': '+64', 'flag': '🇳🇿'},
+    {'name': 'جنوب إفريقيا', 'code': '+27', 'flag': '🇿🇦'},
   ];
 
-  // دالة فتح نافذة البحث واختيار الدولة (مطابقة للصورة الثانية)
+  // دالة فتح نافذة البحث واختيار الدولة مع تفعيل البحث الفوري
   void _openCountryPicker() {
+    List<Map<String, String>> filteredList = List.from(_countriesList);
+
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.background,
@@ -69,46 +111,61 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.75,
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              // شريط البحث العلوي
-              TextField(
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: "ابحث عن الدولة...",
-                  hintStyle: const TextStyle(color: Colors.grey),
-                  prefixIcon: const Icon(Icons.search, color: AppColors.accentGold),
-                  filled: true,
-                  fillColor: AppColors.surface,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _countriesList.length,
-                  itemBuilder: (context, index) {
-                    var country = _countriesList[index];
-                    return ListTile(
-                      leading: Text(country['flag']!, style: const TextStyle(fontSize: 24)),
-                      title: Text(country['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      trailing: Text(country['code']!, style: const TextStyle(color: AppColors.accentGold, fontWeight: FontWeight.bold)),
-                      onTap: () {
-                        setState(() {
-                          _selectedCountryName = country['name']!;
-                          _selectedCountryCode = country['code']!;
-                        });
-                        Navigator.pop(context);
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.75,
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  TextField(
+                    style: const TextStyle(color: Colors.white),
+                    onChanged: (query) {
+                      setModalState(() {
+                        if (query.isEmpty) {
+                          filteredList = List.from(_countriesList);
+                        } else {
+                          filteredList = _countriesList.where((c) => 
+                            c['name']!.toLowerCase().contains(query.toLowerCase()) || 
+                            c['code']!.contains(query)
+                          ).toList();
+                        }
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: "ابحث عن الدولة أو المفتاح الدولي...",
+                      hintStyle: const TextStyle(color: Colors.grey),
+                      prefixIcon: const Icon(Icons.search, color: AppColors.accentGold),
+                      filled: true,
+                      fillColor: AppColors.surface,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: filteredList.length,
+                      itemBuilder: (context, index) {
+                        var country = filteredList[index];
+                        return ListTile(
+                          leading: Text(country['flag']!, style: const TextStyle(fontSize: 24)),
+                          title: Text(country['name']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          trailing: Text(country['code']!, style: const TextStyle(color: AppColors.accentGold, fontWeight: FontWeight.bold)),
+                          onTap: () {
+                            setState(() {
+                              _selectedCountryName = country['name']!;
+                              _selectedCountryCode = country['code']!;
+                            });
+                            Navigator.pop(context);
+                          },
+                        );
                       },
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -135,7 +192,6 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
     );
 
     try {
-      // ربط النواة السيادية مع تفعيل البروكسي والاتصال الآمن
       var response = await BackendCoreEcosystem.requestTelegramOtp(
         "AymnGuard_Sovereign_Proxy_Session",
         fullPhoneNumber,
@@ -184,9 +240,7 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.security, color: AppColors.accentGold),
-            onPressed: () {
-              // زر إضافي للتحكم بالأمان والبروكسيات
-            },
+            onPressed: () {},
           ),
         ],
       ),
@@ -199,8 +253,6 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
             const SizedBox(height: 8),
             const Text("يرجى تأكيد مفتاح بلدك وإدخال رقم هاتفك للاتصال بالمنصة السيادية.", style: TextStyle(color: Colors.grey, fontSize: 13)),
             const SizedBox(height: 30),
-
-            // زر اختيار الدولة المنسدل (مطابق للصورة الأولى)
             GestureDetector(
               onTap: _openCountryPicker,
               child: Container(
@@ -220,8 +272,6 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
               ),
             ),
             const SizedBox(height: 16),
-
-            // حقل إدخال رقم الهاتف
             Directionality(
               textDirection: TextDirection.ltr,
               child: TextField(
@@ -241,8 +291,6 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
               ),
             ),
             const SizedBox(height: 16),
-
-            // خيار مزامنة جهات الاتصال
             Row(
               children: [
                 Checkbox(
@@ -258,8 +306,6 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
               ],
             ),
             const Spacer(),
-
-            // زر البدء والتسجيل السيادي
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
@@ -268,8 +314,8 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
               ),
               onPressed: _loginAndConnect,
               child: const Text("إطلاق الجلسة وبدء الاتصال 🚀", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -319,13 +365,10 @@ class _MainSovereignScreenState extends State<MainSovereignScreen> {
     );
   }
 }
-import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart'; // لتفعيل فتح الروابط الخارجية مباشرة
 
 class CommunitiesScreenTab extends StatelessWidget {
   const CommunitiesScreenTab({super.key});
 
-  // دالة ذكية لفتح الروابط الحقيقية (القنوات، المجموعات، والبوتات)
   Future<void> _launchSovereignUrl(String urlString) async {
     final Uri url = Uri.parse(urlString);
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
@@ -385,6 +428,20 @@ class CommunitiesScreenTab extends StatelessWidget {
         'color': Colors.redAccent,
         'link': '',
       },
+      {
+        'title': 'الرسائل المحفوظة (الملف الشخصي)',
+        'subtitle': 'مساحتك الخاصة لحفظ الرسائل والملفات المهمة',
+        'icon': Icons.bookmark,
+        'color': Colors.teal,
+        'link': '',
+      },
+      {
+        'title': 'المحادثات المؤرشفة',
+        'subtitle': 'سجل المحادثات والمجموعات المخفية مؤقتاً',
+        'icon': Icons.archive,
+        'color': Colors.grey,
+        'link': '',
+      },
     ];
 
     return Scaffold(
@@ -395,12 +452,12 @@ class CommunitiesScreenTab extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [
-          const Text("القنوات والمجموعات الرسمية", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 16)),
+          const Text("القنوات والمجموعات النشطة", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 8),
           ...sovereignGroups.map((group) => _buildCustomCard(
                 context,
                 group['title'],
-                "${group['role']} • ${group['members']}",
+                "${group['role']} • ${group['members']} • ${group['type']}",
                 group['icon'],
                 group['color'],
                 () => _launchSovereignUrl(group['link']),
@@ -411,7 +468,7 @@ class CommunitiesScreenTab extends StatelessWidget {
             child: Divider(color: Colors.white24, thickness: 1),
           ),
 
-          const Text("بوابات الاتصال والتحكم", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 16)),
+          const Text("بوابات الاتصال والمراسلة", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 8),
           ...communicationCategories.map((category) => _buildCustomCard(
                 context,
@@ -479,148 +536,6 @@ class CommunitiesScreenTab extends StatelessWidget {
             color: AppColors.accentGold,
           ),
         ],
-      ),
-    );
-  }
-  final List<Map<String, dynamic>> communicationCategories = [
-      {
-        'title': 'الرسائل الخاصة',
-        'subtitle': 'تصل هنا كافة الرسائل المباشرة والمشفرة',
-        'icon': Icons.chat,
-        'color': Colors.green,
-      },
-      {
-        'title': 'واجهة البوتات (Bots)',
-        'subtitle': 'إدارة وتوجيه الروبوتات والذكاء الاصطناعي',
-        'icon': Icons.smart_toy,
-        'color': Colors.purple,
-      },
-      {
-        'title': 'واجهة المجموعات',
-        'subtitle': 'إدارة النقاشات والمجتمعات التفاعلية',
-        'icon': Icons.forum,
-        'color': Colors.orange,
-      },
-      {
-        'title': 'واجهة القنوات',
-        'subtitle': 'منصات البث المباشر والإعلانات السيادية',
-        'icon': Icons.cell_tower,
-        'color': Colors.redAccent,
-      },
-      {
-        'title': 'الرسائل المحفوظة (الملف الشخصي)',
-        'subtitle': 'مساحتك الخاصة لحفظ الرسائل والملفات المهمة',
-        'icon': Icons.bookmark,
-        'color': Colors.teal,
-      },
-      {
-        'title': 'المحادثات المؤرشفة',
-        'subtitle': 'سجل المحادثات والمجموعات المخفية مؤقتاً',
-        'icon': Icons.archive,
-        'color': Colors.grey,
-      },
-    ];
-
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('إدارة مجتمعاتي وأدواتي 👑', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(12),
-        children: [
-          const Text("القنوات والمجموعات النشطة", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 8),
-          ...sovereignGroups.map((group) => _buildCard(
-                context,
-                group['title'] ?? '',
-                group['subtitle'] ?? '',
-                group['icon'] ?? Icons.circle,
-                group['color'] ?? Colors.grey,
-              )),
-              
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.0),
-            child: Divider(color: Colors.white24, thickness: 1),
-          ),
-
-          const Text("بوابات الاتصال والمراسلة", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 8),
-          ...communicationCategories.map((category) => _buildCard(
-                context,
-                category['title'] ?? '',
-                category['subtitle'] ?? '',
-                category['icon'] ?? Icons.chat,
-                category['color'] ?? Colors.grey,
-          )),
-        ],
-      ),
-    );
-  }
-  Widget _buildStructuredCard(BuildContext context, Map<String, dynamic> data) {
-    String subtitleText = "${data['role']} • ${data['members']} • ${data['type']}";
-    
-    return SovereignCard(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const TelegramCoreChatsScreen(),
-          ),
-        );
-      },
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: (data['color'] as Color).withOpacity(0.2), 
-            child: Icon(data['icon'], color: data['color']),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  data['title'], 
-                  style: const TextStyle(
-                    color: Colors.white, 
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                // استخدام Directionality لضمان عدم انعكاس الأرقام والرموز
-                Directionality(
-                  textDirection: TextDirection.rtl,
-                  child: Text(
-                    subtitleText, 
-                    style: const TextStyle(
-                      color: Colors.grey, 
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Icon(
-            Icons.arrow_forward_ios, 
-            size: 14, 
-            color: AppColors.accentGold,
-          ),
-        ],
-      ),
-    );
-  }
-    // هنا السحر! قمنا بتفعيل الاستدعاء بنجاح لفتح واجهة التيليجرام
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              // تأكد أن الكلاس داخل ملف telegram_core_chats_screen اسمه TelegramCoreChatsScreen
-              builder: (context) => const TelegramCoreChatsScreen(), 
-            ),
-          );
-        },
       ),
     );
   }
