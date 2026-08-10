@@ -1,7 +1,7 @@
 # ==============================================================================
-# AymnGuard Sovereign Enterprise : Autonomous Architect CI/CD Pipeline v34.3
+# AymnGuard Sovereign Enterprise : Autonomous Architect CI/CD Pipeline v34.4
 # ==============================================================================
-name: 👑 Sovereign Supreme Architect & Key Health Validated Factory v34.3
+name: 👑 Sovereign Supreme Architect & Multi-Model Multi-Key Factory v34.4
 
 on:
   push:
@@ -33,21 +33,21 @@ jobs:
           fi
           pip install google-genai sqlalchemy aiosqlite pydantic fastapi uvicorn
 
-      - name: Run Sovereign Validated Key Swarm Agent
+      - name: Run Sovereign Multi-Model & Multi-Key Swarm Agent
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          AI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
           GEMINI_API_KEY_SECONDARY: ${{ secrets.GEMINI_API_KEY_SECONDARY }}
           GEMINI_API_KEY_PROJECT2: ${{ secrets.GEMINI_API_KEY_PROJECT2 }}
         run: |
           python scripts/sovereign_architect_bot.py
 
-      - name: Auto-Commit & Push Sovereign State & Health Validation Sync
+      - name: Auto-Commit & Push Sovereign State & Multi-Model Sync
         run: |
-          git config --global user.name "Sovereign Validated Architect"
-          git config --global user.email "validated@sovereign.bot"
+          git config --global user.name "Sovereign Multi-Model Architect"
+          git config --global user.email "multimodel@sovereign.bot"
           CURRENT_BRANCH=$(git branch --show-current)
           git add .
-          git commit -m "👑 [Sovereign Key Health v34.3]: Automatic validation and multi-project intent sync" || true
+          git commit -m "👑 [Sovereign Multi-Model v34.4]: Multi-model fallback and key rotation intent sync" || true
           git pull origin $CURRENT_BRANCH --rebase --autostash || true
           git push origin $CURRENT_BRANCH
