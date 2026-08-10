@@ -10,11 +10,13 @@ import hmac
 import hashlib
 import urllib.parse
 import os
+import json
 from fastapi import APIRouter, HTTPException, Header, status
 from pydantic import BaseModel
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import jwt
 
+# تم تحديد المسار الأساسي هنا، وهو ما يجب أن يُستدعى من التطبيق
 router = APIRouter(prefix="/api/v1/auth", tags=["Authentication"])
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "your_telegram_bot_token_here")
@@ -26,16 +28,17 @@ class TelegramAuthPayload(BaseModel):
     username: str | None = None
     first_name: str | None = None
 
-def verify_telegram_init_data(init_data: str, bot_token: str) -> bool:
+def verify_telegram_init_data(init_data: str, bot_token: str) -> tuple[bool, dict]:
     """
     التحقق الرياضي المشفر من توقيع Telegram WebApp InitData وفقاً للبروتوكول الرسمي.
+    يعيد قيمة منطقية لنجاح التحقق، بالإضافة إلى قاموس البيانات الموثوقة لاستخراج تفاصيل المستخدم.
     """
     try:
         parsed_url = urllib.parse.parse_qsl(init_data, keep_blank_values=True)
         data_dict = dict(parsed_url)
         
         if "hash" not in data_dict:
-            return False
+            return False, {}
             
         received_hash = data_dict.pop("hash")
         
@@ -50,9 +53,11 @@ def verify_telegram_init_data(init_data: str, bot_token: str) -> bool:
         calculated_hash = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
         
         # مقارنة التوقيعين بأمان تام لمنع هجمات توقيت التنفيذ (Timing Attacks)
-        return hmac.compare_digest(calculated_hash, received_hash)
+        if hmac.compare_digest(calculated_hash, received_hash):
+            return True, data_dict
+        return False, {}
     except Exception:
-        return False
+        return False, {}
 
 @router.post("/telegram/verify")
 async def telegram_auth_endpoint(payload: TelegramAuthPayload, authorization: str = Header(...)):
@@ -69,20 +74,35 @@ async def telegram_auth_endpoint(payload: TelegramAuthPayload, authorization: st
             
         init_data_raw = authorization.split(" ")[1]
         
-        # تنفيذ التحقق الكريبتوغرافي الرياضي
-        if not verify_telegram_init_data(init_data_raw, BOT_TOKEN):
+        # تنفيذ التحقق الكريبتوغرافي الرياضي واستخراج البيانات الموثوقة
+        is_valid, secure_data = verify_telegram_init_data(init_data_raw, BOT_TOKEN)
+        
+        if not is_valid:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="فشل التحقق الرياضي المشفر لتوقيع تيليجرام. البيانات غير موثوقة!"
             )
-            
+        
+        # [تعديل أمني جوهري]: استخراج بيانات المستخدم من التوقيع المشفر وليس من جسم الطلب
+        user_data_str = secure_data.get("user", "{}")
+        secure_user = json.loads(user_data_str)
+        
+        secure_user_id = secure_user.get("id")
+        secure_username = secure_user.get("username", payload.username) 
+        
+        if not secure_user_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="لم يتم العثور على معرف المستخدم داخل البيانات المشفرة."
+            )
+
         # إصدار رمز الدخول السيادي (JWT Token) للمستخدم الموثق
         token_expires = timedelta(hours=12)
-        expire = datetime.utcnow() + token_expires
+        expire = datetime.now(timezone.utc) + token_expires
         
         jwt_payload = {
-            "sub": str(payload.user_id),
-            "username": payload.username,
+            "sub": str(secure_user_id),
+            "username": secure_username,
             "exp": expire
         }
         
