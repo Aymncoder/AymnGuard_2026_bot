@@ -36,5 +36,7 @@ jobs:
 
       # 4. إطلاق المهندس السيادي الآلي لفحص المستودع من الألف إلى الياء
       - name: Run Sovereign Architect Audit Agent
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python scripts/sovereign_architect_bot.py
