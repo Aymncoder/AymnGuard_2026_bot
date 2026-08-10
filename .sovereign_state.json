@@ -60,7 +60,7 @@
     "app/core/config.py": "a7c277390cc46133d3aac64e845219735dc0fe5402103de0e4b37588371aa736",
     "app/core/security.py": "90f7d8a486ffc4e0cf676e3c276ebb95126943b1829f6abac604954c1aa822b5",
     "app/crud/user.py": "746b438c10ecabf246e9fe020f3a2c19bdc8dfd0d80d08cefb8ff10ce49addb3",
-    "backend_core/main.py": "ecd1308753eacf3e2f87a9a4ff02729ccfe1318ca27df830d3ea58cadeb32f45",
+    "backend_core/main.py": "1eeaa76cb8db83fd3ad7e6e9c51f56bede5d543fe486a4eb462dfad24103c67a",
     "backend_core/task_broker.py": "c19e512db57409d915e4752bf82cb9f246eb0ebb17366bcde8386ad23d00cc07",
     "backend_core/core_routes.py": "edbaf71bf17c36a54c66b14c90caed72db1f848e5e9029972d5fb4fae67857ff",
     "backend_core/database.py": "2d5488b887c7f4a8fd6e1d24f6589b6bdd36160830e5262bd445fc067bce7823",
