@@ -1,4 +1,55 @@
 
+# --- Sovereign Enterprise Delta Bridges v33 ---
+from core.meta_engine import router as meta_engine_router
+from services.telegram_bridge import router as telegram_bridge_router
+from services.test_orphan import router as test_orphan_router
+from services.test_orphan_service import router as test_orphan_service_router
+from services.websocket import router as websocket_router
+from services.health import router as health_router
+from src.ai_engine import router as ai_engine_router
+from app.enterprise_gateway import router as enterprise_gateway_router
+from app.empire_app_gateway import router as empire_app_gateway_router
+from backend_core.core_routes import router as core_routes_router
+from backend_core.backend_core.services.meta_engine import router as meta_engine_router
+from backend_core.app.api.__init__ import router as __init___router
+from backend_core.app.api.api_router import router as api_router_router
+from backend_core.app.api.v1.auth import router as auth_router
+from backend_core.app.api.v1.__init__ import router as __init___router
+from backend_core.app.api.v1.api import router as api_router
+from backend_core.app.api.v1.api_router import router as api_router_router
+from backend_core.app.api.v1.router import router as router_router
+from backend_core.app.api.v1.endpoints.users import router as users_router
+from backend_core.app.api.v1.endpoints.auth import router as auth_router
+from backend_core.app.api.v1.endpoints.__init__ import router as __init___router
+from backend_core.app.api.v1.endpoints.telegram import router as telegram_router
+from backend_core.api.v1.subscription_router import router as subscription_router_router
+from backend_core.api.v1.search_media_router import router as search_media_router_router
+app.include_router(meta_engine_router)
+app.include_router(telegram_bridge_router)
+app.include_router(test_orphan_router)
+app.include_router(test_orphan_service_router)
+app.include_router(websocket_router)
+app.include_router(health_router)
+app.include_router(ai_engine_router)
+app.include_router(enterprise_gateway_router)
+app.include_router(empire_app_gateway_router)
+app.include_router(core_routes_router)
+app.include_router(meta_engine_router)
+app.include_router(__init___router)
+app.include_router(api_router_router)
+app.include_router(auth_router)
+app.include_router(__init___router)
+app.include_router(api_router)
+app.include_router(api_router_router)
+app.include_router(router_router)
+app.include_router(users_router)
+app.include_router(auth_router)
+app.include_router(__init___router)
+app.include_router(telegram_router)
+app.include_router(subscription_router_router)
+app.include_router(search_media_router_router)
+
+
 # --- Sovereign Enterprise Auto-Wired Bridges v32 ---
 from core.meta_engine import router as meta_engine_router
 from services.telegram_bridge import router as telegram_bridge_router
