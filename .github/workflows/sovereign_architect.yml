@@ -42,11 +42,12 @@ jobs:
         run: |
           python scripts/sovereign_architect_bot.py
 
-      # 5. الحفظ والرفع التلقائي (Auto-Commit & Push) للتعويض والربط
+      # 5. الحفظ والرفع التلقائي (Auto-Commit & Push) مع مزامنة التحديثات سحابياً
       - name: Auto-Commit & Push Sovereign Changes
         run: |
           git config --global user.name "Sovereign Architect Bot"
           git config --global user.email "architect@sovereign.bot"
+          git pull origin main --rebase || true
           git add .
           git diff --staged --quiet || git commit -m "👑 [Sovereign Auto-Patch]: Autonomous wiring, dependency sync and ecosystem update"
-          git push
+          git push origin main
