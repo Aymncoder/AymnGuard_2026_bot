@@ -16,20 +16,20 @@ jobs:
         with:
           host: ${{ secrets.SERVER_IP }}
           username: root
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            # 1. الدخول إلى مجلد المشروع (تأكد أن هذا هو المسار الصحيح داخل سيرفرك)
+            # 1. الدخول إلى مجلد المشروع
             cd /root/AymnGuard_2026_bot
             
             # 2. سحب أحدث التعديلات من جيتهاب
             git pull origin main
             
-            # 3. إعادة تشغيل البوت (قم بإزالة علامة # من أمام الأمر الذي تستخدمه فقط)
+            # 3. إيقاف أي نسخة سابقة تعمل من البوت لتجنب تداخل العمليات
+            pkill -f "python3 run.py" || true
+            pkill -f "python3 main.py" || true
+            pkill -f "python run.py" || true
+            pkill -f "python main.py" || true
             
-            # الخيار الأول: إذا كنت تستخدم Docker لتشغيل البوت
-            # docker restart aymnguard_core
-            
-            # الخيار الثاني: إذا كنت تستخدم Python مباشرة
-            # (نستخدم pkill لإيقاف النسخة القديمة، و nohup لتشغيل النسخة الجديدة في الخلفية)
-            # pkill -f "python3 run.py" || true
-            # nohup python3 run.py > /dev/null 2>&1 &
+            # 4. تشغيل البوت في الخلفية (تم اعتماد run.py كملف تشغيل أساسي)
+            # إذا كان ملفك الأساسي هو main.py، فقط قم بتغيير الكلمة في السطر السفلي
+            nohup python3 run.py > /dev/null 2>&1 &
