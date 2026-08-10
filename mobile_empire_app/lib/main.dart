@@ -481,7 +481,7 @@ class CommunitiesScreenTab extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const TelegramCoreChatsScreen(),
+                        builder: (context) => TelegramCoreChatsScreen(),
                       ),
                     );
                   }
@@ -545,7 +545,6 @@ class AccountSettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const String userAccount = ""; // Fallback variable or parameter check
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(title: const Text("الإعدادات")),
@@ -592,7 +591,6 @@ class SovereignEnterpriseBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const String userAccount = ""; // Fallback
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24.0),
@@ -617,7 +615,6 @@ class SovereignEnterpriseBanner extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            pub: null, // Placeholder to satisfy structure
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
