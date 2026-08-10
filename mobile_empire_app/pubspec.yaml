@@ -10,10 +10,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  # حزمة الاتصال بالخادم والباكن إند
+  # حزمة الاتصال والخادم والاي كي
   http: ^1.2.0
   # حزمة توليد الباركود
   qr_flutter: ^4.1.0
+  # حزمة فتح الروابط والقنوات الخارجية السيادية
+  url_launcher: ^6.2.5
 
 dev_dependencies:
   flutter_test:
