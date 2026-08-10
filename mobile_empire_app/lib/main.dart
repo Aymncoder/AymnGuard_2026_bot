@@ -49,7 +49,6 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
   String _selectedCountryCode = "+967";
   bool _syncContacts = false;
 
-  // قائمة شاملة وموسعة لجميع دول العالم ومفتاح الاتصال والأعلام الرسمية
   final List<Map<String, String>> _countriesList = [
     {'name': 'اليمن', 'code': '+967', 'flag': '🇾🇪'},
     {'name': 'المملكة العربية السعودية', 'code': '+966', 'flag': '🇸🇦'},
@@ -99,7 +98,6 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
     {'name': 'جنوب إفريقيا', 'code': '+27', 'flag': '🇿🇦'},
   ];
 
-  // دالة فتح نافذة البحث واختيار الدولة مع تفعيل البحث الفوري
   void _openCountryPicker() {
     List<Map<String, String>> filteredList = List.from(_countriesList);
 
@@ -547,6 +545,7 @@ class AccountSettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const String userAccount = ""; // Fallback variable or parameter check
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(title: const Text("الإعدادات")),
@@ -593,6 +592,7 @@ class SovereignEnterpriseBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const String userAccount = ""; // Fallback
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24.0),
@@ -617,6 +617,7 @@ class SovereignEnterpriseBanner extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
+            pub: null, // Placeholder to satisfy structure
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
