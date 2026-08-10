@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign Enterprise : Sovereign Omniscient & Autonomous Engine v9.0
+AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v10.0.0
 ==============================================================================
-المهندس الإمبراطوري الكلي: يمسح الجذر بالكامل، يكشف أي نقص، يولد أكواد الربط 
-والتعويض عبر الذكاء الاصطناعي للخدمات والبطات والعمليات الخلفية، ويقوم بالحقن 
-والدمج الجذري في النواة المركزية وملفات التشغيل لتصبح المنظومة حية 100%.
+المهندس الإمبراطوري الكلي والحي: يمسح الجذر بالكامل، يحدث التبعيات، يصحح و يحدث
+الأكواد البرمجية القديمة لأحدث معايير بايثون، يكشف النقص، يولد أكواد الربط 
+والتعويض عبر الذكاء الاصطناعي، ويقوم بالحقن والدمج الجذري لتصبح المنظومة حية 100%.
 ==============================================================================
 """
 
@@ -19,9 +19,9 @@ import asyncio
 # --- إعداد السجلات المؤسسية ---
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s | 👑 SOVEREIGN-OMNISCIENT-[%(levelname)-7s] | %(message)s"
+    format="%(asctime)s | 👑 SOVEREIGN-LIVING-OMNISCIENT-[%(levelname)-7s] | %(message)s"
 )
-logger = logging.getLogger("SovereignOmniscient")
+logger = logging.getLogger("SovereignLivingOmniscient")
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
@@ -36,7 +36,12 @@ class SovereignOmniscientEngine:
         self.orphan_modules = []
         self.ai_api_key = os.getenv("AI_API_KEY", os.getenv("GEMINI_API_KEY", ""))
         self.main_py_path = self.root_path / "backend_core" / "main.py"
-        self.telemetry = {"scanned": 0, "upgraded_deps": False, "wired_components": 0}
+        self.telemetry = {
+            "scanned": 0, 
+            "upgraded_deps": False, 
+            "wired_components": 0,
+            "code_modernized": 0
+        }
 
     def scan_entire_ecosystem(self):
         """مسح راداري شامل لكافة زوايا وجذور المشروع"""
@@ -85,6 +90,50 @@ Return ONLY raw requirement lines. No markdown blocks, no explanations.
         except Exception as e:
             logger.error(f"❌ خطأ في الارتقاء التقني: {e}")
 
+    async def modernize_codebase(self):
+        """وحدة التحديث الهيكلي والمطابقة اللغوية: فحص الأكواد وتحديث الأساليب القديمة برمجياً"""
+        if not self.ai_api_key:
+            return
+
+        logger.info("🛠️ [Code Modernization]: فحص الأكواد البرمجية وتحديث الأساليب والدوال القديمة...")
+        
+        for py_file in self.all_python_files:
+            if "sovereign_architect_bot" in str(py_file) or "site-packages" in str(py_file):
+                continue
+                
+            try:
+                with open(py_file, "r", encoding="utf-8") as f:
+                    old_code = f.read()
+
+                prompt = f"""
+You are an elite Senior Python Architect. Analyze this file:
+{py_file.name}
+Code:
+{old_code}
+
+Task: Modernize the code. Update deprecated Python syntax, improve efficiency, and replace outdated library patterns with current Python 3.11+ standards. 
+Maintain existing logic completely, but improve the architecture and fix any obsolete syntax.
+Return ONLY the full modernized code content. No markdown blocks, no explanations.
+"""
+                async with httpx.AsyncClient(timeout=60.0) as client:
+                    res = await client.post(
+                        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+                        params={"key": self.ai_api_key},
+                        json={"contents": [{"parts": [{"text": prompt}]}]}
+                    )
+                    if res.status_code == 200:
+                        data = res.json()
+                        new_code = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+                        new_code = new_code.replace("```python", "").replace("```", "").strip()
+                        
+                        if new_code and new_code != old_code.strip():
+                            with open(py_file, "w", encoding="utf-8") as f:
+                                f.write(new_code)
+                            self.telemetry["code_modernized"] += 1
+                            logger.info(f"✨ [Modernized]: تم تحديث وتطوير الهيكل البرمجي للملف: {py_file.name}")
+            except Exception as e:
+                logger.error(f"❌ خطأ أثناء تحديث الملف البرمجي {py_file}: {e}")
+
     def autonomous_bridge_and_wiring(self):
         """الكشف والربط التلقائي الكلي لأي خدمة أو بوت أو راوتر معزول بالنواة المركزية"""
         logger.info("⚙️ [Omniscient Wiring]: فحص ومعالجة الروابط المفقودة والخدمات المعزولة...")
@@ -102,7 +151,6 @@ Return ONLY raw requirement lines. No markdown blocks, no explanations.
             try:
                 with open(py_file, "r", encoding="utf-8") as f:
                     content = f.read()
-                    # فحص ما إذا كان الملف يحتوي على وظائف أو مسارات أو بوتات ولم يُستدعَ في النواة
                     if py_file.stem not in main_content:
                         module_str = str(rel_path.with_suffix('')).replace(os.sep, '.')
                         self.orphan_modules.append((py_file, module_str, content))
@@ -133,7 +181,6 @@ Return ONLY raw requirement lines. No markdown blocks, no explanations.
         new_bridges = []
 
         for py_file, mod_str, code_content in self.orphan_modules:
-            # إذا كان الملف يحتوي على راوتر أو وظيفة تشغيل
             if "router" in code_content or "def " in code_content:
                 router_name = f"{py_file.stem}_bridge"
                 if "router" in code_content:
@@ -153,15 +200,20 @@ Return ONLY raw requirement lines. No markdown blocks, no explanations.
             self.telemetry["wired_components"] = injected_count
             logger.info(f"🎉 [Success]: تم تعويض وحقن وربط {injected_count} مكون جديد بالنواة المركزية بنجاح.")
 
+    async def async_pipeline(self):
+        """تنفيذ المهام المتزامنة غير المتزامنة (التبعيات + التحديث الهيكلي)"""
+        self.scan_entire_ecosystem()
+        await self.modernize_infrastructure_dependencies()
+        await self.modernize_codebase()
+        self.autonomous_bridge_and_wiring()
+
     def run(self):
         print("="*70)
-        print("👑 AYMNGUARD SOVEREIGN OMNISCIENT ENGINE - v9.0.0")
+        print("👑 AYMNGUARD SOVEREIGN LIVING OMNISCIENT ENGINE - v10.0.0")
         print("="*70)
-        self.scan_entire_ecosystem()
-        asyncio.run(self.modernize_infrastructure_dependencies())
-        self.autonomous_bridge_and_wiring()
+        asyncio.run(self.async_pipeline())
         print("\n" + "="*70)
-        print(f"📊 TELEMETRY: Scanned={self.telemetry['scanned']} | Wired={self.telemetry['wired_components']} | Upgraded={self.telemetry['upgraded_deps']}")
+        print(f"📊 TELEMETRY: Scanned={self.telemetry['scanned']} | Wired={self.telemetry['wired_components']} | Upgraded Deps={self.telemetry['upgraded_deps']} | Modernized Files={self.telemetry['code_modernized']}")
         print("👑 SYSTEM STATUS: 100% AUTONOMOUSLY SYNCHRONIZED & SECURED")
         print("="*70 + "\n")
 
