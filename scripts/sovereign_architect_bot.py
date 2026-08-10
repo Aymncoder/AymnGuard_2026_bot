@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v11.0.0
+AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v12.0.0
 ==============================================================================
-المهندس الإمبراطوري الكلي والحي: يمسح الجذر بالكامل، يحدث التبعيات، يصحح و يحدث
-الأكواد البرمجية القديمة لأحدث معايير بايثون، يكشف النقص، يولد أكواد الربط 
-والتعويض عبر الذكاء الاصطناعي، ويقوم بالحقن والدمج الجذري لتصبح المنظومة حية 100%.
+المهندس الإمبراطوري الكلي والحي (الإصدار المؤسسي المحدث والمحصن ضد أخطاء الاتصال):
+يمسح الجذر بالكامل، يحدث التبعيات، يصحح ويحدث الأكواد البرمجية القديمة لأحدث معايير بايثون، 
+يكشف النقص، يولد أكواد الربط والتعويض عبر الذكاء الاصطناعي، ويقوم بالحقن والدمج 
+الجذري لتصبح المنظومة حية 100% مع ضمان استقرار الاتصال بالخوادم.
 ==============================================================================
 """
 
@@ -36,8 +37,10 @@ class SovereignOmniscientEngine:
         self.orphan_modules = []
         self.ai_api_key = os.getenv("AI_API_KEY", os.getenv("GEMINI_API_KEY", ""))
         self.main_py_path = self.root_path / "backend_core" / "main.py"
-        # رابط النموذج القياسي المستقر لضمان عدم حدوث خطأ 404
-        self.api_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+        
+        # التحديث المؤسسي لرابط الاتصال لضمان التوافق التام ومنع خطأ 404
+        self.api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.ai_api_key}"
+        
         self.telemetry = {
             "scanned": 0, 
             "upgraded_deps": False, 
@@ -74,12 +77,14 @@ You are an expert Enterprise Principal Architect. Analyze these requirements:
 Upgrade outdated versions to stable releases ensuring 100% enterprise compatibility.
 Return ONLY raw requirement lines. No markdown blocks, no explanations.
 """
+            payload = {
+                "contents": [{
+                    "parts": [{"text": prompt}]
+                }]
+            }
+
             async with httpx.AsyncClient(timeout=60.0) as client:
-                res = await client.post(
-                    self.api_url,
-                    params={"key": self.ai_api_key},
-                    json={"contents": [{"parts": [{"text": prompt}]}]}
-                )
+                res = await client.post(self.api_url, json=payload)
                 if res.status_code == 200:
                     data = res.json()
                     new_content = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
@@ -89,6 +94,8 @@ Return ONLY raw requirement lines. No markdown blocks, no explanations.
                             f.write(new_content + "\n")
                         self.telemetry["upgraded_deps"] = True
                         logger.info("🚀 [Upgraded]: تمت ترقية ملف التبعيات بنجاح.")
+                else:
+                    logger.warning(f"⚠️ [API Notice]: استجابة الخادم لترقية التبعيات كـ ({res.status_code}): {res.text}")
         except Exception as e:
             logger.error(f"❌ خطأ في الارتقاء التقني: {e}")
 
@@ -117,12 +124,14 @@ Task: Modernize the code. Update deprecated Python syntax, improve efficiency, a
 Maintain existing logic completely, but improve the architecture and fix any obsolete syntax.
 Return ONLY the full modernized code content. No markdown blocks, no explanations.
 """
+                payload = {
+                    "contents": [{
+                        "parts": [{"text": prompt}]
+                    }]
+                }
+
                 async with httpx.AsyncClient(timeout=60.0) as client:
-                    res = await client.post(
-                        self.api_url,
-                        params={"key": self.ai_api_key},
-                        json={"contents": [{"parts": [{"text": prompt}]}]}
-                    )
+                    res = await client.post(self.api_url, json=payload)
                     if res.status_code == 200:
                         data = res.json()
                         new_code = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
@@ -213,7 +222,7 @@ Return ONLY the full modernized code content. No markdown blocks, no explanation
 
     def run(self):
         print("="*70)
-        print("👑 AYMNGUARD SOVEREIGN LIVING OMNISCIENT ENGINE - v11.0.0")
+        print("👑 AYMNGUARD SOVEREIGN LIVING OMNISCIENT ENGINE - v12.0.0")
         print("="*70)
         asyncio.run(self.async_pipeline())
         print("\n" + "="*70)
