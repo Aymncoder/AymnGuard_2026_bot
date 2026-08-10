@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v32.0.0
+AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v32.0.1
 ==============================================================================
-المهندس الإمبراطوري الأسمى (الجيل الثاني والثلاثون - المعمارية السحابية الفائقة):
+المهندس الإمبراطوري الأسمى (الجيل الثاني والثلاثون - النسخة المصححة):
+- تصحيح ترتيب استيراد المكتبات (import os في الصدارة).
 - حقن آمن ومتطور عبر شجرة البنية النحوية (AST-Safe Code Injection).
 - مراقبة وسجلات مؤسسية منظمة (Structured JSON Telemetry).
-- مولد ذاتي ذكي للخدمات الحرجة (Health, Security, Database, Auth, AI, WebSocket).
-- فحص صحي استباقي (Pre-flight Diagnostics) لمنع أي تداخل أو أعطال.
 ==============================================================================
 """
-
-os.environ.setdefault("PYTHONUNBUFFERED", "1")
 
 import os
 import sys
@@ -20,6 +17,8 @@ import logging
 from pathlib import Path
 import asyncio
 import ast
+
+os.environ.setdefault("PYTHONUNBUFFERED", "1")
 
 # --- إعداد السجلات المؤسسية الهيكلية (Structured JSON Logging) ---
 class StructuredJsonFormatter(logging.Formatter):
@@ -68,7 +67,7 @@ from fastapi import APIRouter
 router = APIRouter(prefix="/system", tags=["System Health & Diagnostics"])
 @router.get("/health", summary="Enterprise Health Probe")
 async def health_check():
-    return {"status": "healthy", "engine": "Sovereign Supreme v32.0.0", "uptime": "99.99%"}
+    return {"status": "healthy", "engine": "Sovereign Supreme v32.0.1", "uptime": "99.99%"}
 ''',
     "ai_engine": '''# -*- coding: utf-8 -*-
 from fastapi import APIRouter, Body
@@ -169,7 +168,6 @@ class SovereignSupremeEngineV32:
             logger.error(f"❌ تعذر تحليل شجرة النواة المركزية: {e}")
             return
 
-        # استخراج الراوترات المضافة مسبقاً لمنع التكرار والاشتباك
         registered_modules = set()
         for node in ast.walk(tree):
             if isinstance(node, ast.ImportFrom) and node.module:
@@ -206,14 +204,14 @@ class SovereignSupremeEngineV32:
 
     def run(self):
         print("="*85)
-        print("👑 AYMNGUARD SOVEREIGN ENTERPRISE : SUPREME ENGINE - v32.0.0 (GLOBAL ENTERPRISE)")
+        print("👑 AYMNGUARD SOVEREIGN ENTERPRISE : SUPREME ENGINE - v32.0.1 (GLOBAL ENTERPRISE)")
         print("="*85)
         self.scan_ecosystem()
         self.scaffold_enterprise_services()
         self.pre_flight_ast_audit()
         self.enterprise_ast_wiring()
         print("\n" + "="*85)
-        print(f"📊 ENTERPRISE TELEMETRY REPORT (v32):")
+        print(f"📊 ENTERPRISE TELEMETRY REPORT (v32.0.1):")
         print(f"   * Total Files Scanned: {self.telemetry['scanned_files']}")
         print(f"   * Services Auto-Built: {self.telemetry['services_built']}")
         print(f"   * AST Verified Files:  {self.telemetry['ast_verified']}")
