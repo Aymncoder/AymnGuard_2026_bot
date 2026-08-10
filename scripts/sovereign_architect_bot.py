@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v34.2.0
+AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v34.3.0
 ==============================================================================
-المهندس الإمبراطوري الأسمى (الجيل 34.2 - محرك التبديل الذكي والمفاتيح المزدوجة):
-- تدوير تلقائي للمفاتيح عند بلوغ حدود الحصة (Key Rotation Pool).
-- إبادة كاملة لعوائق الـ 429 وتأمين استمرارية مصنع الوكلاء (AI Swarm).
-- الذاكرة السيادية المحدثة والتنفيذ التفاضلي الآمن.
+المهندس الإمبراطوري الأسمى (الجيل 34.3 - فحص صحة المفاتيح والتنفيذ عبر مشاريع متعددة):
+- دالة فحص صحة المفاتيح التلقائية (Automatic Key Health Validator).
+- ترتيب المفاتيح واستبعاد المعطلة أو المستنفدة قبل بدء فريق الوكلاء.
+- نظام النوايا السيادية مع الحصانة المطلقة ضد قيود الـ API.
 ==============================================================================
 """
 
@@ -32,12 +32,12 @@ class StructuredJsonFormatter(logging.Formatter):
         log_record = {
             "timestamp": self.formatTime(record, self.datefmt),
             "level": record.levelname,
-            "engine": "SovereignSupremeEngine-v34.2",
+            "engine": "SovereignSupremeEngine-v34.3",
             "message": record.getMessage()
         }
         return json.dumps(log_record, ensure_ascii=False)
 
-logger = logging.getLogger("SovereignSupremeEngine342")
+logger = logging.getLogger("SovereignSupremeEngine343")
 handler = logging.StreamHandler(sys.stdout)
 handler.setFormatter(StructuredJsonFormatter())
 logger.addHandler(handler)
@@ -51,7 +51,7 @@ TARGET_FOLDERS = ["core", "services", "bots", "security", "src", "app", "backend
 STATE_FILE_PATH = ROOT_DIR / ".sovereign_state.json"
 INTENT_FILE_PATH = ROOT_DIR / "sovereign_intent.txt"
 
-class SovereignSupremeEngineV342:
+class SovereignSupremeEngineV343:
     def __init__(self, root_path: Path):
         self.root_path = root_path
         self.all_python_files = []
@@ -59,34 +59,67 @@ class SovereignSupremeEngineV342:
         self.main_py_path = self.root_path / "backend_core" / "main.py"
         self.state_data = self.load_sovereign_state()
         
-        # تجهيز مسبح المفاتيح الدوار (Key Rotation Pool) لتجاوز حدود الحصة نهائياً
-        self.api_keys = [
+        # تجميع كافة المفاتيح المحتملة من جميع المشاريع المنفصلة
+        raw_keys = [
             os.getenv("GEMINI_API_KEY", ""),
             os.getenv("GEMINI_API_KEY_SECONDARY", ""),
+            os.getenv("GEMINI_API_KEY_PROJECT2", ""),
             os.getenv("AI_API_KEY", "")
         ]
-        self.api_keys = [k for k in self.api_keys if k and k.strip() != ""]
+        # إزالة الفراغات والتكرارات
+        self.raw_keys = list(dict.fromkeys([k.strip() for k in raw_keys if k and k.strip() != ""]))
+        self.valid_keys = []
         self.current_key_index = 0
-        self.client = self._get_next_client()
+        
+        # تشغيل دالة فحص صحة المفاتيح فور الانطلاق
+        self.validate_and_rank_api_keys()
+        self.client = self._get_active_client()
 
         self.telemetry = {
             "intents_processed": 0,
             "scanned_files": 0,
             "delta_processed": 0,
-            "routers_wired": 0
+            "routers_wired": 0,
+            "valid_keys_count": len(self.valid_keys)
         }
 
-    def _get_next_client(self):
-        if not AI_MODULE_AVAILABLE or not self.api_keys:
+    def validate_and_rank_api_keys(self):
+        """🔒 دالة فحص صحة المفاتيح التلقائية (Automatic Key Health Validator)"""
+        logger.info("🔍 [SECURITY]: بدء فحص صحة المفاتيح التلقائي وتقييم الجاهزية...")
+        if not AI_MODULE_AVAILABLE or not self.raw_keys:
+            logger.warning("⚠️ لا توجد مفاتيح مدخلة أو مكتبة google-genai غير مجهزة.")
+            return
+
+        verified_keys = []
+        for index, key in enumerate(self.raw_keys):
+            masked_key = f"{key[:6]}...{key[-4:]}"
+            try:
+                test_client = genai.Client(api_key=key)
+                # اختبار استجابة سريع وخفيف لضمان عمل المفتاح وعدم تجاوزه للحصة
+                test_response = test_client.models.generate_content(
+                    model='gemini-2.0-flash',
+                    contents="Ping"
+                )
+                if test_response and test_response.text:
+                    verified_keys.append(key)
+                    logger.info(f"✅ [KEY VALID]: المفتاح رقم {index+1} ({masked_key}) سليم وجاهز 100%.")
+            except Exception as e:
+                logger.warning(f"❌ [KEY INVALID/EXHAUSTED]: المفتاح رقم {index+1} ({masked_key}) محظور أو مستنفد: {e}")
+
+        self.valid_keys = verified_keys
+        logger.info(f"🛡️ [SECURITY REPORT]: إجمالي المفاتيح الشغالة بنجاح: {len(self.valid_keys)} من أصل {len(self.raw_keys)}")
+
+    def _get_active_client(self):
+        if not AI_MODULE_AVAILABLE or not self.valid_keys:
             return None
-        key = self.api_keys[self.current_key_index % len(self.api_keys)]
+        key = self.valid_keys[self.current_key_index % len(self.valid_keys)]
         return genai.Client(api_key=key)
 
     def _rotate_key(self):
-        if len(self.api_keys) > 1:
+        if len(self.valid_keys) > 1:
             self.current_key_index += 1
-            logger.info(f"🔄 [KEY ROTATION]: التبديل تلقائياً إلى مفتاح API الاحتياطي رقم {self.current_key_index + 1}")
-            self.client = self._get_next_client()
+            logger.info(f"🔄 [AUTO ROTATION]: التبديل تلقائياً إلى المفتاح الشغال رقم {self.current_key_index + 1}")
+            self.client = self._get_active_client()
 
     def load_sovereign_state(self) -> dict:
         if STATE_FILE_PATH.exists():
@@ -114,7 +147,7 @@ class SovereignSupremeEngineV342:
             return ""
 
     async def orchestrate_multi_agent_swarm(self):
-        """غرفة عمليات الوكلاء مع التدوير التلقائي للمفاتيح وقهر قيود الحصة"""
+        """غرفة عمليات الوكلاء الذكية المعتمدة على المفاتيح المفحوصة والمحصنة"""
         if not INTENT_FILE_PATH.exists():
             return
 
@@ -124,10 +157,10 @@ class SovereignSupremeEngineV342:
         if not intent_text or intent_text.lower() in ["", "none", "done", "تم الإنجاز بنجاح بواسطة فريق الوكلاء الذكي."]:
             return
 
-        logger.info(f"🌐 [AI SWARM v34.2]: استلام نية/فكرة جديدة للتصنيع: '{intent_text[:50]}...'")
+        logger.info(f"🌐 [AI SWARM v34.3]: استلام الفكرة والمباشرة بالتصنيع: '{intent_text[:50]}...'")
         
         if not self.client:
-            logger.error("❌ مفاتيح API للذكاء الاصطناعي غير متوفرة.")
+            logger.error("❌ لا توجد مفاتيح API صالحة حالياً لتشغيل فريق العمل.")
             return
 
         prompt = f"""
@@ -136,10 +169,10 @@ class SovereignSupremeEngineV342:
 رغبة العميل والفكرة المطلوبة: "{intent_text}"
 
 قم بتوليد الأكواد اللازمة لتحقيق هذه الفكرة بالكامل. 
-مخرجاتك يجب أن تكون بصيغة JSON فقط، حيث يكون المفتاح هو مسار الملف (مثلاً services/omega_core.py) والقيمة هي الكود البرمجي الكامل بلغة بايثون. لا تكتب أي نصوص خارج الـ JSON.
+مخرجاتك يجب أن تكون بصيغة JSON فقط، حيث يكون المفتاح هو مسار الملف (مثلاً services/omega_fabric.py) والقيمة هي الكود البرمجي الكامل بلغة بايثون. لا تكتب أي نصوص خارج الـ JSON.
 يجب أن تحتوي الملفات على `APIRouter` إذا كانت تقدم خدمة ويب، وأن تكون متزامنة وخالية من الأخطاء النحوية المطلقة.
 """
-        max_attempts = len(self.api_keys) * 2
+        max_attempts = max(len(self.valid_keys) * 2, 2)
         for attempt in range(max_attempts):
             try:
                 response = self.client.models.generate_content(
@@ -170,15 +203,14 @@ class SovereignSupremeEngineV342:
                 
             except Exception as e:
                 logger.warning(f"⚠️ تنبيه في محاولة الاستدعاء {attempt + 1}: {e}")
-                # إذا كان خطأ حصة، نقوم بتبديل المفتاح فوراً لمفتاح آخر إن وجد
                 if "429" in str(e) or "Resource Exhausted" in str(e):
                     self._rotate_key()
-                    time.sleep(3)
+                    time.sleep(2)
                 else:
                     if attempt < max_attempts - 1:
-                        time.sleep(5)
+                        time.sleep(4)
                     else:
-                        logger.error("❌ فشل استدعاء الذكاء الاصطناعي بعد تجربة كافة البدائل.")
+                        logger.error("❌ فشل استدعاء الذكاء الاصطناعي بعد تجربة كافة المفاتيح المفحوصة.")
 
     def scan_ecosystem_with_delta(self):
         logger.info("🔍 بدء المسح الراداري التفاضلي (Delta Engine Scan)...")
@@ -242,7 +274,7 @@ class SovereignSupremeEngineV342:
                 logger.error(f"⚠️ خطأ أثناء المعالجة لـ {rel_path}: {e}")
 
         if new_imports or new_inclusions:
-            injection_block = "\n# --- Sovereign Enterprise AI-Generated Bridges v34.2 ---\n" + "\n".join(new_imports) + "\n" + "\n".join(new_inclusions) + "\n"
+            injection_block = "\n# --- Sovereign Enterprise AI-Generated Bridges v34.3 ---\n" + "\n".join(new_imports) + "\n" + "\n".join(new_inclusions) + "\n"
             updated_main_code = injection_block + "\n" + main_code
             with open(self.main_py_path, "w", encoding="utf-8") as f:
                 f.write(updated_main_code)
@@ -257,11 +289,12 @@ class SovereignSupremeEngineV342:
 
     def run(self):
         print("="*85)
-        print("👑 AYMNGUARD SOVEREIGN ENTERPRISE : SUPREME ENGINE - v34.2.0 (KEY ROTATION ENGINE)")
+        print("👑 AYMNGUARD SOVEREIGN ENTERPRISE : SUPREME ENGINE - v34.3.0 (KEY HEALTH VALIDATED)")
         print("="*85)
         asyncio.run(self.async_run())
         print("\n" + "="*85)
-        print(f"📊 IMPERIAL AI SWARM REPORT (v34.2):")
+        print(f"📊 IMPERIAL AI SWARM REPORT (v34.3):")
+        print(f"   * Verified Valid API Keys: {self.telemetry['valid_keys_count']}")
         print(f"   * AI Intents Executed:     {self.telemetry['intents_processed']}")
         print(f"   * Total Ecosystem Files:   {self.telemetry['scanned_files']}")
         print(f"   * Delta Files Audited:     {self.telemetry['delta_processed']}")
@@ -270,5 +303,5 @@ class SovereignSupremeEngineV342:
         print("="*85 + "\n")
 
 if __name__ == "__main__":
-    engine = SovereignSupremeEngineV342(ROOT_DIR)
+    engine = SovereignSupremeEngineV343(ROOT_DIR)
     engine.run()
