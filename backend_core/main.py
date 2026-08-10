@@ -266,6 +266,89 @@ async def sovereign_lifespan(app: FastAPI):
 # 7. تعريف التطبيق المركزي (FastAPI Master Instance)
 # ==============================================================================
 app = FastAPI(
+
+# --- Omniscient Auto-Wired Bridges ---
+import core.command_bridge # Auto-linked background/service module
+import core.ecosystem_automation # Auto-linked background/service module
+import core.market_engine # Auto-linked background/service module
+import core.master_orchestrator # Auto-linked background/service module
+import core.web3_nexus # Auto-linked background/service module
+from core.meta_engine import router as meta_engine_bridge
+app.include_router(meta_engine_bridge)
+import core.exceptions # Auto-linked background/service module
+import core.sovereign_platform_hub # Auto-linked background/service module
+import core.neural_core # Auto-linked background/service module
+import core.telegram_broadcaster # Auto-linked background/service module
+import core.gateways.telegram_gateway # Auto-linked background/service module
+import core.agents.market_agent # Auto-linked background/service module
+import core.agents.base_agent # Auto-linked background/service module
+import core.agents.security_agent # Auto-linked background/service module
+import core.database.init_db # Auto-linked background/service module
+import core.core.universal_marketplace # Auto-linked background/service module
+import services.market_intelligence # Auto-linked background/service module
+import services.payment_engine # Auto-linked background/service module
+import services.telegram_gateway # Auto-linked background/service module
+from services.telegram_bridge import router as telegram_bridge_bridge
+app.include_router(telegram_bridge_bridge)
+from services.test_orphan import router as test_orphan_bridge
+app.include_router(test_orphan_bridge)
+import services.ai_microservice_adapter # Auto-linked background/service module
+import services.trading_market_microservice_adapter # Auto-linked background/service module
+import services.session_transfer_microservice_adapter # Auto-linked background/service module
+from services.test_orphan_service import router as test_orphan_service_bridge
+app.include_router(test_orphan_service_bridge)
+import services.protection_microservice_adapter # Auto-linked background/service module
+import services.sovereign_agents # Auto-linked background/service module
+import services.queue_manager # Auto-linked background/service module
+import services.worker # Auto-linked background/service module
+import bots.protection.telegram_protection_runner # Auto-linked background/service module
+import security.shield # Auto-linked background/service module
+import security.hmac_security_guard # Auto-linked background/service module
+import security.protection_bot # Auto-linked background/service module
+from src.ai_engine import router as ai_engine_bridge
+app.include_router(ai_engine_bridge)
+from app.enterprise_gateway import router as enterprise_gateway_bridge
+app.include_router(enterprise_gateway_bridge)
+from app.empire_app_gateway import router as empire_app_gateway_bridge
+app.include_router(empire_app_gateway_bridge)
+import backend_core.task_broker # Auto-linked background/service module
+from backend_core.core_routes import router as core_routes_bridge
+app.include_router(core_routes_bridge)
+import backend_core.neural_engine # Auto-linked background/service module
+import backend_core.context_vault # Auto-linked background/service module
+import backend_core.mtproto_client # Auto-linked background/service module
+import backend_core.proxy_manager # Auto-linked background/service module
+import backend_core.tests.unit.test_users # Auto-linked background/service module
+import backend_core.bot.subscriber_panel # Auto-linked background/service module
+import backend_core.bot.owner_panel # Auto-linked background/service module
+import backend_core.middlewares.throttling # Auto-linked background/service module
+import backend_core.services.ai_image_generator # Auto-linked background/service module
+import backend_core.services.search_media_engine # Auto-linked background/service module
+import backend_core.services.subscription_service # Auto-linked background/service module
+import backend_core.services.group_protection_engine # Auto-linked background/service module
+import backend_core.services.telegram_business # Auto-linked background/service module
+from backend_core.backend_core.services.meta_engine import router as meta_engine_bridge
+app.include_router(meta_engine_bridge)
+import backend_core.app.telegram_bot_core # Auto-linked background/service module
+import backend_core.app.schemas.user_schema # Auto-linked background/service module
+import backend_core.app.services.scheduler # Auto-linked background/service module
+import backend_core.app.services.logistics_engine # Auto-linked background/service module
+from backend_core.app.api.api_router import router as api_router_bridge
+app.include_router(api_router_bridge)
+import backend_core.app.api.dependencies.deps # Auto-linked background/service module
+import backend_core.app.api.dependencies.db_deps # Auto-linked background/service module
+import backend_core.app.api.middlewares.rate_limiter # Auto-linked background/service module
+from backend_core.app.api.v1.api_router import router as api_router_bridge
+app.include_router(api_router_bridge)
+from backend_core.app.api.v1.endpoints.users import router as users_bridge
+app.include_router(users_bridge)
+import backend_core.app.api.v1.endpoints.ai_services # Auto-linked background/service module
+import backend_core.app.core.telegram_auth # Auto-linked background/service module
+import backend_core.app.core.exceptions # Auto-linked background/service module
+from backend_core.api.v1.subscription_router import router as subscription_router_bridge
+app.include_router(subscription_router_bridge)
+from backend_core.api.v1.search_media_router import router as search_media_router_bridge
+app.include_router(search_media_router_bridge)
     title="AymnCoder Plus Sovereign Enterprise Core",
     version="19.0.0-ImperialMaster",
     description="The Absolute Master Backend Hub controlling all enterprise micro-services, bots, and trading engines",
