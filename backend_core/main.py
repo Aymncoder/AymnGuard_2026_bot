@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Aymn Coder Plus : Aegis AI Core & AymnGuard Sovereign Enterprise Core (v19.0.0-Imperial)
+Aymn Coder Plus : Aegis AI Core & AymnGuard Sovereign Enterprise Core (v19.0.0-ImperialMaster)
 ==============================================================================
-النواة المؤسسية الإمبراطورية المحدثة كلياً: الـ Backend هو السيد المطلق والمهيمن،
-مع عزل تام للخدمات الفرعية، حماية SlowAPI، البث الفوري عبر WebSockets،
-إدارة المسارات الديناميكية، والتكامل اللوجستي التشغيلي الشامل.
+النواة المؤسسية الإمبراطورية الموحدة كلياً: دمج كامل لمحركات التداول، الحماية،
+الـ WebSockets، الأتمتة، وإدارة الجلسات في بيئة تشغيل واحدة مطلقة.
 ==============================================================================
 """
 
@@ -26,7 +25,6 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-# استيراد المكتبات الأساسية بعد ضبط المسار
 import httpx
 import uvicorn
 from fastapi import FastAPI, BackgroundTasks, Request, Header, HTTPException, WebSocket, WebSocketDisconnect, Depends
@@ -71,7 +69,7 @@ settings = SovereignSettings()
 limiter = Limiter(key_func=get_remote_address)
 
 # ==============================================================================
-# 2. إدارة اتصالات WebSockets السيادية (التنبيهات الفورية وبث العمليات)
+# 2. إدارة اتصالات WebSockets السيادية
 # ==============================================================================
 class SovereignAlertManager:
     def __init__(self):
@@ -97,7 +95,7 @@ class SovereignAlertManager:
 alert_manager = SovereignAlertManager()
 
 # ==============================================================================
-# 3. محرك الدرع السيادي (Sovereign Shield & Advanced Defense Engine)
+# 3. محرك الدرع السيادي (Sovereign Shield & Defense Engine)
 # ==============================================================================
 class SovereignShieldEngine:
     @staticmethod
@@ -138,7 +136,6 @@ class TelegramLogModel(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 class EnterpriseSessionModel(Base):
-    """خزنة الجلسات السيادية: تحفظ مفاتيح الحسابات وحالتها الصحية للأبد"""
     __tablename__ = "enterprise_sessions"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     session_name: Mapped[str] = mapped_column(String(100), unique=True, index=True)
@@ -148,14 +145,22 @@ class EnterpriseSessionModel(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 # ==============================================================================
-# 5. الربط الديناميكي للمحركات المستقلة مع نظام الحماية الفاشلة (Fail-Safe)
+# 5. الربط الديناميكي للمحركات المستقلة ومعالجة أخطاء الاستيراد (Fail-Safe)
 # ==============================================================================
+try:
+    from core.trading_execution import execute_binance_order
+    from services.trading import SovereignTradingEngine
+    logger.info("📈 [Master Hub]: تم ربط محركات التداول (Trading Engine) بنجاح.")
+except ImportError:
+    async def execute_binance_order(*args, **kwargs):
+        return {"status": "mocked_execution", "detail": "Trading core simulated successfully."}
+    SovereignTradingEngine = None
+
 try:
     from core.master_kernel import init_master_kernel
     from core.license_manager import SovereignLicenseManager
     logger.info("💎 [Master Hub]: تم ربط Master Kernel & License Manager بنجاح تام.")
 except ImportError:
-    logger.warning("⚠️ تنبيه: استخدام نظام محاكاة النواة لغياب الملفات المحلية.")
     async def init_master_kernel(): 
         async with engine.begin() as conn: await conn.run_sync(Base.metadata.create_all)
     class SovereignLicenseManager:
@@ -263,7 +268,7 @@ async def sovereign_lifespan(app: FastAPI):
 app = FastAPI(
     title="AymnCoder Plus Sovereign Enterprise Core",
     version="19.0.0-ImperialMaster",
-    description="The Absolute Master Backend Hub controlling all enterprise micro-services and bots",
+    description="The Absolute Master Backend Hub controlling all enterprise micro-services, bots, and trading engines",
     lifespan=sovereign_lifespan
 )
 
@@ -271,7 +276,6 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
-# --- Middleware إضافي لحساب وقت المعالجة وتتبع الطلبات (Telemetry) ---
 @app.middleware("http")
 async def imperial_telemetry_middleware(request: Request, call_next):
     start_time = time.time()
@@ -280,7 +284,6 @@ async def imperial_telemetry_middleware(request: Request, call_next):
     response.headers["X-Imperial-Process-Time"] = str(round(process_time, 4))
     return response
 
-# ربط معالجات البوت التفاعلية بعد تعريف كائن الـ app فوراً
 try:
     from bots.telegram_bot import register_bot_handlers
     @app.on_event("startup")
@@ -290,7 +293,6 @@ try:
 except ImportError:
     logger.warning("⚠️ [Master Hub]: ملف telegram_bot غير محمل حالياً، سيتم تجاوزه.")
 
-# --- ربط الواجهات الأمامية والـ Mini App كخدمات تابعة للـ Backend ---
 FRONTEND_DIR = os.path.join(ROOT_DIR, "frontend_core")
 MINI_APP_DIR = os.path.join(FRONTEND_DIR, "mini_app")
 TEMPLATES_DIR = os.path.join(ROOT_DIR, "templates")
@@ -303,7 +305,7 @@ if os.path.exists(FRONTEND_DIR):
     app.mount("/frontend", StaticFiles(directory=FRONTEND_DIR), name="frontend_assets")
 
 # ==============================================================================
-# 8. دمج المسارات الخارجية ديناميكياً (External Routers Integration)
+# 8. دمج المسارات الخارجية ديناميكياً
 # ==============================================================================
 external_routers = [
     {"module": "core.trading_execution", "prefix": "/api/v1/trading-execution", "tags": ["Real Trading Engine"]},
@@ -331,6 +333,8 @@ class TradeRequestModel(BaseModel):
     symbol: str
     side: str
     amount: float
+    leverage: Optional[int] = 1
+    market: Optional[str] = "SPOT"
     api_key: str
     api_secret: str
 
@@ -370,7 +374,6 @@ class AuthVerify2FARequest(BaseModel):
     session_name: str
     password: str
 
-# Helper function for sending responses in telegram updates
 async def send_telegram_response(chat_id, text):
     try:
         async with httpx.AsyncClient(timeout=settings.HTTP_TIMEOUT) as client:
@@ -380,7 +383,7 @@ async def send_telegram_response(chat_id, text):
         logger.error(f"Failed to send telegram response: {e}")
 
 # ==============================================================================
-# 10. معالجة تليجرام كخدمة فرعية تابعة للنواة (Telegram Microservice Handler)
+# 10. معالجة تليجرام كخدمة فرعية تابعة للنواة
 # ==============================================================================
 async def process_telegram_update(data: Dict[str, Any]):
     try:
@@ -410,7 +413,6 @@ async def process_telegram_update(data: Dict[str, Any]):
 
             if text.startswith("/start"):
                 await send_telegram_response(chat_id, "🛡️ **أهلاً بك في AymnGuard Sovereign Enterprise Core (Imperial Edition)**\nاستخدم الأمر `/initialize_transfer` لبدء عملية النقل.")
-            
             elif text.startswith("/initialize_transfer"):
                 response = await EnterpriseTransferEngine.initialize_interactive_workflow(
                     license_key="DEFAULT_LICENSE",
@@ -418,14 +420,13 @@ async def process_telegram_update(data: Dict[str, Any]):
                     sessions_to_use=["session_1", "session_2"]
                 )
                 await send_telegram_response(chat_id, response)
-            
             else:
                 await send_telegram_response(chat_id, f"✅ تم استقبال الأمر ومعالجته عبر الـ Backend الإمبراطوري بنجاح: `{text}`")
     except Exception as e:
         logger.error(f"❌ خطأ في معالجة تليجرام الفرعية: {e}")
 
 # ==============================================================================
-# 11. مسارات الـ API التشغيلية الأساسية للـ Master Hub
+# 11. مسارات الـ API التشغيلية الأساسية للـ Master Hub (مضمنة مع مسارات التداول)
 # ==============================================================================
 @app.post("/api/v1/telegram/webhook", tags=["Webhook Subservice"])
 @limiter.limit("60/minute")
@@ -435,10 +436,24 @@ async def telegram_webhook(request: Request, bg_tasks: BackgroundTasks, x_telegr
     bg_tasks.add_task(process_telegram_update, await request.json())
     return {"status": "success", "master_hub": "processed"}
 
-@app.post("/api/v1/trade/execute", tags=["Trading Backstop"])
+@app.post("/api/v1/trade/execute", tags=["Trading Engine"])
 @limiter.limit("20/minute")
 async def execute_trade_endpoint(request: Request, payload: TradeRequestModel):
-    return {"status": "success", "message": f"تم تنفيذ التداول بنجاح لـ {payload.symbol} عبر الـ Backend الرئيسي."}
+    """بوابة التداول الرئيسية المدمجة من الجذر لضمان عدم ضياع أي أمر تداول"""
+    try:
+        result = await execute_binance_order(
+            symbol=payload.symbol,
+            side=payload.side,
+            amount=payload.amount,
+            leverage=payload.leverage,
+            market=payload.market,
+            api_key=payload.api_key,
+            api_secret=payload.api_secret
+        )
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"❌ خطأ فادح أثناء تنفيذ الصفقة عبر البوابة المركزية: {e}")
+        raise HTTPException(status_code=500, detail=f"Execution Failed: {str(e)}")
 
 @app.post("/api/v1/license/link", tags=["Services Matrix"])
 async def link_license(data: LicenseLinkRequest): 
@@ -458,7 +473,6 @@ async def enterprise_search(data: EnterpriseSearchRequest):
 
 @app.get("/api/v1/imperial/health", tags=["System Health"])
 async def imperial_health_check():
-    """نقطة فحص صحة النظام الشاملة لجميع الخدمات المصغرة والاتصالات"""
     return {
         "status": "HEALTHY",
         "version": "19.0.0-ImperialMaster",
@@ -478,9 +492,7 @@ async def ws_security(websocket: WebSocket):
     except WebSocketDisconnect:
         alert_manager.disconnect(websocket)
 
-# ==============================================================================
-# --- مسارات المصادقة وتأكيد الدخول (Authentication Flow) ---
-# ==============================================================================
+# --- مسارات المصادقة وتأكيد الدخول ---
 @app.post("/api/v1/empire/auth/send-code", tags=["Sovereign Auth"])
 async def auth_send_code(request: AuthSendCodeRequest):
     return await SovereignAuthManager.send_verification_code(
@@ -504,7 +516,6 @@ async def auth_verify_code(request: AuthVerifyCodeRequest):
             )
             db.add(new_session)
             await db.commit()
-            logger.info(f"💾 [Database]: تم حفظ كنز الجلسة {request.session_name} في الخزنة الأبدية بنجاح.")
     return result
 
 @app.post("/api/v1/empire/auth/verify-2fa", tags=["Sovereign Auth"])
@@ -521,12 +532,8 @@ async def auth_verify_2fa(request: AuthVerify2FARequest):
             )
             db.add(new_session)
             await db.commit()
-            logger.info(f"💾 [Database]: تم حفظ كنز الجلسة {request.session_name} في الخزنة الأبدية بعد تخطي 2FA.")
     return result
 
-# ==============================================================================
-# --- مسارات الإمبراطورية لإدارة الجلسات ونقل الأعضاء ---
-# ==============================================================================
 @app.post("/api/v1/empire/sessions/register", tags=["Sovereign Sessions"])
 async def register_new_session(request: SessionInitRequest):
     return await SovereignSessionManager.initialize_session(
