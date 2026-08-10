@@ -133,8 +133,9 @@ Provide a clean, robust, enterprise-grade Python FastAPI router wrapper or integ
         
         for orphan in self.orphan_files:
             rel_path = orphan.relative_to(self.root_path)
-            logger.info(جاري معالجة الملف المعزول: {rel_path})
-            
+            logger.info(f"جاري معالجة الملف المعزول: {rel_path}")
+
+         
             try:
                 with open(orphan, "r", encoding="utf-8") as f:
                     content = f.read()
