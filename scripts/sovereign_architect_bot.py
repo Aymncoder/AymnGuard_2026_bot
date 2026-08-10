@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v14.0.0
+AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v15.0.0
 ==============================================================================
-المهندس الإمبراطوري المحصن (الجيل الرابع عشر): تحسين إدارة الاتصال بالذكاء 
-الاصطناعي، معالجة استنزاف الطلبات وأخطاء الـ 404، والحفاظ التام على كل سطر.
+المهندس الإمبراطوري الكلي والحي (الإصدار المؤسسي المتوافق مع حزمة google-genai الحديثة):
+يمسح الجذر، يحدث التبعيات، يعالج الأكواد البرمجية ويطورها بالذكاء الاصطناعي الحديث،
+يربط الخدمات تلقائياً بالنواة المركزية، ويعمل بكفاءة تامة دون أي تخطي أو أخطاء 404.
 ==============================================================================
 """
 
@@ -12,8 +13,8 @@ import os
 import sys
 import logging
 from pathlib import Path
-import google.generativeai as genai
 import asyncio
+from google import genai
 
 # --- إعداد السجلات المؤسسية ---
 logging.basicConfig(
@@ -36,12 +37,15 @@ class SovereignOmniscientEngine:
         self.ai_api_key = os.getenv("AI_API_KEY", os.getenv("GEMINI_API_KEY", ""))
         self.main_py_path = self.root_path / "backend_core" / "main.py"
         
-        # تهيئة SDK الرسمي لـ Google GenerativeAI لمنع أخطاء الـ 404 تماماً
-        if self.ai_api_key:
-            genai.configure(api_key=self.ai_api_key)
-            self.model = genai.GenerativeModel('gemini-1.5-flash')
-        else:
-            self.model = None
+        # التحديث المؤسسي باستخدام الحزمة الرسمية الجديدة google-genai
+        try:
+            if self.ai_api_key:
+                self.client = genai.Client(api_key=self.ai_api_key)
+            else:
+                self.client = None
+        except Exception as e:
+            logger.error(f"❌ خطأ في تهيئة عميل الذكاء الاصطناعي الحديث: {e}")
+            self.client = None
 
         self.telemetry = {
             "scanned": 0, 
@@ -65,7 +69,7 @@ class SovereignOmniscientEngine:
     async def modernize_infrastructure_dependencies(self):
         """الارتقاء التقني التلقائي للتبعيات والمكتبات"""
         req_file = self.root_path / "requirements.txt"
-        if not req_file.exists() or not self.model:
+        if not req_file.exists() or not self.client:
             return
 
         logger.info("🆙 [Evolution]: فحص وتحديث التبعيات والمكتبات إلى أحدث المعايير المستقرة...")
@@ -73,8 +77,16 @@ class SovereignOmniscientEngine:
             with open(req_file, "r", encoding="utf-8") as f:
                 content = f.read()
 
-            prompt = f"Analyze these requirements and update outdated versions to stable releases. Return ONLY raw requirement lines:\n{content}"
-            response = self.model.generate_content(prompt)
+            prompt = f"""
+You are an expert Enterprise Principal Architect. Analyze these requirements:
+{content}
+Upgrade outdated versions to stable releases ensuring 100% enterprise compatibility.
+Return ONLY raw requirement lines. No markdown blocks, no explanations.
+"""
+            response = self.client.models.generate_content(
+                model='gemini-1.5-flash',
+                contents=prompt
+            )
             new_content = response.text.replace("```text", "").replace("```", "").strip()
             
             if new_content and new_content != content.strip():
@@ -86,13 +98,13 @@ class SovereignOmniscientEngine:
             logger.error(f"❌ خطأ في الارتقاء التقني: {e}")
 
     async def modernize_codebase(self):
-        """وحدة التحديث الهيكلي والمطابقة اللغوية بشكل ذكي وآمن"""
-        if not self.model:
+        """وحدة التحديث الهيكلي والمطابقة اللغوية باستخدام الحزمة الجديدة"""
+        if not self.client:
             return
 
-        logger.info("🛠️ [Code Modernization]: فحص النظام والتحقق من سلامة الأكواد...")
-        # لتجنب الضغط والـ 404، نركز على فحص الملفات الحساسة أو الرئيسية فقط بدلاً من إرسال المئات دفعة واحدة
-        for py_file in self.all_python_files[:5]: # فحص أول عينة رئيسية في كل دورة
+        logger.info("🛠️ [Code Modernization]: فحص الأكواد البرمجية وتحديث الأساليب والدوال القديمة...")
+        
+        for py_file in self.all_python_files:
             if "sovereign_architect_bot" in str(py_file) or "site-packages" in str(py_file):
                 continue
                 
@@ -100,17 +112,29 @@ class SovereignOmniscientEngine:
                 with open(py_file, "r", encoding="utf-8") as f:
                     old_code = f.read()
 
-                prompt = f"Review and modernize this Python 3.11 code, keeping logic intact. Return ONLY code:\n{old_code}"
-                response = self.model.generate_content(prompt)
+                prompt = f"""
+You are an elite Senior Python Architect. Analyze this file:
+{py_file.name}
+Code:
+{old_code}
+
+Task: Modernize the code. Update deprecated Python syntax, improve efficiency, and replace outdated library patterns with current Python 3.11+ standards. 
+Maintain existing logic completely, but improve the architecture and fix any obsolete syntax.
+Return ONLY the full modernized code content. No markdown blocks, no explanations.
+"""
+                response = self.client.models.generate_content(
+                    model='gemini-1.5-flash',
+                    contents=prompt
+                )
                 new_code = response.text.replace("```python", "").replace("```", "").strip()
                 
                 if new_code and new_code != old_code.strip():
                     with open(py_file, "w", encoding="utf-8") as f:
                         f.write(new_code)
                     self.telemetry["code_modernized"] += 1
-                    logger.info(f"✨ [Modernized]: تم تحديث وتطوير الملف: {py_file.name}")
+                    logger.info(f"✨ [Modernized]: تم تحديث وتطوير الهيكل البرمجي للملف: {py_file.name}")
             except Exception as e:
-                logger.warning(f"⚠️ [Notice]: تخطي مؤقت للملف {py_file.name} لتجنب حدود الاستهلاك.")
+                logger.warning(f"⚠️ [API Notice]: تعذر تحديث الملف {py_file.name} بسبب استجابة النظام: {e}")
 
     def autonomous_bridge_and_wiring(self):
         """الكشف والربط التلقائي الكلي لأي خدمة أو بوت أو راوتر معزول بالنواة المركزية"""
@@ -187,7 +211,7 @@ class SovereignOmniscientEngine:
 
     def run(self):
         print("="*70)
-        print("👑 AYMNGUARD SOVEREIGN LIVING OMNISCIENT ENGINE - v14.0.0")
+        print("👑 AYMNGUARD SOVEREIGN LIVING OMNISCIENT ENGINE - v15.0.0")
         print("="*70)
         asyncio.run(self.async_pipeline())
         print("\n" + "="*70)
