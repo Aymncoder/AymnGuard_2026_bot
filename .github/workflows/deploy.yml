@@ -22,7 +22,11 @@ jobs:
             cd /root/AymnGuard_2026_bot
             
             # 2. سحب أحدث التعديلات من جيتهاب
-            git pull origin main
+                        # سحب أحدث التعديلات وفرضها على السيرفر مع تنظيف الملفات المؤقتة المعيقة
+            git fetch --all
+            git reset --hard origin/main
+            git clean -fd
+
             
             # 3. إيقاف أي نسخة سابقة تعمل من البوت لتجنب تداخل العمليات
             pkill -f "python3 run.py" || true
