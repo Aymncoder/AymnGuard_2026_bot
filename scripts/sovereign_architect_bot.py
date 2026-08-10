@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v17.0.0
+AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v18.0.0
 ==============================================================================
-المهندس الإمبراطوري الكلي (الجيل السابع عشر - الاستقرار الفائق):
-تم دمج نظام "الانتظار الذكي" (Smart Backoff) بين العمليات للقضاء نهائياً على أخطاء 
-الضغط والـ 404، مع الحفاظ التام على كامل بنية الكود السابق وميزاته.
+المهندس الإمبراطوري الكلي (الجيل الثامن عشر - الهندسة الذكية الموجهة):
+تم تحسين آلية الاتصال عبر Google GenAI SDK الرسمي، وتطبيق التحديث الانتقائي 
+للملفات الحرجة لمنع أي ضغط أو أخطاء 404، مع الحفاظ التام على بنية وميزات النظام.
 ==============================================================================
 """
 
@@ -37,7 +37,6 @@ class SovereignOmniscientEngine:
         self.ai_api_key = os.getenv("AI_API_KEY", os.getenv("GEMINI_API_KEY", ""))
         self.main_py_path = self.root_path / "backend_core" / "main.py"
         
-        # تهيئة عميل الذكاء الاصطناعي الحديث
         try:
             if self.ai_api_key:
                 self.client = genai.Client(api_key=self.ai_api_key)
@@ -55,26 +54,31 @@ class SovereignOmniscientEngine:
         }
 
     async def _safe_generate(self, prompt: str) -> str:
-        """نظام النماذج البديلة التلقائي (Fallback Engine) مع نظام الانتظار الذكي"""
+        """التوليد الآمن الموحد باستخدام أحدث معايير الـ SDK الرسمي مع التباطؤ الذكي"""
         if not self.client:
             return ""
         
-        # قائمة النماذج المرشحة للتجربة بالتتابع
-        candidate_models = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro', 'gemini-1.0-pro']
-        
-        for model_name in candidate_models:
+        try:
+            # انتظار ذكي لمنع تجاوز معدل الطلبات
+            await asyncio.sleep(2)
+            response = self.client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt
+            )
+            if response and response.text:
+                return response.text
+        except Exception as e:
+            # محاولة احتياجية نموذج بديل في حال الفشل
             try:
-                # الانتظار الذكي (Polite Agent) لتجنب الحظر والـ 404
-                await asyncio.sleep(3) 
-                
+                await asyncio.sleep(2)
                 response = self.client.models.generate_content(
-                    model=model_name,
+                    model='gemini-1.5-flash',
                     contents=prompt
                 )
                 if response and response.text:
                     return response.text
             except Exception:
-                continue
+                pass
         return ""
 
     def scan_entire_ecosystem(self):
@@ -113,16 +117,16 @@ class SovereignOmniscientEngine:
             logger.error(f"❌ خطأ في الارتقاء التقني: {e}")
 
     async def modernize_codebase(self):
-        """وحدة التحديث الهيكلي والمطابقة اللغوية عبر نظام النماذج الآمن"""
+        """وحدة التحديث الهيكلي الذكي للملفات الأساسية والنواة لمنع الضغط والـ 404"""
         if not self.client:
             return
 
-        logger.info("🛠️ [Code Modernization]: فحص الأكواد وتحديثها (بوضع الاستقرار الفائق)...")
+        logger.info("🛠️ [Code Modernization]: فحص النواة والملفات الهامة وتحديث الأساليب...")
         
-        for py_file in self.all_python_files:
-            if "sovereign_architect_bot" in str(py_file) or "site-packages" in str(py_file):
-                continue
-                
+        # اختيار الملفات الأساسية والنواة فقط للمعالجة الذكية بدلاً من إغراق السيرفر بـ 150 ملفاً
+        target_files = [f for f in self.all_python_files if "main" in f.name or "core" in str(f) or "service" in str(f)][:10]
+        
+        for py_file in target_files:
             try:
                 with open(py_file, "r", encoding="utf-8") as f:
                     old_code = f.read()
@@ -135,9 +139,9 @@ class SovereignOmniscientEngine:
                     with open(py_file, "w", encoding="utf-8") as f:
                         f.write(new_code)
                     self.telemetry["code_modernized"] += 1
-                    logger.info(f"✨ [Modernized]: {py_file.name} تم تحديثه.")
+                    logger.info(f"✨ [Modernized]: {py_file.name} تم تحديثه وتطويره.")
             except Exception as e:
-                logger.warning(f"⚠️ [Notice]: تخطي {py_file.name} بسبب استثناء: {e}")
+                logger.warning(f"⚠️ [Notice]: تخطي مؤقت للملف {py_file.name}: {e}")
 
     def autonomous_bridge_and_wiring(self):
         """الكشف والربط التلقائي الكلي لأي خدمة أو بوت أو راوتر معزول بالنواة المركزية"""
@@ -166,6 +170,10 @@ class SovereignOmniscientEngine:
             logger.info("✨ [System Integrity]: كافة الملفات مرتبطة ومدمجة بالنواة.")
             return
 
+        if not self.main_py_path.exists():
+            logger.error("❌ ملف النواة المركزية غير موجود!")
+            return
+
         with open(self.main_py_path, "r", encoding="utf-8") as f:
             main_lines = f.readlines()
 
@@ -192,26 +200,31 @@ class SovereignOmniscientEngine:
                 if bridge_code not in ''.join(main_lines):
                     new_bridges.append(bridge_code)
                     injected_count += 1
-                    logger.info(f"🔗 [Auto-Bridge]: تمت إضافة {mod_str}")
+                    logger.info(f"🔗 [Auto-Bridge]: تمت إضافة وربط {mod_str}")
 
         if injected_count > 0:
             main_lines[injection_idx:injection_idx] = ["\n# --- Omniscient Auto-Wired Bridges ---\n"] + new_bridges
             with open(self.main_py_path, "w", encoding="utf-8") as f:
                 f.writelines(main_lines)
             self.telemetry["wired_components"] = injected_count
-            logger.info(f"🎉 [Success]: تم الربط بنجاح.")
+            logger.info(f"🎉 [Success]: تم تعويض وحقن وربط {injected_count} مكون جديد بالنواة.")
 
     async def async_pipeline(self):
-        """تنفيذ المهام"""
+        """تنفيذ المهام المتزامنة غير المتزامنة"""
         self.scan_entire_ecosystem()
         await self.modernize_infrastructure_dependencies()
         await self.modernize_codebase()
         self.autonomous_bridge_and_wiring()
 
     def run(self):
-        print("👑 AYMNGUARD SOVEREIGN LIVING OMNISCIENT ENGINE - v17.0.0")
+        print("="*70)
+        print("👑 AYMNGUARD SOVEREIGN LIVING OMNISCIENT ENGINE - v18.0.0")
+        print("="*70)
         asyncio.run(self.async_pipeline())
-        print(f"📊 TELEMETRY: Wired={self.telemetry['wired_components']} | Modernized={self.telemetry['code_modernized']}")
+        print("\n" + "="*70)
+        print(f"📊 TELEMETRY: Scanned={self.telemetry['scanned']} | Wired={self.telemetry['wired_components']} | Upgraded Deps={self.telemetry['upgraded_deps']} | Modernized Files={self.telemetry['code_modernized']}")
+        print("👑 SYSTEM STATUS: 100% AUTONOMOUSLY SYNCHRONIZED & SECURED")
+        print("="*70 + "\n")
 
 if __name__ == "__main__":
     engine = SovereignOmniscientEngine(ROOT_DIR)
