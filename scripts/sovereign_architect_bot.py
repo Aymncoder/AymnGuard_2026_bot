@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v10.0.0
+AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v11.0.0
 ==============================================================================
 المهندس الإمبراطوري الكلي والحي: يمسح الجذر بالكامل، يحدث التبعيات، يصحح و يحدث
 الأكواد البرمجية القديمة لأحدث معايير بايثون، يكشف النقص، يولد أكواد الربط 
@@ -36,6 +36,8 @@ class SovereignOmniscientEngine:
         self.orphan_modules = []
         self.ai_api_key = os.getenv("AI_API_KEY", os.getenv("GEMINI_API_KEY", ""))
         self.main_py_path = self.root_path / "backend_core" / "main.py"
+        # رابط النموذج القياسي المستقر لضمان عدم حدوث خطأ 404
+        self.api_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
         self.telemetry = {
             "scanned": 0, 
             "upgraded_deps": False, 
@@ -74,7 +76,7 @@ Return ONLY raw requirement lines. No markdown blocks, no explanations.
 """
             async with httpx.AsyncClient(timeout=60.0) as client:
                 res = await client.post(
-                    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+                    self.api_url,
                     params={"key": self.ai_api_key},
                     json={"contents": [{"parts": [{"text": prompt}]}]}
                 )
@@ -117,7 +119,7 @@ Return ONLY the full modernized code content. No markdown blocks, no explanation
 """
                 async with httpx.AsyncClient(timeout=60.0) as client:
                     res = await client.post(
-                        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+                        self.api_url,
                         params={"key": self.ai_api_key},
                         json={"contents": [{"parts": [{"text": prompt}]}]}
                     )
@@ -131,6 +133,8 @@ Return ONLY the full modernized code content. No markdown blocks, no explanation
                                 f.write(new_code)
                             self.telemetry["code_modernized"] += 1
                             logger.info(f"✨ [Modernized]: تم تحديث وتطوير الهيكل البرمجي للملف: {py_file.name}")
+                    else:
+                        logger.warning(f"⚠️ [API Notice]: تعذر تحديث الملف {py_file.name} بسبب استجابة الخادم كـ ({res.status_code})")
             except Exception as e:
                 logger.error(f"❌ خطأ أثناء تحديث الملف البرمجي {py_file}: {e}")
 
@@ -209,7 +213,7 @@ Return ONLY the full modernized code content. No markdown blocks, no explanation
 
     def run(self):
         print("="*70)
-        print("👑 AYMNGUARD SOVEREIGN LIVING OMNISCIENT ENGINE - v10.0.0")
+        print("👑 AYMNGUARD SOVEREIGN LIVING OMNISCIENT ENGINE - v11.0.0")
         print("="*70)
         asyncio.run(self.async_pipeline())
         print("\n" + "="*70)
