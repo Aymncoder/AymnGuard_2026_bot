@@ -4,7 +4,7 @@
 Aymn Coder Plus : Aegis AI Core & AymnGuard Sovereign Enterprise Core (v19.0.0-ImperialMaster)
 ==============================================================================
 النواة المؤسسية الإمبراطورية الموحدة كلياً: دمج كامل لمحركات التداول، الحماية،
-الـ WebSockets، الأتمتة، وإدارة الجلسات في بيئة تشغيل واحدة مطلقة.
+الـ WebSockets، الأتمتة، وإدارة الجلسات مع محرك الاكتشاف التلقائي الشامل (Total Auto-Discovery).
 ==============================================================================
 """
 
@@ -305,26 +305,45 @@ if os.path.exists(FRONTEND_DIR):
     app.mount("/frontend", StaticFiles(directory=FRONTEND_DIR), name="frontend_assets")
 
 # ==============================================================================
-# 8. دمج المسارات الخارجية ديناميكياً
+# 8. محرك الاكتشاف والمسح الشامل التلقائي (Total Auto-Discovery Engine)
 # ==============================================================================
-external_routers = [
-    {"module": "core.trading_execution", "prefix": "/api/v1/trading-execution", "tags": ["Real Trading Engine"]},
-    {"module": "src.ai_engine", "prefix": "/api/v1/ai-forge", "tags": ["AI Feature Forge"]},
-    {"module": "security.core_routes", "prefix": "/api/v1/security-core", "tags": ["Advanced Security"]},
-    {"module": "app.enterprise_gateway", "prefix": "/api/v1/enterprise", "tags": ["Enterprise Gateway"]},
-    {"module": "services.telegram_bridge", "prefix": "/api/v1/telegram-bridge", "tags": ["Telegram Bridge"]}
-]
+def register_all_enterprise_modules(fastapi_app, base_root_dir):
+    """
+    يمسح كل المجلدات والمحركات الفرعية للمشروع من الألف إلى الياء،
+    ويستخرج المسارات (Routers) والمكونات ويسجلها تلقائياً دون تدخل يدوي.
+    """
+    logger.info("🛡️ [Auto-Discovery]: بدء مسح واكتشاف كافة ملفات ومجلدات المستودع الشاملة...")
+    target_folders = ["services", "bots", "security", "core", "src", "app"]
+    discovered_count = 0
+    
+    for folder in target_folders:
+        folder_path = os.path.join(base_root_dir, folder)
+        if not os.path.exists(folder_path):
+            continue
+            
+        for root, _, files in os.walk(folder_path):
+            for file in files:
+                if file.endswith(".py") and file != "__init__.py":
+                    full_file_path = os.path.join(root, file)
+                    rel_path = os.path.relpath(full_file_path, base_root_dir)
+                    module_path = rel_path[:-3].replace(os.sep, ".")
+                    
+                    try:
+                        module = importlib.import_module(module_path)
+                        if hasattr(module, "router"):
+                            endpoint_prefix = f"/api/v1/{folder}/{file[:-3].replace('_', '-')}"
+                            tag_name = f"{folder.upper()} : {file[:-3].replace('_', ' ').title()}"
+                            
+                            fastapi_app.include_router(module.router, prefix=endpoint_prefix, tags=[tag_name])
+                            logger.info(f"🔗 [Auto-Linked Router]: {module_path} -> [{endpoint_prefix}]")
+                            discovered_count += 1
+                    except Exception as e:
+                        logger.debug(f"ℹ️ [Discovery Skip]: تعذر تحميل الملف {module_path}: {e}")
+                        
+    logger.info(f"✨ [Auto-Discovery Complete]: تم بنجاح اكتشاف وربط {discovered_count} مكوناً برمجياً بالكتلة التشغيلية.")
 
-for route_info in external_routers:
-    try:
-        module = importlib.import_module(route_info["module"])
-        if hasattr(module, "router"):
-            app.include_router(module.router, prefix=route_info["prefix"], tags=route_info["tags"])
-            logger.info(f"🔗 [Router Integrated]: تم ربط مسارات {route_info['module']}")
-    except ImportError:
-        logger.debug(f"ℹ️ [Router Skip]: المجلد {route_info['module']} غير محمل حالياً.")
-    except Exception as e:
-        logger.error(f"⚠️ [Router Error] في {route_info['module']}: {str(e)}")
+# تفعيل الاكتشاف التلقائي الشامل فوراً
+register_all_enterprise_modules(app, ROOT_DIR)
 
 # ==============================================================================
 # 9. نماذج بيانات التحقق (Pydantic Models)
