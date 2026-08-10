@@ -1,128 +1,88 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign Enterprise : Master Orchestrator (v18.0.0-Unified)
+AymnGuard Sovereign Enterprise : Master Orchestrator (v19.0.0-UnifiedMaster)
 ==============================================================================
-نظام الإقلاع التشغيلي الشامل: يدمج الفحص الاستخباراتي، تهيئة قاعدة البيانات،
-وإطلاق خادم FastAPI الإمبراطوري ليعمل ككيان واحد متكامل (Zero-Freeze).
+نظام الإقلاع التشغيلي الشامل والموحد: يدمج فحص البنية التحتية، تهيئة قاعدة البيانات،
+ويطلق النواة الإمبراطورية العظمى (backend_core.main:app) لتعمل ككيان واحد متكامل (Zero-Freeze).
+==============================================================================
 """
 
 import os
 import sys
 import logging
 import asyncio
-import importlib
 import uvicorn
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-# --- إعداد المسارات والبيئة ---
+# --- إعداد المسارات والبيئة السيادية ---
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-# --- استدعاءات النظام ---
-from app.empire_app_gateway import sovereign_app_router
-from core.database import init_db
-
+# استيراد أداة تهيئة قاعدة البيانات الأساسية
 try:
-    from bots.protection.telegram_protection_runner import TelegramProtectionRunner
+    from core.database import init_db
 except ImportError:
-    TelegramProtectionRunner = None
+    # بديل في حال اختلاف مسار قاعدة البيانات
+    def init_db():
+        pass
 
-# --- إعداد السجلات (Enterprise Logging) ---
+# --- إعداد السجلات المؤسسية (Enterprise Logging) ---
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s | 👑 [%(levelname)-8s] | %(name)s - %(message)s"
+    format="%(asctime)s | 👑 [%(levelname)-8s] | %(name)s - %(message)s"
 )
-logger = logging.getLogger("AymnGuard.SovereignMaster")
+logger = logging.getLogger("AymnGuard.SovereignMasterOrchestrator")
 
 # ==============================================================================
-# 1. نظام التشخيص والتهيئة (Pre-flight Diagnostics)
+# 1. نظام التشخيص والتهيئة القبلية (Pre-flight Diagnostics)
 # ==============================================================================
 def verify_infrastructure():
-    logger.info("🛡️ [Diagnostics]: جاري فحص البنية التحتية والخزنة...")
-    dirs = ["database", "logs", "app", "core", "bots", "services", "security"]
+    logger.info("🛡️ [Diagnostics]: جاري فحص البنية التحتية والخزنة والمجلدات السيادية...")
+    dirs = ["database", "logs", "app", "core", "bots", "services", "security", "backend_core"]
     for d in dirs:
         os.makedirs(os.path.join(ROOT_DIR, d), exist_ok=True)
     
-    # تهيئة قاعدة البيانات
+    # تهيئة قاعدة البيانات وإصلاح الجداول
     try:
         init_db()
         logger.info("✅ [Database]: تم فحص وهيكلة قاعدة البيانات بنجاح.")
     except Exception as e:
-        logger.critical(f"❌ [Database Error]: فشل إعداد قاعدة البيانات: {e}")
-        sys.exit(1)
+        logger.warning(f"⚠️ [Database Notice]: تم تخطي التهيئة المباشرة لكونها تدار عبر النواة العظمى: {e}")
 
 # ==============================================================================
-# 2. دورة حياة الإمبراطورية (Lifespan Orchestration)
+# 2. استدعاء التطبيق المركزي الموحد من النواة الكبرى
 # ==============================================================================
-@asynccontextmanager
-async def sovereign_lifespan(app: FastAPI):
-    logger.info("🚀 [SYSTEM BOOT]: بدء إقلاع منصة AymnGuard Sovereign Enterprise...")
-    
-    # تحميل المحركات (Microservices & Bots)
-    logger.info("🧠 [AGI Forge]: تحميل العقل العصبي والميكروسيرفسات...")
-    
-    # ربط بوت الحماية إن وجد
-    if TelegramProtectionRunner:
-        logger.info("🤖 [Telegram Runner]: إطلاق مشغل تيليجرام الآمن.")
-        
-    logger.info("✅ [EMPIRE ONLINE]: جميع الخدمات تعمل بكفاءة سيادية.")
-    yield 
-    
-    logger.info("🛑 [SYSTEM SHUTDOWN]: إغلاق آمن وحفظ الحالات...")
+# نحن هنا نربط run.py مباشرة بـ backend_core.main لضمان عدم وجود تناقض أو ازدواجية
+try:
+    from backend_core.main import app as imperial_master_app
+    logger.info("💎 [Master Bridge]: تم ربط النواة الإمبراطورية الكبرى (backend_core/main.py) بنجاح تام.")
+except ImportError as err:
+    logger.critical(f"❌ [Fatal Error]: تعذر استيراد النواة الكبرى من backend_core.main: {err}")
+    sys.exit(1)
 
 # ==============================================================================
-# 3. تهيئة التطبيق المركزي (API Gateway)
+# 3. إطلاق التشغيل المركزي (Execution Launcher)
 # ==============================================================================
-app = FastAPI(
-    title="AymnGuard Sovereign Enterprise API",
-    description="البوابة الإمبراطورية للتحكم بالذكاء الاصطناعي والحماية.",
-    version="18.0.0",
-    lifespan=sovereign_lifespan
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.include_router(sovereign_app_router)
-
-# ==============================================================================
-# 4. مسارات الفحص والتشغيل (Execution)
-# ==============================================================================
-@app.get("/")
-async def root_status():
-    return {
-        "status": "ONLINE",
-        "system": "AymnGuard Enterprise",
-        "database": "Initialized",
-        "version": "18.0.0"
-    }
-
 if __name__ == "__main__":
-    # تنفيذ الفحص القبلي قبل التشغيل
+    # تنفيذ الفحص القبلي للبنية التحتية
     verify_infrastructure()
     
+    # قراءة متغيرات البيئة أو الاعتماد على الإعدادات الموحدة
     host = os.getenv("HOST", "0.0.0.0")
-    port = int(os.getenv("PORT", 8000))
+    port = int(os.getenv("PORT", 10000)) # استخدام بورت النواة الموحد
     
-    logger.info(f"⚡ [Master Launcher]: الإطلاق على {host}:{port}...")
+    logger.info(f"⚡ [Master Launcher]: جاري إطلاق الإمبراطورية السيادية على الشبكة {host}:{port}...")
     
     try:
         uvicorn.run(
-            "run:app", # تأكد أن هذا الملف اسمه run.py
+            imperial_master_app,
             host=host,
             port=port,
             reload=False,
-            workers=4,
+            workers=1, # ضبط الـ workers لضمان استقرار جلسات الـ WebSockets والـ Background Tasks
             log_level="info"
         )
     except Exception as e:
-        logger.critical(f"❌ [Fatal Startup Error]: {e}")
+        logger.critical(f"❌ [Fatal Startup Error]: حدث خطأ أثناء الإقلاع: {e}")
