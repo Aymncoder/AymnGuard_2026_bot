@@ -6,27 +6,28 @@ name: 👑 Sovereign Architect & Integrity Agent
 on:
   push:
     branches: [ "main", "master" ]
-  pull_request:
-    branches: [ "main", "master" ]
-  workflow_dispatch:  # يتيح لك تشغيل الأداة يدويًا في أي وقت بضغطة زر من واجهة GitHub
+  workflow_dispatch:
+
+permissions:
+  contents: write  # منح الصلاحية الكاملة للأداة لتعديل ورفع الملفات للمستودع
 
 jobs:
   sovereign-audit:
     runs-on: ubuntu-latest
     
     steps:
-      # 1. سحب أحدث نسخة من المستودع الإمبراطوري
+      # 1. سحب أحدث نسخة من المستودع
       - name: Checkout Sovereign Repository
         uses: actions/checkout@v4
 
-      # 2. إعداد بيئة تشغيل بايثون القياسية
+      # 2. إعداد بيئة بايثون
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: 'pip'
 
-      # 3. تثبيت التبعيات والحزم المطلوبة للنظام
+      # 3. تثبيت التبعيات
       - name: Install Enterprise Dependencies
         run: |
           python -m pip install --upgrade pip
@@ -34,9 +35,18 @@ jobs:
             pip install -r requirements.txt
           fi
 
-      # 4. إطلاق المهندس السيادي الآلي لفحص المستودع من الألف إلى الياء
+      # 4. إطلاق المهندس السيادي الآلي (التعديل والمحاكاة)
       - name: Run Sovereign Architect Audit Agent
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python scripts/sovereign_architect_bot.py
+
+      # 5. الحفظ والرفع التلقائي (Auto-Commit & Push) للتعويض والربط
+      - name: Auto-Commit & Push Sovereign Changes
+        run: |
+          git config --global user.name "Sovereign Architect Bot"
+          git config --global user.email "architect@sovereign.bot"
+          git add .
+          git diff --staged --quiet || git commit -m "👑 [Sovereign Auto-Patch]: Autonomous wiring, dependency sync and ecosystem update"
+          git push
