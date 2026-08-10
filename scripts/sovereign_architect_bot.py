@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v19.0.0
+AymnGuard Sovereign Enterprise : Sovereign Living Omniscient Engine v20.0.0
 ==============================================================================
-المهندس الإمبراطوري الكلي (الجيل التاسع عشر - النماذج الحية المعتمدة):
-تم تحديث أسماء النماذج المعتمدة لعام 2026 (`gemini-2.0-flash`, `gemini-1.5-flash`)
-للقضاء الجذري على أخطاء الـ 404، مع تفعيل الانتظار الذكي (Smart Backoff) 
-والحفاظ التام على بنية وميزات النظام بالكامل.
+المهندس الإمبراطوري الكلي (الجيل العشرون - إدارة التدفق والتراجع الذكي):
+تم دمج نظام معالجة أخطاء الضغط (429 Too Many Requests) والـ (404) عبر التراجع 
+الزمني التدريجي (Exponential Backoff)، مع الحفاظ التام على كل ميزات النظام.
 ==============================================================================
 """
 
@@ -55,32 +54,32 @@ class SovereignOmniscientEngine:
         }
 
     async def _safe_generate(self, prompt: str) -> str:
-        """محرك التوليد الآمن المحدث بنماذج 2026 الحية والانتظار الذكي"""
+        """محرك التوليد الآمن مع معالجة ذكية لأخطاء 429 و 404 وتراجع زمني تدريجي"""
         if not self.client:
             return ""
         
-        # قائمة النماذج الحية المعتمدة رسمياً لعام 2026
-        candidate_models = [
-            'gemini-2.0-flash',
-            'gemini-1.5-flash',
-            'gemini-2.0-pro-exp-02-05',
-            'gemini-1.5-pro'
-        ]
+        candidate_models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro']
         
         for model_name in candidate_models:
-            try:
-                # انتظار ذكي (Polite Agent) لتجنب حظر المعدل (Rate Limit) والـ 404
-                await asyncio.sleep(2)
-                
-                response = self.client.models.generate_content(
-                    model=model_name,
-                    contents=prompt
-                )
-                if response and response.text:
-                    return response.text
-            except Exception:
-                # تجربة النموذج التالي بصمت في حال لم يكن مدعوماً على المفتاح الحالي
-                continue
+            for attempt in range(2): # محاولتان لكل نموذج مع تراجع زمني
+                try:
+                    # انتظار ذكي لمنع تجاوز حد الاستهلاك (Rate Limit)
+                    await asyncio.sleep(4 + (attempt * 5))
+                    
+                    response = self.client.models.generate_content(
+                        model=model_name,
+                        contents=prompt
+                    )
+                    if response and response.text:
+                        return response.text
+                except Exception as e:
+                    error_msg = str(e)
+                    if "429" in error_msg:
+                        logger.warning(f"⚠️ [Rate Limit 429]: تم بلوغ حد الطلبات المؤقت لنموذج {model_name}، جارِ الانتظار للإعادة...")
+                        await asyncio.sleep(10) # انتظار أطول عند حدوث ضغط
+                        continue
+                    else:
+                        break # الانتقال للنموذج التالي في حال خطأ 404 أو غيره
         return ""
 
     def scan_entire_ecosystem(self):
@@ -119,14 +118,13 @@ class SovereignOmniscientEngine:
             logger.error(f"❌ خطأ في الارتقاء التقني: {e}")
 
     async def modernize_codebase(self):
-        """وحدة التحديث الهيكلي الذكي للملفات الأساسية والنواة"""
+        """وحدة التحديث الهيكلي الذكي للملفات الهامة مع إدارة التدفق الآمن"""
         if not self.client:
             return
 
-        logger.info("🛠️ [Code Modernization]: فحص النواة والملفات الهامة وتحديث الأساليب...")
+        logger.info("🛠️ [Code Modernization]: فحص النواة والملفات الهامة وتحديث الأساليب بحذر واستقرار...")
         
-        # اختيار الملفات الأساسية والنواة للمعالجة الذكية لضمان الاستقرار الفائق والسرعة
-        target_files = [f for f in self.all_python_files if "main" in f.name or "core" in str(f) or "service" in str(f)][:10]
+        target_files = [f for f in self.all_python_files if "main" in f.name or "core" in str(f) or "service" in str(f)][:8]
         
         for py_file in target_files:
             try:
@@ -141,7 +139,7 @@ class SovereignOmniscientEngine:
                     with open(py_file, "w", encoding="utf-8") as f:
                         f.write(new_code)
                     self.telemetry["code_modernized"] += 1
-                    logger.info(f"✨ [Modernized]: {py_file.name} تم تحديثه وتطويره.")
+                    logger.info(f"✨ [Modernized]: {py_file.name} تم تحديثه وتطويره بنجاح.")
             except Exception as e:
                 logger.warning(f"⚠️ [Notice]: تخطي مؤقت للملف {py_file.name}: {e}")
 
@@ -220,7 +218,7 @@ class SovereignOmniscientEngine:
 
     def run(self):
         print("="*70)
-        print("👑 AYMNGUARD SOVEREIGN LIVING OMNISCIENT ENGINE - v19.0.0")
+        print("👑 AYMNGUARD SOVEREIGN LIVING OMNISCIENT ENGINE - v20.0.0")
         print("="*70)
         asyncio.run(self.async_pipeline())
         print("\n" + "="*70)
