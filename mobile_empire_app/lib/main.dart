@@ -299,7 +299,16 @@ class CommunitiesScreenTab extends StatelessWidget {
         title: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         subtitle: Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
         trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
-        onTap: () {},
+        onTap: () {
+          // هنا السحر! قمنا بتفعيل الاستدعاء بنجاح لفتح واجهة التيليجرام
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              // تأكد أن الكلاس داخل ملف telegram_core_chats_screen اسمه TelegramCoreChatsScreen
+              builder: (context) => const TelegramCoreChatsScreen(), 
+            ),
+          );
+        },
       ),
     );
   }
