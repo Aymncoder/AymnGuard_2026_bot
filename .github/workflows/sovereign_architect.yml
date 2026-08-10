@@ -9,48 +9,42 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write  # منح الصلاحية الكاملة للأداة لتعديل ورفع الملفات للمستودع
+  contents: write
 
 jobs:
   sovereign-audit:
     runs-on: ubuntu-latest
     
     steps:
-      # 1. سحب أحدث نسخة من المستودع
       - name: Checkout Sovereign Repository
         uses: actions/checkout@v4
 
-      # 2. إعداد بيئة بايثون
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: 'pip'
 
-      # 3. تثبيت التبعيات واعتمادات الاتصال للإصدار v32.0.0 (المعمارية العالمية الفائقة)
       - name: Install Enterprise Dependencies
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then
             pip install -r requirements.txt
           fi
-          # ضمان توفر حزم البنية التحتية والذكاء الاصطناعي المؤسسي
           pip install google-genai sqlalchemy aiosqlite pydantic fastapi uvicorn
 
-      # 4. إطلاق المهندس السيادي الأسمى (الجيل 32 - المعمارية السحابية الفائقة والتدقيق الآمن)
       - name: Run Sovereign Supreme Audit Agent
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python scripts/sovereign_architect_bot.py
 
-      # 5. الحفظ والرفع التلقائي (Auto-Commit & Push) مع مزامنة الفرع الحالي ديناميكياً
       - name: Auto-Commit & Push Sovereign Changes
         run: |
           git config --global user.name "Sovereign Supreme Architect"
           git config --global user.email "supreme@sovereign.bot"
           CURRENT_BRANCH=$(git branch --show-current)
-          git pull origin $CURRENT_BRANCH --rebase || true
           git add .
-          git diff --staged --quiet || git commit -m "👑 [Sovereign Enterprise Patch]: Autonomous global ecosystem sync and v32.0 architecture upgrade"
+          git commit -m "👑 [Sovereign Enterprise Patch]: Autonomous ecosystem sync and v32.0.2 upgrade" || true
+          git pull origin $CURRENT_BRANCH --rebase --autostash || true
           git push origin $CURRENT_BRANCH
