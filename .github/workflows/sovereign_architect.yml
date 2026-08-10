@@ -1,7 +1,7 @@
 # ==============================================================================
-# AymnGuard Sovereign Enterprise : Autonomous Architect CI/CD Pipeline v34.1
+# AymnGuard Sovereign Enterprise : Autonomous Architect CI/CD Pipeline v34.2
 # ==============================================================================
-name: 👑 Sovereign Supreme Architect & AI Swarm Resilient Factory
+name: 👑 Sovereign Supreme Architect & Key Rotation Factory v34.2
 
 on:
   push:
@@ -33,7 +33,7 @@ jobs:
           fi
           pip install google-genai sqlalchemy aiosqlite pydantic fastapi uvicorn
 
-      - name: Run Sovereign Resilient AI Swarm Agent
+      - name: Run Sovereign Key-Rotation AI Swarm Agent
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           AI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -41,12 +41,12 @@ jobs:
         run: |
           python scripts/sovereign_architect_bot.py
 
-      - name: Auto-Commit & Push Sovereign State & Resilient Changes
+      - name: Auto-Commit & Push Sovereign State & Rotation Sync
         run: |
-          git config --global user.name "Sovereign Resilient Architect"
-          git config --global user.email "resilient@sovereign.bot"
+          git config --global user.name "Sovereign Key-Rotation Architect"
+          git config --global user.email "rotation@sovereign.bot"
           CURRENT_BRANCH=$(git branch --show-current)
           git add .
-          git commit -m "👑 [Sovereign Resilient v34.1]: Auto-recovery and multi-model intent execution sync" || true
+          git commit -m "👑 [Sovereign Key Rotation v34.2]: Multi-key failover and autonomous intent sync" || true
           git pull origin $CURRENT_BRANCH --rebase --autostash || true
           git push origin $CURRENT_BRANCH
