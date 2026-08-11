@@ -4,14 +4,13 @@
 /// ==============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:mobile_empire_app/app_config.dart';
 
 class SovereignBotModel {
   final String id;
   final String name;
   final String description;
   final IconData icon;
-  bool isInstalled;
+  final bool isInstalled;
   final bool isCustom;
 
   const SovereignBotModel({
@@ -28,7 +27,7 @@ class SovereignBotModel {
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       description: json['description'] ?? '',
-      icon: Icons.extension, // الأيقونة الافتراضية السيادية
+      icon: Icons.extension,
       isInstalled: json['is_installed'] ?? false,
       isCustom: json['is_custom'] ?? false,
     );
@@ -40,7 +39,7 @@ class SovereignBotModel {
       'name': name,
       'description': description,
       'is_installed': isInstalled,
-      'is_custom': is_custom,
+      'is_custom': isCustom,
     };
   }
 }
