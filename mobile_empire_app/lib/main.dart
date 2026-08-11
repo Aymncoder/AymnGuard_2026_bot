@@ -11,6 +11,7 @@ import 'sovereign_card.dart';
 import 'package:mobile_empire_app/premium_dashboard_screens.dart';
 import 'package:mobile_empire_app/app_drawers.dart';
 import 'package:mobile_empire_app/models/bot_model.dart';
+import 'package:mobile_empire_app/neural_core_screen.dart';
 
 void main() {
   runApp(const AymnGuardPlusApp());
