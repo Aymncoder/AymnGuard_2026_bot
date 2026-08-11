@@ -1,11 +1,7 @@
+// -*- coding: utf-8 -*-
 import 'package:flutter/material.dart';
 import 'app_config.dart';
 
-// ==============================================================================
-// 10. القوائم الجانبية (Drawers)
-// ==============================================================================
-
-/// القائمة الجانبية لحسابات المستخدم (النسخة الشاملة)
 class MultiAccountDrawer extends StatelessWidget {
   const MultiAccountDrawer({super.key});
 
@@ -16,15 +12,17 @@ class MultiAccountDrawer extends StatelessWidget {
       child: SafeArea(
         child: Column(
           children: [
-            const UserAccountsDrawerHeader(
-              decoration: BoxDecoration(color: AppColors.surface),
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 
-              currentAccountPicture: CircleAvatar(
+            UserAccountsDrawerHeader(
+              decoration: const BoxDecoration(color: AppColors.surface),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              currentAccountPicture: const CircleAvatar(
                   backgroundColor: Colors.white,
                   child: Icon(Icons.person, size: 40, color: Colors.grey)),
-              otherAccountsPictures: [
+              otherAccountsPictures: const [
                 CircleAvatar(backgroundColor: Colors.blue, child: Text("AN"))
               ],
+              accountName: const Text("AymnGuard Plus User"),
+              accountEmail: const Text("sovereign@aymnguard.enterprise"),
             ),
             Expanded(
               child: ListView(
@@ -67,7 +65,6 @@ class MultiAccountDrawer extends StatelessWidget {
   }
 }
 
-/// القائمة الجانبية للأدوات المتقدمة (Super App Tools)
 class AdvancedToolsDrawer extends StatelessWidget {
   const AdvancedToolsDrawer({super.key});
 
