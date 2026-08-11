@@ -18,9 +18,7 @@ class MultiAccountDrawer extends StatelessWidget {
           children: [
             const UserAccountsDrawerHeader(
               decoration: BoxDecoration(color: AppColors.surface),
-              accountName: Text("يارب",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              accountEmail: Text("+967 775 786 363"),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 
               currentAccountPicture: CircleAvatar(
                   backgroundColor: Colors.white,
                   child: Icon(Icons.person, size: 40, color: Colors.grey)),
