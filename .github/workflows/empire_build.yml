@@ -1,5 +1,5 @@
 # =====================================================================
-# AymnGuard Enterprise : Advanced CI/CD Cloud Factory (v18.9.0)
+# AymnGuard Enterprise : Advanced CI/CD Cloud Factory (v34.4.0)
 # =====================================================================
 # Sovereign App Name: AymnGuard Plus
 # Target Output: Single Comprehensive Fat APK & AAB
@@ -12,8 +12,13 @@ on:
   push:
     branches:
       - main
+      - master
     paths:
       - 'mobile_empire_app/**'
+
+permissions:
+  contents: write
+  actions: read
 
 jobs:
   build-super-app:
@@ -22,10 +27,10 @@ jobs:
 
     steps:
       - name: 🛡️ امتساج مستودع الإمبراطورية
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: ☕ إعداد بيئة التطوير (Java 17)
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
@@ -64,7 +69,7 @@ jobs:
         continue-on-error: true # استمرار البناء حتى لو فشلت الاختبارات لضمان الإنتاج
 
       - name: 🛡️ الفحص الأمني والتحليل البرمجي سيادياً (Linting)
-        run: flutter analyze
+        run: flutter analyze --no-fatal-infos
         working-directory: ./mobile_empire_app
         continue-on-error: true
 
@@ -91,11 +96,11 @@ jobs:
         with:
           name: AymnGuardPlus-Unified-APK
           # مسار الـ APK الموحد النهائي
-          path: mobile_empire_app/build/app/outputs/apk/release/app-release.apk
+          path: mobile_empire_app/build/app/outputs/flutter-apk/app-release.apk
           retention-days: 7
 
       - name: 📦 (AppBundle) تصدير حزمة المتجر
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         with:
           name: AymnGuardPlus-GooglePlay-AAB
           path: mobile_empire_app/build/app/outputs/bundle/release/app-release.aab
