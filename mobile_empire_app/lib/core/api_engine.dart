@@ -1,13 +1,17 @@
+// -*- coding: utf-8 -*-
+/// ==============================================================================
+/// AymnGuard Sovereign Enterprise : Sovereign API Engine v34.8
+/// ==============================================================================
+
 import 'dart:convert';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 
-/// السنترال الشامل: محرك الاتصال بالبوابة المؤسسية السيادية
+/// 👑 السنترال الشامل: محرك الاتصال بالبوابة المؤسسية السيادية
 class SovereignApiEngine {
-  // عنوان الـ IP الخاص بسيرفرك والنقطة المرجعية (استبدله لاحقاً إذا تغير السيرفر)
   static const String _baseUrl = 'http://135.181.86.199:8000/api/v1';
-  
-  // مفتاح الترخيص الافتراضي (يمكننا جعله ديناميكياً لاحقاً)
   static const String _licenseKey = 'AYMN-PREMIUM-LICENSE-2026';
+  static const Duration _defaultTimeout = Duration(seconds: 15);
 
   // ===========================================================================
   // 1. محرك إدارة الجلسات (Sessions Engine)
@@ -89,25 +93,37 @@ class SovereignApiEngine {
   }
 
   // ===========================================================================
-  // الدالة المركزية لإرسال الطلبات (Private Helper)
+  // الدالة المركزية لإرسال الطلبات المحصنة (Private Helper)
   // ===========================================================================
   static Future<Map<String, dynamic>> _postRequest(String endpoint, Map<String, dynamic> body) async {
     try {
       final response = await http.post(
         Uri.parse('$_baseUrl$endpoint'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Sovereign-License': _licenseKey,
+        },
         body: jsonEncode(body),
-      );
+      ).timeout(_defaultTimeout);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return jsonDecode(response.body);
+        final decoded = jsonDecode(response.body);
+        if (decoded is Map<String, dynamic>) {
+          return decoded;
+        }
+        return {"error": true, "message": "تنسيق الاستجابة غير متطابق"};
       } else {
         return {
           "error": true,
-          "message": "فشل الاتصال: ${response.statusCode}",
+          "message": "فشل الاتصال بالخادم: ${response.statusCode}",
           "details": response.body
         };
       }
+    } on TimeoutException {
+      return {
+        "error": true,
+        "message": "انتهت مهلة الاتصال بالخادم الإمبراطوري"
+      };
     } catch (e) {
       return {
         "error": true,
