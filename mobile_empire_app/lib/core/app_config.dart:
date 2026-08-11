@@ -1,12 +1,20 @@
+// -*- coding: utf-8 -*-
+/// ==============================================================================
+/// AymnGuard Sovereign Enterprise : Application Configuration & Theme v34.8
+/// ==============================================================================
+
 import 'package:flutter/material.dart';
 
-abstract class AppConfig {
-  static const String serverUrl = "http://135.181.86.199:10050";
+/// 👑 الإعدادات العامة وثوابت الخادم الإمبراطوري
+class AppConfig {
+  // تم توحيد المنفذ مع البوصلة الخلفية لضمان استجابة البوابات بلا عوائق
+  static const String serverUrl = "http://135.181.86.199:8000";
   static const String appVersion = "21.0.0 Enterprise";
   static const bool isOwnerStatus = true;
 }
 
-abstract class AppColors {
+/// 🎨 لوحة الألوان السيادية الرسمية للإمبراطورية
+class AppColors {
   static const Color background = Color(0xFF151E27);
   static const Color surface = Color(0xFF1E293B);
   static const Color primary = Color(0xFF0EA5E9);
