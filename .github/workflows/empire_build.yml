@@ -36,12 +36,13 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: 🦋 إعداد محرك Flutter المؤسسي (3.19.0)
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.19.0'
-          channel: 'stable'
-          cache: true
+    - name: 🦅 المؤسس (3.44.9) إعداد محرك
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.44.9'
+        channel: 'stable'
+        cache: true
+
 
       - name: 🛠️ Install Enterprise Dependencies & AI Scanners
         run: |
