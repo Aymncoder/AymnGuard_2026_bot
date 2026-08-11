@@ -12,17 +12,16 @@ class MultiAccountDrawer extends StatelessWidget {
       child: SafeArea(
         child: Column(
           children: [
-            UserAccountsDrawerHeader(
-              decoration: const BoxDecoration(color: AppColors.surface),
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              currentAccountPicture: const CircleAvatar(
+            const UserAccountsDrawerHeader(
+              decoration: BoxDecoration(color: AppColors.surface),
+              currentAccountPicture: CircleAvatar(
                   backgroundColor: Colors.white,
                   child: Icon(Icons.person, size: 40, color: Colors.grey)),
-              otherAccountsPictures: const [
+              otherAccountsPictures: [
                 CircleAvatar(backgroundColor: Colors.blue, child: Text("AN"))
               ],
-              accountName: const Text("AymnGuard Plus User"),
-              accountEmail: const Text("sovereign@aymnguard.enterprise"),
+              accountName: Text("AymnGuard Plus User", style: TextStyle(fontWeight: FontWeight.bold)),
+              accountEmail: Text("sovereign@aymnguard.enterprise"),
             ),
             Expanded(
               child: ListView(
@@ -87,9 +86,9 @@ class AdvancedToolsDrawer extends StatelessWidget {
                   SizedBox(height: 10),
                   Text("محركات الـ Super App",
                       style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold)),
+                       fontSize: 18,
+                      color: Colors.white,
+                   fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
