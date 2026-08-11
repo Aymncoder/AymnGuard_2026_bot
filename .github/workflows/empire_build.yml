@@ -8,6 +8,7 @@
 name: 👑 Sovereign Empire Super-App Builder
 
 on:
+  workflow_call: # 👈 أضف هذا السطر لتمكين المحرك الرئيسي من استدعائه
   workflow_dispatch:
   push:
     branches:
