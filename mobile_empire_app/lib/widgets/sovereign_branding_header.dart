@@ -8,17 +8,16 @@ class SovereignBrandingHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
       decoration: BoxDecoration(
-        color: const Color(0xFF0D1117), // خلفية داكنة تحاكي طابع السيادة التقنية
+        color: const Color(0xFF0D1117),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFD4AF37).withOpacity(0.3), // إطار ذهبي خفيف
+          color: const Color(0xFFD4AF37).withOpacity(0.3),
           width: 1,
         ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 1. أيقونة الدرع الإمبراطوري ثلاثي الأبعاد مع إطار ذهبي مضيء
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
@@ -46,18 +45,16 @@ class SovereignBrandingHeader extends StatelessWidget {
             child: const Icon(
               Icons.security_rounded,
               size: 40,
-              color: Color(0xFFF3C68F), // لون ذهبي متوهج للأيقونة
+              color: Color(0xFFF3C68F),
             ),
           ),
           
           const SizedBox(height: 16),
 
-          // 2. اسم التطبيق بخط إبداعي عالمي (AymnGuard Plus)
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // كلمة AymnGuard بيضاء ناصعة مع تباعد حروف أنيق
               Text(
                 'AymnGuard',
                 style: TextStyle(
@@ -75,7 +72,6 @@ class SovereignBrandingHeader extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               
-              // شارة Plus الذهبية للإصدار السيادي المتقدم
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
@@ -105,7 +101,6 @@ class SovereignBrandingHeader extends StatelessWidget {
 
           const SizedBox(height: 8),
 
-          // 3. الشعار الترويجي التحتي (Tagline) بخط رمادي رفيع ودقيق
           Text(
             'Sovereign Enterprise Security & Core Architecture',
             textAlign: TextAlign.center,
