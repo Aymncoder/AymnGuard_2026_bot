@@ -67,13 +67,6 @@ jobs:
 # =====================================================================
 # الوظيفة: التنسيق المركزي، الاستدعاء المظلي، الفحص اللامركزي، والبث العالمي
 # =====================================================================
-
-name: 👑 Sovereign Master Engine Mega-Core Pipeline
-
-on:
-  workflow_dispatch:
-    inputs:
-      debug_mode:
         description: 'Enable verbose debugging for Sovereign Engine'
         required: false
         default: 'true'
