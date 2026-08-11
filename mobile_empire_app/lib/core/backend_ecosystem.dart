@@ -1,11 +1,18 @@
+// -*- coding: utf-8 -*-
+/// ==============================================================================
+/// AymnGuard Sovereign Enterprise : The Universal Integration Engine v34.6
+/// ==============================================================================
+
 import 'dart:convert';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 
 /// 👑 نظام الربط الشامل والنهائي (The Universal Integration Engine)
-/// يربط كل ملفات ومجلدات إمبراطورية AymnGuard بالتطبيق دون أي نقصان.
+/// يربط كل ملفات ومجلدات إمبراطورية AymnGuard بالتطبيق دون أي نقصان مع حماية مؤسسية.
 class BackendCoreEcosystem {
   static const String _baseUrl = 'http://135.181.86.199:8000';
   static const String _license = 'AYMN-PREMIUM-LICENSE-2026';
+  static const Duration _defaultTimeout = Duration(seconds: 15);
 
   // ===========================================================================
   // 1. الربط مع ملفات API/V1 العامة (البوابات والمسارات)
@@ -15,7 +22,7 @@ class BackendCoreEcosystem {
   }
 
   // ===========================================================================
-  // إدارة المصادقة السيادية (Pyrogram OTP) - [تم التصحيح هنا]
+  // إدارة المصادقة السيادية (Pyrogram OTP)
   // ===========================================================================
   static Future<Map<String, dynamic>> requestTelegramOtp(
     String sessionName, 
@@ -260,18 +267,34 @@ class BackendCoreEcosystem {
   }
 
   // ===========================================================================
-  // ⚙️ معالجات الاتصال الأساسية (POST & GET Middlewares)
+  // ⚙️ معالجات الاتصال الأساسية المحصنة (POST & GET Middlewares)
   // ===========================================================================
   static Future<Map<String, dynamic>> _post(String endpoint, Map<String, dynamic> body) async {
     body['license_key'] = _license;
     try {
       final response = await http.post(
         Uri.parse('$_baseUrl$endpoint'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Sovereign-License': _license,
+        },
         body: jsonEncode(body),
-      );
-      if (response.statusCode == 429) return {"error": true, "message": "نظام الحماية نشط - يرجى التمهل"};
-      return jsonDecode(response.body);
+      ).timeout(_defaultTimeout);
+
+      if (response.statusCode == 429) {
+        return {"error": true, "message": "نظام الحماية نشط - يرجى التمهل"};
+      }
+      if (response.statusCode >= 500) {
+        return {"error": true, "message": "خطأ في الخادم الإمبراطوري (${response.statusCode})"};
+      }
+
+      final decoded = jsonDecode(response.body);
+      if (decoded is Map<String, dynamic>) {
+        return decoded;
+      }
+      return {"error": true, "message": "تنسيق استجابة غير صالح من السيرفر"};
+    } on TimeoutException {
+      return {"error": true, "message": "انتهت مهلة الاتصال بالخادم الإمبراطوري"};
     } catch (e) {
       return {"error": true, "message": "فشل الربط بالمسار: $endpoint"};
     }
@@ -281,12 +304,26 @@ class BackendCoreEcosystem {
     try {
       final response = await http.get(
         Uri.parse('$_baseUrl$endpoint'),
-        headers: {'Content-Type': 'application/json'},
-      );
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Sovereign-License': _license,
+        },
+      ).timeout(_defaultTimeout);
+
       if (response.statusCode == 429) {
         return {"error": true, "message": "نظام الحماية نشط - يرجى التمهل"};
       }
-      return jsonDecode(response.body);
+      if (response.statusCode >= 500) {
+        return {"error": true, "message": "خطأ في الخادم الإمبراطوري (${response.statusCode})"};
+      }
+
+      final decoded = jsonDecode(response.body);
+      if (decoded is Map<String, dynamic>) {
+        return decoded;
+      }
+      return {"error": true, "message": "تنسيق استجابة غير صالح من السيرفر"};
+    } on TimeoutException {
+      return {"error": true, "message": "انتهت مهلة الاتصال بالخادم الإمبراطوري"};
     } catch (e) {
       return {"error": true, "message": "السيرفر لا يستجيب أو مغلق."};
     }
