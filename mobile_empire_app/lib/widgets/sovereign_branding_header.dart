@@ -1,4 +1,5 @@
-file_content = """import 'package:flutter/material.dart';
+// -*- coding: utf-8 -*-
+import 'package:flutter/material.dart';
 
 class SovereignBrandingHeader extends StatelessWidget {
   const SovereignBrandingHeader({Key? key}) : super(key: key);
@@ -11,7 +12,7 @@ class SovereignBrandingHeader extends StatelessWidget {
         color: const Color(0xFF0D1117),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFD4AF37).withOpacity(0.3),
+          color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -24,7 +25,7 @@ class SovereignBrandingHeader extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFFD4AF37).withOpacity(0.4),
+                  const Color(0xFFD4AF37).withValues(alpha: 0.4),
                   const Color(0xFF1A1F2C),
                 ],
                 begin: Alignment.topLeft,
@@ -32,7 +33,7 @@ class SovereignBrandingHeader extends StatelessWidget {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFD4AF37).withOpacity(0.3),
+                  color: const Color(0xFFD4AF37).withValues(alpha: 0.3),
                   blurRadius: 15,
                   spreadRadius: 2,
                 ),
@@ -64,7 +65,7 @@ class SovereignBrandingHeader extends StatelessWidget {
                   letterSpacing: 2.0,
                   shadows: [
                     Shadow(
-                      color: Colors.white.withOpacity(0.4),
+                      color: Colors.white.withValues(alpha: 0.4),
                       blurRadius: 8,
                     ),
                   ],
@@ -81,7 +82,7 @@ class SovereignBrandingHeader extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFD4AF37).withOpacity(0.5),
+                      color: const Color(0xFFD4AF37).withValues(alpha: 0.5),
                       blurRadius: 6,
                     ),
                   ],
@@ -116,7 +117,3 @@ class SovereignBrandingHeader extends StatelessWidget {
     );
   }
 }
-"""
-
-with open('sovereign_branding_header.dart', 'w', encoding='utf-8') as f:
-    f.write(file_content)
