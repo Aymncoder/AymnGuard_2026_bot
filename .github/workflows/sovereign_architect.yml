@@ -14,7 +14,7 @@ permissions:
 jobs:
   sovereign-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Sovereign Repository
         uses: actions/checkout@v4
@@ -33,11 +33,12 @@ jobs:
           fi
           pip install google-genai sqlalchemy aiosqlite pydantic fastapi uvicorn
 
-      - name: Execute Sovereign Deployment Shield
+      - name: Execute Sovereign Deployment Shield & Active AI Engine
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           GEMINI_API_KEY_SECONDARY: ${{ secrets.GEMINI_API_KEY_SECONDARY }}
           GEMINI_API_KEY_PROJECT2: ${{ secrets.GEMINI_API_KEY_PROJECT2 }}
         run: |
-          echo "👑 [SOVEREIGN DEPLOY]: تم التحقق من سلامة البنية التحتية، النظام مؤمن ومستعد للتشغيل بلا توقف."
+          echo "👑 [SOVEREIGN DEPLOY] : بدء تفعيل وإطلاق محرك الشفاء الذكي والربط الإمبراطوري..."
+          python scripts/sovereign_architect_bot.py
