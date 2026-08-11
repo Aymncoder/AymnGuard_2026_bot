@@ -91,4 +91,4 @@ jobs:
         with:
           commit_message: "👑 Sovereign Master Engine: إتمام التدقيق، الإصلاح المعماري، والربط المؤسسي بنجاح تام"
           branch: ${{ github.head_ref || github.ref_name }}
-          pull_strategy: "REBASE"
+          
