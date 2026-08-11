@@ -1,6 +1,6 @@
 // -*- coding: utf-8 -*-
 /// ==============================================================================
-/// AymnGuard Sovereign Enterprise : Autonomous Neural Core Screen v1.0
+/// AymnGuard Sovereign Enterprise : Autonomous Neural Core Screen v1.2
 /// ==============================================================================
 
 import 'package:flutter/material.dart';
