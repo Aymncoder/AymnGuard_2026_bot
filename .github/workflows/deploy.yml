@@ -1,17 +1,29 @@
-          script: |
-            # 1. الدخول إلى مجلد المشروع
-            cd /root/AymnGuard_2026_bot
-            
-            # 2. سحب أحدث التعديلات بالقوة
-            git fetch --all
-            git reset --hard origin/main
-            git clean -fd
-            
-            # 3. إيقاف أي نسخة سابقة للبوت لمنع تداخل العمليات
-            pkill -f "python" || true
-            
-            # 4. تشغيل البوت في الخلفية مع فصله تماماً عن جلسة SSH (هنا التعديل الجديد)
-            nohup python3 run.py </dev/null>/dev/null 2>&1 &
-            
-            # 5. إنهاء الاتصال بنجاح
-            sleep 2
+name: 🚀 Sovereign Deployment Engine
+
+on:
+  workflow_call: # 👈 هذا السطر الأساسي لربطه مع المايسترو
+
+jobs:
+  deploy:
+    name: "🌐 Execute Production Deployment"
+    runs-on: self-hosted
+    steps:
+      - name: 🌐 Execute Production Deployment & Process Restart
+        run: |
+          echo "--- 🌐 بدء نشر المحرك السيادي على الخادم ---"
+          cd /root/AymnGuard_2026_bot
+          
+          # 1. سحب أحدث التعديلات بالقوة
+          git fetch --all
+          git reset --hard origin/main
+          git clean -fd
+          
+          # 2. إيقاف أي نسخة سابقة للمبوت لمنع تداخل العمليات
+          pkill -f "python" || true
+          
+          # 3. تشغيل البوت في الخلفية بمعزل عن جلسة SSH
+          nohup python3 run.py </dev/null >/dev/null 2>&1 &
+          
+          # 4. إنهاء الاتصال بنجاح
+          sleep 2
+          echo "✅ [Deployment Success]: تم إقلاع المحرك وتشغيل البوت بنجاح تام في الخلفية."
