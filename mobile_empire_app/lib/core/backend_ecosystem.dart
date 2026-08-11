@@ -14,6 +14,13 @@ class BackendCoreEcosystem {
   static const String _license = 'AYMN-PREMIUM-LICENSE-2026';
   static const Duration _defaultTimeout = Duration(seconds: 15);
 
+  // دالة داخلية لتنظيف الرابط وضمان عدم تكرار الشرطات المائلة //
+  static String _formatUrl(String endpoint) {
+    String base = _baseUrl.endsWith('/') ? _baseUrl.substring(0, _baseUrl.length - 1) : _baseUrl;
+    String path = endpoint.startsWith('/') ? endpoint : '/$endpoint';
+    return '$base$path';
+  }
+
   // ===========================================================================
   // 1. الربط مع ملفات API/V1 العامة (البوابات والمسارات)
   // ===========================================================================
@@ -273,7 +280,7 @@ class BackendCoreEcosystem {
     body['license_key'] = _license;
     try {
       final response = await http.post(
-        Uri.parse('$_baseUrl$endpoint'),
+        Uri.parse(_formatUrl(endpoint)), // استخدام الدالة المصلحة
         headers: {
           'Content-Type': 'application/json',
           'X-Sovereign-License': _license,
@@ -303,7 +310,7 @@ class BackendCoreEcosystem {
   static Future<Map<String, dynamic>> _get(String endpoint) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl$endpoint'),
+        Uri.parse(_formatUrl(endpoint)), // استخدام الدالة المصلحة
         headers: {
           'Content-Type': 'application/json',
           'X-Sovereign-License': _license,
