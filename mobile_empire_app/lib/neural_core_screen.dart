@@ -1,11 +1,11 @@
 // -*- coding: utf-8 -*-
 /// ==============================================================================
-/// AymnGuard Sovereign Enterprise : Autonomous Neural Core Screen v4.2
+/// AymnGuard Sovereign Enterprise : Autonomous Neural Core Screen v5.0 (Absolute)
 /// ==============================================================================
 
 import 'package:flutter/material.dart';
-import 'app_config.dart';
-import 'core/backend_ecosystem.dart';
+import 'package:mobile_empire_app/app_config.dart';
+import 'package:mobile_empire_app/core/backend_ecosystem.dart';
 
 class NeuralCoreScreen extends StatefulWidget {
   const NeuralCoreScreen({super.key});
