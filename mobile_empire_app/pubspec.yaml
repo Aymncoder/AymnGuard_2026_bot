@@ -24,7 +24,6 @@ flutter_icons:
   ios: true
   image_path: "assets/app_icon.png"
   min_sdk_android: 21
-
 flutter:
   uses-material-design: true
   assets:
