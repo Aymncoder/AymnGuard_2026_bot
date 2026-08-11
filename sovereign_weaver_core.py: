@@ -1,52 +1,43 @@
 import os
 import sys
 
-def weave_code_with_registry(target_file, snippet_code, snippet_type="widget"):
-    """
-    محرك الخياطة المتقدم والمربوط بسجل القوالب السيادية
-    """
+def weave_code_snippet(target_file, snippet_code):
+    print(f"⚙️ جاري فحص الملف: {target_file}")
     if not os.path.exists(target_file):
-        print(f"❌ [Weaver Error]: الملف {target_file} غير موجود.")
+        print(f"❌ خطأ: الملف غير موجود!")
         return False
 
     with open(target_file, 'r', encoding='utf-8') as f:
         content = f.read()
 
+    # تنظيف الكود وإزالة أي علامات غريبة
     clean_snippet = snippet_code.strip()
+    if clean_snippet.startswith("```"):
+        lines = clean_snippet.splitlines()
+        if len(lines) > 2:
+            clean_snippet = "\n".join(lines[1:-1]).strip()
+
     if clean_snippet in content:
-        print(f"ℹ️ [Weaver Notice]: الكود موجود مسبقاً في {target_file}.")
+        print("ℹ️ ملاحظة: الكود موجود مسبقاً، لا داعي للتكرار.")
         return True
 
-    # تحديد علامة الحقن بناءً على نوع القطعة البرمجية
-    marker_map = {
-        "import": "// --- SOVEREIGN_IMPORT_MARKER ---",
-        "init": "// --- SOVEREIGN_INIT_MARKER ---",
-        "widget": "// --- SOVEREIGN_WIDGET_MARKER ---",
-        "py_import": "# --- SOVEREIGN_PYTHON_IMPORTS_MARKER ---",
-        "py_route": "# --- SOVEREIGN_PYTHON_ROUTES_MARKER ---"
-    }
-
-    target_marker = marker_map.get(snippet_type, "// --- SOVEREIGN_WIDGET_MARKER ---")
-
-    if target_marker in content:
-        updated_content = content.replace(target_marker, f"{target_marker}\n{clean_snippet}")
-        print(f"🎯 [Weaver Success]: تم حقن القطعة في الموضع المعياري: {target_type}")
-    else:
-        updated_content = content + f"\n\n{clean_snippet}\n"
-        print(f"⚠️ [Weaver Fallback]: لم يتم العثور على العلامة، تم الحقن في نهاية الملف.")
+    # الإضافة الآمنة في نهاية الملف
+    updated_content = content + f"\n\n// --- تم الحقن الآلي بواسطة المحرك السيادي ---\n{clean_snippet}\n"
 
     with open(target_file, 'w', encoding='utf-8') as f:
         f.write(updated_content)
 
+    print("🎯 نجاح: تم دمج الكود البرمجي في الملف بدقة.")
     return True
 
 if __name__ == "__main__":
     target = os.getenv("TARGET_FILE", "")
     snippet = os.getenv("CODE_SNIPPET", "")
-    stype = os.getenv("SNIPPET_TYPE", "widget")
     
     if target and snippet:
-        weave_code_with_registry(target, snippet, stype)
+        success = weave_code_snippet(target, snippet)
+        if not success:
+            sys.exit(1)
     else:
-        print("❌ [Weaver Fatal Error]: بيانات غير كافية للحقن.")
+        print("❌ خطأ: بيانات مفقودة، تأكد من المسار والكود.")
         sys.exit(1)
