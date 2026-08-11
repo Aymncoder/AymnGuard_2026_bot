@@ -1,6 +1,8 @@
 name: "🌐 AymnGuard Sovereign Mega-Pipeline: Autonomous Workforce & Auto-Healing"
 
+
 on:
+  workflow_call: # 👈 أضف هذا السطر لربطه بالمايسترو الرئيسي
   push:
     branches: [ "main", "master", "production" ]
   pull_request:
