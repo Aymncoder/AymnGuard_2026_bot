@@ -3,7 +3,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'app_config.dart';
 import 'core/backend_ecosystem.dart';
 import 'sovereign_card.dart';
-import 'package:mobile_empire_app/telegram_core_chats_screen.dart';
 import 'package:mobile_empire_app/premium_dashboard_screens.dart';
 import 'package:mobile_empire_app/app_drawers.dart';
 
@@ -481,7 +480,7 @@ class CommunitiesScreenTab extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => TelegramCoreChatsScreen(),
+                        builder: (context) => const TelegramCoreChatsScreen(),
                       ),
                     );
                   }
@@ -532,6 +531,31 @@ class CommunitiesScreenTab extends StatelessWidget {
             Icons.arrow_forward_ios, 
             size: 14, 
             color: AppColors.accentGold,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// 🛡️ تعريف شاشة محادثات وبوتات تليجرام السيادية لتلافي أي خطأ في النطاق
+class TelegramCoreChatsScreen extends StatelessWidget {
+  const TelegramCoreChatsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text('محادثات وبوتات تليجرام السيادية 🛡️', style: TextStyle(fontSize: 18)),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: const [
+          ListTile(
+            leading: CircleAvatar(backgroundColor: Colors.purple, child: Icon(Icons.smart_toy, color: Colors.white)),
+            title: Text('AymnGuard 2026 Bot', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            subtitle: Text('إدارة العمليات والأمان السيادي', style: TextStyle(color: Colors.grey)),
           ),
         ],
       ),
@@ -627,7 +651,7 @@ class SovereignEnterpriseBanner extends StatelessWidget {
               color: Color(0xFFD4AF37),
             ),
           ),
-          const SizedBox(height: 16),
+      const SizedBox(height: 16),
           const Text(
             "AymnGuard Plus",
             style: TextStyle(
