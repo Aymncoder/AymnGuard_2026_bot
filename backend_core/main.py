@@ -45,6 +45,19 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column
 from sqlalchemy import String, Integer, DateTime, Text
 from sqlalchemy.future import select
+from fastapi import FastAPI
+
+app = FastAPI(title="AymnGuard Sovereign Core")
+
+# --- SOVEREIGN_PYTHON_IMPORTS_MARKER ---
+# (يتم حقن استدعاءات المكتبات الجديدة هنا)
+
+# --- SOVEREIGN_PYTHON_ROUTES_MARKER ---
+# (يتم حقن مسارات الـ API والتحكم هنا تلقائياً)
+
+@app.get("/")
+def read_root():
+    return {"status": "Sovereign Engine Operational"}
 
 # ==============================================================================
 # 1. إعدادات التسجيل والبيئة المركزية (Logging & Config Settings)
