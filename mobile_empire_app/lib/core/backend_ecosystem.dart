@@ -14,11 +14,16 @@ class BackendCoreEcosystem {
   static const String _license = 'AYMN-PREMIUM-LICENSE-2026';
   static const Duration _defaultTimeout = Duration(seconds: 15);
 
-  // دالة داخلية لتنظيف الرابط وضمان عدم تكرار الشرطات المائلة //
+  // دالة داخلية لتنظيف الرابط وضمان عدم تكرار الشرطات المائلة (المعالجة الآمنة الجذرية) //
   static String _formatUrl(String endpoint) {
-    String base = _baseUrl.endsWith('/') ? _baseUrl.substring(0, _baseUrl.length - 1) : _baseUrl;
-    String path = endpoint.startsWith('/') ? endpoint : '/$endpoint';
-    return '$base$path';
+    // إزالة الشرطات الزائدة من نهاية الرابط الأساسي
+    final cleanBase = _baseUrl.replaceAll(RegExp(r'/+$'), '');
+    // إزالة الشرطات الزائدة من بداية المسار المرسل
+    final cleanEndpoint = endpoint.replaceAll(RegExp(r'^/+'), '');
+    // إزالة أي شرطات مزدوجة قد تحدث بالخطأ في منتصف المسار
+    final sanitizedEndpoint = cleanEndpoint.replaceAll(RegExp(r'/+'), '/');
+    
+    return '$cleanBase/$sanitizedEndpoint';
   }
 
   // ===========================================================================
