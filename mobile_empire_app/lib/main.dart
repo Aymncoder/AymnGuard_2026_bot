@@ -1,3 +1,8 @@
+// -*- coding: utf-8 -*-
+/// ==============================================================================
+/// AymnGuard Sovereign Enterprise : Main Application Entry Point v34.5
+/// ==============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'app_config.dart';
@@ -5,6 +10,7 @@ import 'core/backend_ecosystem.dart';
 import 'sovereign_card.dart';
 import 'package:mobile_empire_app/premium_dashboard_screens.dart';
 import 'package:mobile_empire_app/app_drawers.dart';
+import 'package:mobile_empire_app/models/bot_model.dart';
 
 void main() {
   runApp(const AymnGuardPlusApp());
@@ -71,30 +77,6 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
     {'name': 'الصومال', 'code': '+252', 'flag': '🇸🇴'},
     {'name': 'جيبوتي', 'code': '+253', 'flag': '🇩🇯'},
     {'name': 'جزر القمر', 'code': '+269', 'flag': '🇰🇲'},
-    {'name': 'الولايات المتحدة', 'code': '+1', 'flag': '🇺🇸'},
-    {'name': 'كندا', 'code': '+1', 'flag': '🇨🇦'},
-    {'name': 'المملكة المتحدة', 'code': '+44', 'flag': '🇬🇧'},
-    {'name': 'فرنسا', 'code': '+33', 'flag': '🇫🇷'},
-    {'name': 'ألمانيا', 'code': '+49', 'flag': '🇩🇪'},
-    {'name': 'إيطاليا', 'code': '+39', 'flag': '🇮🇹'},
-    {'name': 'إسبانيا', 'code': '+34', 'flag': '🇪🇸'},
-    {'name': 'تركيا', 'code': '+90', 'flag': '🇹🇷'},
-    {'name': 'روسيا', 'code': '+7', 'flag': '🇷🇺'},
-    {'name': 'الصين', 'code': '+86', 'flag': '🇨🇳'},
-    {'name': 'اليابان', 'code': '+81', 'flag': '🇯🇵'},
-    {'name': 'كوريا الجنوبية', 'code': '+82', 'flag': '🇰🇷'},
-    {'name': 'الهند', 'code': '+91', 'flag': '🇮🇳'},
-    {'name': 'باكستان', 'code': '+92', 'flag': '🇵🇰'},
-    {'name': 'إيران', 'code': '+98', 'flag': '🇮🇷'},
-    {'name': 'إندونيسيا', 'code': '+62', 'flag': '🇮🇩'},
-    {'name': 'ماليزيا', 'code': '+60', 'flag': '🇲🇾'},
-    {'name': 'سنغافورة', 'code': '+65', 'flag': '🇸🇬'},
-    {'name': 'البرازيل', 'code': '+55', 'flag': '🇧🇷'},
-    {'name': 'الأرجنتين', 'code': '+54', 'flag': '🇦🇷'},
-    {'name': 'المكسيك', 'code': '+52', 'flag': '🇲🇽'},
-    {'name': 'أستراليا', 'code': '+61', 'flag': '🇦🇺'},
-    {'name': 'نيوزيلندا', 'code': '+64', 'flag': '🇳🇿'},
-    {'name': 'جنوب إفريقيا', 'code': '+27', 'flag': '🇿🇦'},
   ];
 
   void _openCountryPicker() {
@@ -538,7 +520,6 @@ class CommunitiesScreenTab extends StatelessWidget {
   }
 }
 
-// 🛡️ تعريف شاشة محادثات وبوتات تليجرام السيادية لتلافي أي خطأ في النطاق
 class TelegramCoreChatsScreen extends StatelessWidget {
   const TelegramCoreChatsScreen({super.key});
 
@@ -651,7 +632,7 @@ class SovereignEnterpriseBanner extends StatelessWidget {
               color: Color(0xFFD4AF37),
             ),
           ),
-      const SizedBox(height: 16),
+          const SizedBox(height: 16),
           const Text(
             "AymnGuard Plus",
             style: TextStyle(
