@@ -1,6 +1,6 @@
 // -*- coding: utf-8 -*-
 /// ==============================================================================
-/// AymnGuard Sovereign Enterprise : Sovereign Bot Data Model v34.4.1
+/// AymnGuard Sovereign Enterprise : Sovereign Bot Data Model v34.5
 /// ==============================================================================
 
 import 'package:flutter/material.dart';
@@ -10,10 +10,10 @@ class SovereignBotModel {
   final String name;
   final String description;
   final IconData icon;
-  final bool isInstalled;
+  bool isInstalled;
   final bool isCustom;
 
-  const SovereignBotModel({
+  SovereignBotModel({
     required this.id,
     required this.name,
     required this.description,
@@ -41,5 +41,23 @@ class SovereignBotModel {
       'is_installed': isInstalled,
       'is_custom': isCustom,
     };
+  }
+
+  SovereignBotModel copyWith({
+    String? id,
+    String? name,
+    String? description,
+    IconData? icon,
+    bool? isInstalled,
+    bool? isCustom,
+  }) {
+    return SovereignBotModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      icon: icon ?? this.icon,
+      isInstalled: isInstalled ?? this.isInstalled,
+      isCustom: isCustom ?? this.isCustom,
+    );
   }
 }
