@@ -34,7 +34,7 @@ jobs:
           CODE_SNIPPET: ${{ github.event.inputs.code_snippet }}
           SNIPPET_TYPE: ${{ github.event.inputs.snippet_type }}
         run: |
-          python3 sovereign_weaver_core.py
+          python3 اسم_المجلد/sovereign_weaver_core.py
 
       - name: 💾 حفظ ورفع التعديلات تلقائياً
         run: |
