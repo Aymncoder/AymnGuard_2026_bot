@@ -1,9 +1,10 @@
+// -*- coding: utf-8 -*-
+/// ==============================================================================
+/// AymnGuard Sovereign Enterprise : Sovereign Bot Data Model v34.4
+/// ==============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:mobile_empire_app/app_config.dart';
-
-// ==============================================================================
-// نموذج بيانات البوتات السيادية (Sovereign Bot Data Model)
-// ==============================================================================
 
 class SovereignBotModel {
   final String id;
@@ -13,7 +14,7 @@ class SovereignBotModel {
   bool isInstalled;
   final bool isCustom;
 
-  SovereignBotModel({
+  const SovereignBotModel({
     required this.id,
     required this.name,
     required this.description,
@@ -22,16 +23,24 @@ class SovereignBotModel {
     this.isCustom = false,
   });
 
-  /// تحويل البيانات القادمة من السيرفر (JSON) إلى كائن (Object)
   factory SovereignBotModel.fromJson(Map<String, dynamic> json) {
     return SovereignBotModel(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       description: json['description'] ?? '',
-      // ملاحظة: الأيقونة هنا ثابتة حالياً، يمكن ربطها لاحقاً ببيانات السيرفر إذا لزم الأمر
-      icon: Icons.extension,
+      icon: Icons.extension, // الأيقونة الافتراضية السيادية
       isInstalled: json['is_installed'] ?? false,
       isCustom: json['is_custom'] ?? false,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'is_installed': isInstalled,
+      'is_custom': is_custom,
+    };
   }
 }
