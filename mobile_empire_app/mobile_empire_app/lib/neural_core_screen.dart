@@ -1,6 +1,6 @@
 // -*- coding: utf-8 -*-
 /// ==============================================================================
-/// AymnGuard Sovereign Enterprise : Autonomous Neural Core Screen v1.6
+/// AymnGuard Sovereign Enterprise : Autonomous Neural Core Screen v2.0
 /// ==============================================================================
 
 import 'package:flutter/material.dart';
@@ -128,3 +128,4 @@ class _NeuralCoreScreenState extends State<NeuralCoreScreen> {
     );
   }
 }
+
