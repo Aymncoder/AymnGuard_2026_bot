@@ -1,0 +1,64 @@
+import os
+import sys
+import re
+
+def clean_and_format_snippet(snippet):
+    """
+    تنظيف الكود المرسل من أي علامات تنصيص زائدة أو رموز تلوث بناء الجملة (Syntax)
+    """
+    # إزالة علامات التنصيص الخارجية المفرطة إن وجدت بالخطأ
+    cleaned = snippet.strip()
+    if cleaned.startswith("```") and cleaned.endswith("```"):
+        lines = cleaned.splitlines()
+        # إزالة السطر الأول والأخير إذا كانا يمثلان كتلة الكود (Markdown code blocks)
+        if len(lines) > 2:
+            cleaned = "\n".join(lines[1:-1]).strip()
+    return cleaned
+
+def weave_code_snippet(target_file, snippet_code, target_marker):
+    """
+    محرك الخياطة والدمج المتقدم: يقوم بالحقن الدقيق بناءً على العلامات الميدانية (Markers)
+    """
+    if not os.path.exists(target_file):
+        print(f"❌ [Weaver Error]: الملف المستهدف '{target_file}' غير موجود في المسار المحدد.")
+        return False
+
+    with open(target_file, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    processed_snippet = clean_and_format_snippet(snippet_code)
+
+    # التحقق من عدم التكرار المطابق تماماً
+    if processed_snippet in content:
+        print(f"ℹ️ [Weaver Notice]: الكود المرسل موجود مسبقاً في {target_file}، تم تخطي التكرار بنجاح.")
+        return True
+
+    # البحث عن علامة الحقن المخصصة
+    if target_marker and target_marker in content:
+        # حقن الكود مباشرة بعد علامة الموضع المحددة
+        updated_content = content.replace(target_marker, f"{target_marker}\n\n{processed_snippet}\n")
+        print(f"🎯 [Weaver Match]: تم التعرف على علامة الحقن '{target_marker}' بنجاح.")
+    else:
+        # إن لم توجد علامة، يتم الحقن التلقائي في نهاية الملف مع فاصل آمن
+        print(f"⚠️ [Weaver Warning]: لم يتم العثور على العلامة '{target_marker}'، سيتم الحقن في نهاية الملف.")
+        updated_content = content + f"\n\n// --- Sovereign Auto-Injected Block ---\n{processed_snippet}\n"
+
+    with open(target_file, 'w', encoding='utf-8') as f:
+        f.write(updated_content)
+
+    print(f"✅ [Weaver Success]: تم دمج وخياطة القطعة البرمجية بنجاح تام داخل: {target_file}")
+    return True
+
+if __name__ == "__main__":
+    # جلب المتغيرات البيئية المرسلة من خط الإنتاج (GitHub Actions)
+    target = os.getenv("TARGET_FILE", "")
+    snippet = os.getenv("CODE_SNIPPET", "")
+    marker = os.getenv("TARGET_MARKER", "// --- SOVEREIGN_INJECTION_POINT ---")
+
+    if not target or not snippet:
+        print("❌ [Weaver Fatal Error]: مسار الملف المستهدف أو القطعة البرمجية مفقودان.")
+        sys.exit(1)
+
+    success = weave_code_snippet(target, snippet, marker)
+    if not success:
+        sys.exit(1)
