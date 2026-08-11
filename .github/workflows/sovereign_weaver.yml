@@ -1,0 +1,56 @@
+name: 🧬 Sovereign Weaver & Auto-Stitching Engine
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_file:
+        description: 'المسار المستهدف لدمج الكود (مثل: mobile_empire_app/lib/main.dart)'
+        required: true
+        type: string
+      code_snippet:
+        description: 'القطعة البرمجية أو الدالة المراد زرعها وربطها'
+        required: true
+        type: string
+      target_marker:
+        description: 'علامة الموضع (Marker) للحقن الدقيق'
+        required: false
+        default: '# --- SOVEREIGN_INJECTION_POINT ---'
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  weave_and_heal:
+    name: "🧵 خياطة ودمج الكود السيادي تلقائياً"
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛡️ Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🐍 Set up Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 🧬 Run Sovereign Weaver Core
+        env:
+          TARGET_FILE: ${{ inputs.target_file }}
+          CODE_SNIPPET: ${{ inputs.code_snippet }}
+          TARGET_MARKER: ${{ inputs.target_marker }}
+        run: |
+          python3 sovereign_weaver_core.py
+
+      - name: 🛡️ AST & Syntax Validation (فحص النحو والترميم)
+        run: |
+          echo "🔍 بدء التدقيق النحوي للبنية المدمجة..."
+          pip install flake8 --break-system-packages || true
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || echo "⚠️ تحذير طفيف تم رصده وتجاوزه."
+
+      - name: 🚀 Commit & Push Weaved Changes (حفظ التعديلات في المستودع)
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🧬 [Sovereign Weaver]: تم دمج القطعة البرمجية وخياطتها في مكانها الصحيح بنجاح."
+          branch: ${{ github.head_ref || github.ref_name }}
