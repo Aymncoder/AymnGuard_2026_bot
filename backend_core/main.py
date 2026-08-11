@@ -1,163 +1,10 @@
-
-# --- Sovereign Enterprise Delta Bridges v33 ---
-from core.meta_engine import router as meta_engine_router
-from services.telegram_bridge import router as telegram_bridge_router
-from services.test_orphan import router as test_orphan_router
-from services.test_orphan_service import router as test_orphan_service_router
-from services.websocket import router as websocket_router
-from services.health import router as health_router
-from src.ai_engine import router as ai_engine_router
-from app.enterprise_gateway import router as enterprise_gateway_router
-from app.empire_app_gateway import router as empire_app_gateway_router
-from backend_core.core_routes import router as core_routes_router
-from backend_core.backend_core.services.meta_engine import router as meta_engine_router
-from backend_core.app.api.__init__ import router as __init___router
-from backend_core.app.api.api_router import router as api_router_router
-from backend_core.app.api.v1.auth import router as auth_router
-from backend_core.app.api.v1.__init__ import router as __init___router
-from backend_core.app.api.v1.api import router as api_router
-from backend_core.app.api.v1.api_router import router as api_router_router
-from backend_core.app.api.v1.router import router as router_router
-from backend_core.app.api.v1.endpoints.users import router as users_router
-from backend_core.app.api.v1.endpoints.auth import router as auth_router
-from backend_core.app.api.v1.endpoints.__init__ import router as __init___router
-from backend_core.app.api.v1.endpoints.telegram import router as telegram_router
-from backend_core.api.v1.subscription_router import router as subscription_router_router
-from backend_core.api.v1.search_media_router import router as search_media_router_router
-app.include_router(meta_engine_router)
-app.include_router(telegram_bridge_router)
-app.include_router(test_orphan_router)
-app.include_router(test_orphan_service_router)
-app.include_router(websocket_router)
-app.include_router(health_router)
-app.include_router(ai_engine_router)
-app.include_router(enterprise_gateway_router)
-app.include_router(empire_app_gateway_router)
-app.include_router(core_routes_router)
-app.include_router(meta_engine_router)
-app.include_router(__init___router)
-app.include_router(api_router_router)
-app.include_router(auth_router)
-app.include_router(__init___router)
-app.include_router(api_router)
-app.include_router(api_router_router)
-app.include_router(router_router)
-app.include_router(users_router)
-app.include_router(auth_router)
-app.include_router(__init___router)
-app.include_router(telegram_router)
-app.include_router(subscription_router_router)
-app.include_router(search_media_router_router)
-
-
-# --- Sovereign Enterprise Auto-Wired Bridges v32 ---
-from core.meta_engine import router as meta_engine_router
-from services.telegram_bridge import router as telegram_bridge_router
-from services.test_orphan import router as test_orphan_router
-from services.test_orphan_service import router as test_orphan_service_router
-from services.websocket import router as websocket_router
-from services.health import router as health_router
-from src.ai_engine import router as ai_engine_router
-from app.enterprise_gateway import router as enterprise_gateway_router
-from app.empire_app_gateway import router as empire_app_gateway_router
-from backend_core.core_routes import router as core_routes_router
-from backend_core.backend_core.services.meta_engine import router as meta_engine_router
-from backend_core.app.api.__init__ import router as __init___router
-from backend_core.app.api.api_router import router as api_router_router
-from backend_core.app.api.v1.auth import router as auth_router
-from backend_core.app.api.v1.__init__ import router as __init___router
-from backend_core.app.api.v1.api import router as api_router
-from backend_core.app.api.v1.api_router import router as api_router_router
-from backend_core.app.api.v1.router import router as router_router
-from backend_core.app.api.v1.endpoints.users import router as users_router
-from backend_core.app.api.v1.endpoints.auth import router as auth_router
-from backend_core.app.api.v1.endpoints.__init__ import router as __init___router
-from backend_core.app.api.v1.endpoints.telegram import router as telegram_router
-from backend_core.api.v1.subscription_router import router as subscription_router_router
-from backend_core.api.v1.search_media_router import router as search_media_router_router
-app.include_router(meta_engine_router)
-app.include_router(telegram_bridge_router)
-app.include_router(test_orphan_router)
-app.include_router(test_orphan_service_router)
-app.include_router(websocket_router)
-app.include_router(health_router)
-app.include_router(ai_engine_router)
-app.include_router(enterprise_gateway_router)
-app.include_router(empire_app_gateway_router)
-app.include_router(core_routes_router)
-app.include_router(meta_engine_router)
-app.include_router(__init___router)
-app.include_router(api_router_router)
-app.include_router(auth_router)
-app.include_router(__init___router)
-app.include_router(api_router)
-app.include_router(api_router_router)
-app.include_router(router_router)
-app.include_router(users_router)
-app.include_router(auth_router)
-app.include_router(__init___router)
-app.include_router(telegram_router)
-app.include_router(subscription_router_router)
-app.include_router(search_media_router_router)
-
-
-# --- Sovereign Enterprise Auto-Wired Bridges v32 ---
-from core.meta_engine import router as meta_engine_router
-from services.telegram_bridge import router as telegram_bridge_router
-from services.test_orphan import router as test_orphan_router
-from services.test_orphan_service import router as test_orphan_service_router
-from services.websocket import router as websocket_router
-from services.health import router as health_router
-from src.ai_engine import router as ai_engine_router
-from app.enterprise_gateway import router as enterprise_gateway_router
-from app.empire_app_gateway import router as empire_app_gateway_router
-from backend_core.core_routes import router as core_routes_router
-from backend_core.backend_core.services.meta_engine import router as meta_engine_router
-from backend_core.app.api.__init__ import router as __init___router
-from backend_core.app.api.api_router import router as api_router_router
-from backend_core.app.api.v1.auth import router as auth_router
-from backend_core.app.api.v1.__init__ import router as __init___router
-from backend_core.app.api.v1.api import router as api_router
-from backend_core.app.api.v1.api_router import router as api_router_router
-from backend_core.app.api.v1.router import router as router_router
-from backend_core.app.api.v1.endpoints.users import router as users_router
-from backend_core.app.api.v1.endpoints.auth import router as auth_router
-from backend_core.app.api.v1.endpoints.__init__ import router as __init___router
-from backend_core.app.api.v1.endpoints.telegram import router as telegram_router
-from backend_core.api.v1.subscription_router import router as subscription_router_router
-from backend_core.api.v1.search_media_router import router as search_media_router_router
-app.include_router(meta_engine_router)
-app.include_router(telegram_bridge_router)
-app.include_router(test_orphan_router)
-app.include_router(test_orphan_service_router)
-app.include_router(websocket_router)
-app.include_router(health_router)
-app.include_router(ai_engine_router)
-app.include_router(enterprise_gateway_router)
-app.include_router(empire_app_gateway_router)
-app.include_router(core_routes_router)
-app.include_router(meta_engine_router)
-app.include_router(__init___router)
-app.include_router(api_router_router)
-app.include_router(auth_router)
-app.include_router(__init___router)
-app.include_router(api_router)
-app.include_router(api_router_router)
-app.include_router(router_router)
-app.include_router(users_router)
-app.include_router(auth_router)
-app.include_router(__init___router)
-app.include_router(telegram_router)
-app.include_router(subscription_router_router)
-app.include_router(search_media_router_router)
-
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
 Aymn Coder Plus : Aegis AI Core & AymnGuard Sovereign Enterprise Core (v19.0.0-ImperialMaster)
 ==============================================================================
 النواة المؤسسية الإمبراطورية الموحدة كلياً: دمج كامل لمحركات التداول، الحماية،
-الـ WebSockets، الأتمتة، وإدارة الجلسات مع محرك الاكتشاف التلقائي الشامل (Total Auto-Discovery).
+الـ WebSockets، الأتمتة، وإدارة الجلسات مع محرك الاكتشاف التلقائي الشامل.
 ==============================================================================
 """
 
@@ -180,7 +27,7 @@ if ROOT_DIR not in sys.path:
 
 import httpx
 import uvicorn
-from fastapi import FastAPI, BackgroundTasks, Request, Header, HTTPException, WebSocket, WebSocketDisconnect, Depends
+from fastapi import FastAPI, BackgroundTasks, Request, Header, HTTPException, WebSocket, WebSocketDisconnect, Depends, APIRouter
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -303,7 +150,7 @@ class EnterpriseSessionModel(Base):
 try:
     from core.trading_execution import execute_binance_order
     from services.trading import SovereignTradingEngine
-    logger.info("📈 [Master Hub]: تم ربط محركات التداول (Trading Engine) بنجاح.")
+    logger.info("📈 [Master Hub]: تم ربط محركات التداول بنجاح.")
 except ImportError:
     async def execute_binance_order(*args, **kwargs):
         return {"status": "mocked_execution", "detail": "Trading core simulated successfully."}
@@ -312,7 +159,6 @@ except ImportError:
 try:
     from core.master_kernel import init_master_kernel
     from core.license_manager import SovereignLicenseManager
-    logger.info("💎 [Master Hub]: تم ربط Master Kernel & License Manager بنجاح تام.")
 except ImportError:
     async def init_master_kernel(): 
         async with engine.begin() as conn: await conn.run_sync(Base.metadata.create_all)
@@ -322,7 +168,6 @@ except ImportError:
 
 try:
     from bots.protection.bot_engine import SovereignProtectionEngine
-    logger.info("🛡️ [Master Hub]: تم ربط محرك Protection Engine بنجاح.")
 except ImportError:
     class SovereignProtectionEngine:
         @staticmethod
@@ -330,7 +175,6 @@ except ImportError:
 
 try:
     from bots.creative.creative_engine import SovereignCreativeStudio
-    logger.info("🎨 [Master Hub]: تم ربط استوديو Creative Studio بنجاح.")
 except ImportError:
     class SovereignCreativeStudio:
         @staticmethod
@@ -338,7 +182,6 @@ except ImportError:
 
 try:
     from bots.search.search_engine import SovereignSearchEngine
-    logger.info("🔍 [Master Hub]: تم ربط محرك Search Engine بنجاح.")
 except ImportError:
     class SovereignSearchEngine:
         @staticmethod
@@ -346,7 +189,6 @@ except ImportError:
 
 try:
     from core.session_manager import SovereignSessionManager
-    logger.info("🧠 [Master Hub]: تم ربط مدير الجلسات (Session Manager) بنجاح.")
 except ImportError:
     class SovereignSessionManager:
         @staticmethod
@@ -356,7 +198,6 @@ except ImportError:
 
 try:
     from services.enterprise_transfer_engine import EnterpriseTransferEngine
-    logger.info("🚀 [Master Hub]: تم ربط محرك نقل الأعضاء (Transfer Engine) بنجاح.")
 except ImportError:
     class EnterpriseTransferEngine:
         @staticmethod
@@ -366,7 +207,6 @@ except ImportError:
 
 try:
     from core.auth_manager import SovereignAuthManager
-    logger.info("🔐 [Master Hub]: تم ربط محرك المصادقة وتأكيد الدخول (Auth Manager) بنجاح.")
 except ImportError:
     class SovereignAuthManager:
         @staticmethod
@@ -418,90 +258,8 @@ async def sovereign_lifespan(app: FastAPI):
 # ==============================================================================
 # 7. تعريف التطبيق المركزي (FastAPI Master Instance)
 # ==============================================================================
+# تم تصحيح بناء الـ FastAPI هنا ليكون متوافقاً مع معايير بايثون
 app = FastAPI(
-
-# --- Omniscient Auto-Wired Bridges ---
-import core.command_bridge # Auto-linked background/service module
-import core.ecosystem_automation # Auto-linked background/service module
-import core.market_engine # Auto-linked background/service module
-import core.master_orchestrator # Auto-linked background/service module
-import core.web3_nexus # Auto-linked background/service module
-from core.meta_engine import router as meta_engine_bridge
-app.include_router(meta_engine_bridge)
-import core.exceptions # Auto-linked background/service module
-import core.sovereign_platform_hub # Auto-linked background/service module
-import core.neural_core # Auto-linked background/service module
-import core.telegram_broadcaster # Auto-linked background/service module
-import core.gateways.telegram_gateway # Auto-linked background/service module
-import core.agents.market_agent # Auto-linked background/service module
-import core.agents.base_agent # Auto-linked background/service module
-import core.agents.security_agent # Auto-linked background/service module
-import core.database.init_db # Auto-linked background/service module
-import core.core.universal_marketplace # Auto-linked background/service module
-import services.market_intelligence # Auto-linked background/service module
-import services.payment_engine # Auto-linked background/service module
-import services.telegram_gateway # Auto-linked background/service module
-from services.telegram_bridge import router as telegram_bridge_bridge
-app.include_router(telegram_bridge_bridge)
-from services.test_orphan import router as test_orphan_bridge
-app.include_router(test_orphan_bridge)
-import services.ai_microservice_adapter # Auto-linked background/service module
-import services.trading_market_microservice_adapter # Auto-linked background/service module
-import services.session_transfer_microservice_adapter # Auto-linked background/service module
-from services.test_orphan_service import router as test_orphan_service_bridge
-app.include_router(test_orphan_service_bridge)
-import services.protection_microservice_adapter # Auto-linked background/service module
-import services.sovereign_agents # Auto-linked background/service module
-import services.queue_manager # Auto-linked background/service module
-import services.worker # Auto-linked background/service module
-import bots.protection.telegram_protection_runner # Auto-linked background/service module
-import security.shield # Auto-linked background/service module
-import security.hmac_security_guard # Auto-linked background/service module
-import security.protection_bot # Auto-linked background/service module
-from src.ai_engine import router as ai_engine_bridge
-app.include_router(ai_engine_bridge)
-from app.enterprise_gateway import router as enterprise_gateway_bridge
-app.include_router(enterprise_gateway_bridge)
-from app.empire_app_gateway import router as empire_app_gateway_bridge
-app.include_router(empire_app_gateway_bridge)
-import backend_core.task_broker # Auto-linked background/service module
-from backend_core.core_routes import router as core_routes_bridge
-app.include_router(core_routes_bridge)
-import backend_core.neural_engine # Auto-linked background/service module
-import backend_core.context_vault # Auto-linked background/service module
-import backend_core.mtproto_client # Auto-linked background/service module
-import backend_core.proxy_manager # Auto-linked background/service module
-import backend_core.tests.unit.test_users # Auto-linked background/service module
-import backend_core.bot.subscriber_panel # Auto-linked background/service module
-import backend_core.bot.owner_panel # Auto-linked background/service module
-import backend_core.middlewares.throttling # Auto-linked background/service module
-import backend_core.services.ai_image_generator # Auto-linked background/service module
-import backend_core.services.search_media_engine # Auto-linked background/service module
-import backend_core.services.subscription_service # Auto-linked background/service module
-import backend_core.services.group_protection_engine # Auto-linked background/service module
-import backend_core.services.telegram_business # Auto-linked background/service module
-from backend_core.backend_core.services.meta_engine import router as meta_engine_bridge
-app.include_router(meta_engine_bridge)
-import backend_core.app.telegram_bot_core # Auto-linked background/service module
-import backend_core.app.schemas.user_schema # Auto-linked background/service module
-import backend_core.app.services.scheduler # Auto-linked background/service module
-import backend_core.app.services.logistics_engine # Auto-linked background/service module
-from backend_core.app.api.api_router import router as api_router_bridge
-app.include_router(api_router_bridge)
-import backend_core.app.api.dependencies.deps # Auto-linked background/service module
-import backend_core.app.api.dependencies.db_deps # Auto-linked background/service module
-import backend_core.app.api.middlewares.rate_limiter # Auto-linked background/service module
-from backend_core.app.api.v1.api_router import router as api_router_bridge
-app.include_router(api_router_bridge)
-from backend_core.app.api.v1.endpoints.users import router as users_bridge
-app.include_router(users_bridge)
-import backend_core.app.api.v1.endpoints.ai_services # Auto-linked background/service module
-import backend_core.app.core.telegram_auth # Auto-linked background/service module
-import backend_core.app.core.exceptions # Auto-linked background/service module
-from backend_core.api.v1.subscription_router import router as subscription_router_bridge
-app.include_router(subscription_router_bridge)
-from backend_core.api.v1.search_media_router import router as search_media_router_bridge
-app.include_router(search_media_router_bridge)
     title="AymnCoder Plus Sovereign Enterprise Core",
     version="19.0.0-ImperialMaster",
     description="The Absolute Master Backend Hub controlling all enterprise micro-services, bots, and trading engines",
@@ -519,6 +277,35 @@ async def imperial_telemetry_middleware(request: Request, call_next):
     process_time = time.time() - start_time
     response.headers["X-Imperial-Process-Time"] = str(round(process_time, 4))
     return response
+
+# ==============================================================================
+# 🌟 دمج المسارات والروابط السيادية (Auto-Wired Bridges) بشكل صحيح هندسياً 🌟
+# تم نقلها إلى هنا (بعد تعريف app) لتفادي أخطاء الانهيار
+# ==============================================================================
+try:
+    from core.meta_engine import router as meta_engine_router
+    app.include_router(meta_engine_router)
+    from services.telegram_bridge import router as telegram_bridge_router
+    app.include_router(telegram_bridge_router)
+    from services.test_orphan import router as test_orphan_router
+    app.include_router(test_orphan_router)
+    from services.test_orphan_service import router as test_orphan_service_router
+    app.include_router(test_orphan_service_router)
+    from services.websocket import router as websocket_router
+    app.include_router(websocket_router)
+    from services.health import router as health_router
+    app.include_router(health_router)
+    from src.ai_engine import router as ai_engine_router
+    app.include_router(ai_engine_router)
+    from app.enterprise_gateway import router as enterprise_gateway_router
+    app.include_router(enterprise_gateway_router)
+    from app.empire_app_gateway import router as empire_app_gateway_router
+    app.include_router(empire_app_gateway_router)
+    from backend_core.core_routes import router as core_routes_router
+    app.include_router(core_routes_router)
+    logger.info("🌉 [Bridges]: تم ربط المسارات الإمبراطورية الأساسية بنجاح.")
+except ImportError as e:
+    logger.debug(f"ℹ️ [Bridges Alert]: بعض المسارات قيد التطوير ولم يتم تحميلها: {e}")
 
 try:
     from bots.telegram_bot import register_bot_handlers
@@ -544,12 +331,8 @@ if os.path.exists(FRONTEND_DIR):
 # 8. محرك الاكتشاف والمسح الشامل التلقائي (Total Auto-Discovery Engine)
 # ==============================================================================
 def register_all_enterprise_modules(fastapi_app, base_root_dir):
-    """
-    يمسح كل المجلدات والمحركات الفرعية للمشروع من الألف إلى الياء،
-    ويستخرج المسارات (Routers) والمكونات ويسجلها تلقائياً دون تدخل يدوي.
-    """
     logger.info("🛡️ [Auto-Discovery]: بدء مسح واكتشاف كافة ملفات ومجلدات المستودع الشاملة...")
-    target_folders = ["services", "bots", "security", "core", "src", "app"]
+    target_folders = ["services", "bots", "security", "core", "src", "app", "backend_core"]
     discovered_count = 0
     
     for folder in target_folders:
@@ -574,60 +357,29 @@ def register_all_enterprise_modules(fastapi_app, base_root_dir):
                             logger.info(f"🔗 [Auto-Linked Router]: {module_path} -> [{endpoint_prefix}]")
                             discovered_count += 1
                     except Exception as e:
-                        logger.debug(f"ℹ️ [Discovery Skip]: تعذر تحميل الملف {module_path}: {e}")
+                        pass
                         
     logger.info(f"✨ [Auto-Discovery Complete]: تم بنجاح اكتشاف وربط {discovered_count} مكوناً برمجياً بالكتلة التشغيلية.")
 
-# تفعيل الاكتشاف التلقائي الشامل فوراً
 register_all_enterprise_modules(app, ROOT_DIR)
 
 # ==============================================================================
 # 9. نماذج بيانات التحقق (Pydantic Models)
 # ==============================================================================
 class TradeRequestModel(BaseModel):
-    symbol: str
-    side: str
-    amount: float
-    leverage: Optional[int] = 1
-    market: Optional[str] = "SPOT"
-    api_key: str
-    api_secret: str
+    symbol: str; side: str; amount: float; leverage: Optional[int] = 1; market: Optional[str] = "SPOT"; api_key: str; api_secret: str
 
 class LicenseLinkRequest(BaseModel): license_key: str; chat_id: str
 class ProtectionSlotRequest(BaseModel): license_key: str; channel_id: str
 class CreativeAssetRequest(BaseModel): license_key: str; prompt: str; asset_type: Optional[str] = "logo"; aspect_ratio: Optional[str] = "1:1"
 class EnterpriseSearchRequest(BaseModel): license_key: str; query: str; scope: Optional[str] = "all"
 
-class SessionInitRequest(BaseModel):
-    license_key: str
-    session_name: str
-    phone_number: str
-    api_id: int
-    api_hash: str
-
-class TransferInitRequest(BaseModel):
-    license_key: str
-    user_id: str
-    sessions_to_use: List[str]
-
-class InteractiveInputRequest(BaseModel):
-    license_key: str
-    user_id: str
-    user_input: str
-
-class AuthSendCodeRequest(BaseModel):
-    session_name: str
-    phone_number: str
-    api_id: int
-    api_hash: str
-
-class AuthVerifyCodeRequest(BaseModel):
-    session_name: str
-    phone_code: str
-
-class AuthVerify2FARequest(BaseModel):
-    session_name: str
-    password: str
+class SessionInitRequest(BaseModel): license_key: str; session_name: str; phone_number: str; api_id: int; api_hash: str
+class TransferInitRequest(BaseModel): license_key: str; user_id: str; sessions_to_use: List[str]
+class InteractiveInputRequest(BaseModel): license_key: str; user_id: str; user_input: str
+class AuthSendCodeRequest(BaseModel): session_name: str; phone_number: str; api_id: int; api_hash: str
+class AuthVerifyCodeRequest(BaseModel): session_name: str; phone_code: str
+class AuthVerify2FARequest(BaseModel): session_name: str; password: str
 
 async def send_telegram_response(chat_id, text):
     try:
@@ -652,11 +404,7 @@ async def process_telegram_update(data: Dict[str, Any]):
             text = msg.get("text", "")
             user_id = str(chat_id)
 
-            response = await EnterpriseTransferEngine.handle_interactive_input(
-                license_key="DEFAULT_LICENSE",
-                user_id=user_id,
-                user_input=text
-            )
+            response = await EnterpriseTransferEngine.handle_interactive_input(license_key="DEFAULT_LICENSE", user_id=user_id, user_input=text)
 
             if response and "البيئة غير مهيأة" not in response:
                 await send_telegram_response(chat_id, response)
@@ -667,22 +415,28 @@ async def process_telegram_update(data: Dict[str, Any]):
                 await session.commit()
 
             if text.startswith("/start"):
-                await send_telegram_response(chat_id, "🛡️ **أهلاً بك في AymnGuard Sovereign Enterprise Core (Imperial Edition)**\nاستخدم الأمر `/initialize_transfer` لبدء عملية النقل.")
+                await send_telegram_response(chat_id, "🛡️ **أهلاً بك في AymnGuard Sovereign Enterprise Core**\nاستخدم الأمر `/initialize_transfer` لبدء عملية النقل.")
             elif text.startswith("/initialize_transfer"):
-                response = await EnterpriseTransferEngine.initialize_interactive_workflow(
-                    license_key="DEFAULT_LICENSE",
-                    user_id=user_id,
-                    sessions_to_use=["session_1", "session_2"]
-                )
+                response = await EnterpriseTransferEngine.initialize_interactive_workflow(license_key="DEFAULT_LICENSE", user_id=user_id, sessions_to_use=["session_1", "session_2"])
                 await send_telegram_response(chat_id, response)
             else:
-                await send_telegram_response(chat_id, f"✅ تم استقبال الأمر ومعالجته عبر الـ Backend الإمبراطوري بنجاح: `{text}`")
+                await send_telegram_response(chat_id, f"✅ تم استقبال الأمر ومعالجته عبر الـ Backend بنجاح: `{text}`")
     except Exception as e:
         logger.error(f"❌ خطأ في معالجة تليجرام الفرعية: {e}")
 
 # ==============================================================================
-# 11. مسارات الـ API التشغيلية الأساسية للـ Master Hub (مضمنة مع مسارات التداول)
+# 11. مسارات الـ API التشغيلية الأساسية للـ Master Hub
 # ==============================================================================
+
+# 🌟 الإضافة الجديدة: مسار تحديث إصدار التطبيق التلقائي (Version Checker) 🌟
+@app.get("/api/v1/system/version", tags=["System Management"])
+async def get_system_version():
+    return {
+        "latest_version": 35.1, # هذا الرقم تغيره عندما ترفع تحديث جديد
+        "download_url": "https://raw.githubusercontent.com/YourName/YourRepo/main/app-release.apk", # ضع رابط الـ APK الحقيقي هنا
+        "is_mandatory": True
+    }
+
 @app.post("/api/v1/telegram/webhook", tags=["Webhook Subservice"])
 @limiter.limit("60/minute")
 async def telegram_webhook(request: Request, bg_tasks: BackgroundTasks, x_telegram_bot_api_secret_token: Optional[str] = Header(None)):
@@ -694,47 +448,27 @@ async def telegram_webhook(request: Request, bg_tasks: BackgroundTasks, x_telegr
 @app.post("/api/v1/trade/execute", tags=["Trading Engine"])
 @limiter.limit("20/minute")
 async def execute_trade_endpoint(request: Request, payload: TradeRequestModel):
-    """بوابة التداول الرئيسية المدمجة من الجذر لضمان عدم ضياع أي أمر تداول"""
     try:
-        result = await execute_binance_order(
-            symbol=payload.symbol,
-            side=payload.side,
-            amount=payload.amount,
-            leverage=payload.leverage,
-            market=payload.market,
-            api_key=payload.api_key,
-            api_secret=payload.api_secret
-        )
+        result = await execute_binance_order(symbol=payload.symbol, side=payload.side, amount=payload.amount, leverage=payload.leverage, market=payload.market, api_key=payload.api_key, api_secret=payload.api_secret)
         return {"status": "success", "data": result}
     except Exception as e:
-        logger.error(f"❌ خطأ فادح أثناء تنفيذ الصفقة عبر البوابة المركزية: {e}")
         raise HTTPException(status_code=500, detail=f"Execution Failed: {str(e)}")
 
 @app.post("/api/v1/license/link", tags=["Services Matrix"])
-async def link_license(data: LicenseLinkRequest): 
-    return await SovereignLicenseManager.verify_and_link_user(data.license_key, data.chat_id)
+async def link_license(data: LicenseLinkRequest): return await SovereignLicenseManager.verify_and_link_user(data.license_key, data.chat_id)
 
 @app.post("/api/v1/protection/activate", tags=["Services Matrix"])
-async def activate_protection(data: ProtectionSlotRequest): 
-    return await SovereignProtectionEngine.activate_protection(data.license_key, data.channel_id)
+async def activate_protection(data: ProtectionSlotRequest): return await SovereignProtectionEngine.activate_protection(data.license_key, data.channel_id)
 
 @app.post("/api/v1/creative/generate", tags=["Services Matrix"])
-async def generate_asset(data: CreativeAssetRequest): 
-    return await SovereignCreativeStudio.generate_asset_request(data.license_key, data.prompt, data.asset_type, data.aspect_ratio)
+async def generate_asset(data: CreativeAssetRequest): return await SovereignCreativeStudio.generate_asset_request(data.license_key, data.prompt, data.asset_type, data.aspect_ratio)
 
 @app.post("/api/v1/search/intelligence", tags=["Services Matrix"])
-async def enterprise_search(data: EnterpriseSearchRequest): 
-    return await SovereignSearchEngine.execute_enterprise_search(data.license_key, data.query, data.scope)
+async def enterprise_search(data: EnterpriseSearchRequest): return await SovereignSearchEngine.execute_enterprise_search(data.license_key, data.query, data.scope)
 
 @app.get("/api/v1/imperial/health", tags=["System Health"])
 async def imperial_health_check():
-    return {
-        "status": "HEALTHY",
-        "version": "19.0.0-ImperialMaster",
-        "database": "CONNECTED",
-        "websockets_active_clients": len(alert_manager.active_connections),
-        "timestamp": datetime.utcnow().isoformat()
-    }
+    return {"status": "HEALTHY", "version": "19.0.0-ImperialMaster", "database": "CONNECTED", "websockets_active_clients": len(alert_manager.active_connections), "timestamp": datetime.utcnow().isoformat()}
 
 @app.websocket("/ws/security-alerts")
 async def ws_security(websocket: WebSocket):
@@ -742,91 +476,51 @@ async def ws_security(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
-            if data == "ping": 
-                await websocket.send_text("pong")
+            if data == "ping": await websocket.send_text("pong")
     except WebSocketDisconnect:
         alert_manager.disconnect(websocket)
 
 # --- مسارات المصادقة وتأكيد الدخول ---
 @app.post("/api/v1/empire/auth/send-code", tags=["Sovereign Auth"])
-async def auth_send_code(request: AuthSendCodeRequest):
-    return await SovereignAuthManager.send_verification_code(
-        session_name=request.session_name,
-        phone_number=request.phone_number,
-        api_id=request.api_id,
-        api_hash=request.api_hash
-    )
+async def auth_send_code(request: AuthSendCodeRequest): return await SovereignAuthManager.send_verification_code(session_name=request.session_name, phone_number=request.phone_number, api_id=request.api_id, api_hash=request.api_hash)
 
 @app.post("/api/v1/empire/auth/verify-code", tags=["Sovereign Auth"])
 async def auth_verify_code(request: AuthVerifyCodeRequest):
-    result = await SovereignAuthManager.verify_code(
-        session_name=request.session_name,
-        phone_code=request.phone_code
-    )
+    result = await SovereignAuthManager.verify_code(session_name=request.session_name, phone_code=request.phone_code)
     if result.get("status") == "success":
         async with async_session() as db:
-            new_session = EnterpriseSessionModel(
-                session_name=request.session_name,
-                session_string=result["session_string"]
-            )
-            db.add(new_session)
+            db.add(EnterpriseSessionModel(session_name=request.session_name, session_string=result["session_string"]))
             await db.commit()
     return result
 
 @app.post("/api/v1/empire/auth/verify-2fa", tags=["Sovereign Auth"])
 async def auth_verify_2fa(request: AuthVerify2FARequest):
-    result = await SovereignAuthManager.verify_2fa_password(
-        session_name=request.session_name,
-        password=request.password
-    )
+    result = await SovereignAuthManager.verify_2fa_password(session_name=request.session_name, password=request.password)
     if result.get("status") == "success":
         async with async_session() as db:
-            new_session = EnterpriseSessionModel(
-                session_name=request.session_name,
-                session_string=result["session_string"]
-            )
-            db.add(new_session)
+            db.add(EnterpriseSessionModel(session_name=request.session_name, session_string=result["session_string"]))
             await db.commit()
     return result
 
 @app.post("/api/v1/empire/sessions/register", tags=["Sovereign Sessions"])
-async def register_new_session(request: SessionInitRequest):
-    return await SovereignSessionManager.initialize_session(
-        license_key=request.license_key,
-        session_name=request.session_name,
-        api_id=request.api_id,
-        api_hash=request.api_hash,
-        phone_number=request.phone_number
-    )
+async def register_new_session(request: SessionInitRequest): return await SovereignSessionManager.initialize_session(license_key=request.license_key, session_name=request.session_name, api_id=request.api_id, api_hash=request.api_hash, phone_number=request.phone_number)
 
 @app.get("/api/v1/empire/sessions/analytics", tags=["Sovereign Sessions"])
-async def get_session_analytics(license_key: str):
-    return await SovereignSessionManager.get_enterprise_analytics_report(license_key)
+async def get_session_analytics(license_key: str): return await SovereignSessionManager.get_enterprise_analytics_report(license_key)
 
 @app.post("/api/v1/empire/transfer/start-workflow", tags=["Sovereign Transfer"])
 async def start_transfer_workflow(request: TransferInitRequest):
-    response_msg = await EnterpriseTransferEngine.initialize_interactive_workflow(
-        license_key=request.license_key,
-        user_id=request.user_id,
-        sessions_to_use=request.sessions_to_use
-    )
-    return {"status": "workflow_initialized", "ai_response": response_msg}
+    return {"status": "workflow_initialized", "ai_response": await EnterpriseTransferEngine.initialize_interactive_workflow(license_key=request.license_key, user_id=request.user_id, sessions_to_use=request.sessions_to_use)}
 
 @app.post("/api/v1/empire/transfer/interactive-input", tags=["Sovereign Transfer"])
 async def handle_transfer_input(request: InteractiveInputRequest):
-    response_msg = await EnterpriseTransferEngine.handle_interactive_input(
-        license_key=request.license_key,
-        user_id=request.user_id,
-        user_input=request.user_input
-    )
-    return {"status": "success", "ai_response": response_msg}
+    return {"status": "success", "ai_response": await EnterpriseTransferEngine.handle_interactive_input(license_key=request.license_key, user_id=request.user_id, user_input=request.user_input)}
 
 @app.get("/", response_class=HTMLResponse, tags=["Web Interface"])
 async def home():
     index_path = os.path.join(TEMPLATES_DIR, "index.html")
     if os.path.exists(index_path):
-        with open(index_path, "r", encoding="utf-8") as f: 
-            return f.read()
+        with open(index_path, "r", encoding="utf-8") as f: return f.read()
     return "<h2>AymnGuard Sovereign Enterprise Core - Imperial Master Backend Hub Online v19.0.0</h2>"
 
 if __name__ == "__main__":
