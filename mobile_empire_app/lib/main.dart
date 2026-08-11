@@ -13,7 +13,10 @@ import 'package:mobile_empire_app/app_drawers.dart';
 import 'package:mobile_empire_app/models/bot_model.dart';
 import 'package:mobile_empire_app/neural_core_screen.dart';
 
+// --- SOVEREIGN_IMPORT_MARKER ---
+
 void main() {
+  // --- SOVEREIGN_INIT_MARKER ---
   runApp(const AymnGuardPlusApp());
 }
 
@@ -328,6 +331,7 @@ class SovereignDashboardTab extends StatelessWidget {
               _buildButton(context, 'مجموعة الدعم', Icons.group, const Color(0xFF3FB950), () => launchUrl(Uri.parse('https://t.me/AymnGuard'), mode: LaunchMode.externalApplication)),
             ],
           ),
+          // --- SOVEREIGN_WIDGET_MARKER ---
           const SizedBox(height: 100),
         ],
       ),
