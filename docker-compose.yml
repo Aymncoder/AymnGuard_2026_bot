@@ -97,6 +97,5 @@ volumes:
   redis_data:
 
 networks:
-ms:
   aymn_network:
     driver: bridge
