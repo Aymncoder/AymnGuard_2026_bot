@@ -84,7 +84,7 @@ jobs:
           echo "- **Sovereign App Name:** AymnGuard Plus ✅" >> $GITHUB_STEP_SUMMARY
           echo "- **Status:** Final Success ✅" >> $GITHUB_STEP_SUMMARY
           echo "- **Platform:** Android (Unified Single APK & AAB)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Flutter Version:** 3.19.0" >> $GITHUB_STEP_SUMMARY
+          echo "- **Flutter Version:** 3.44.9" >> $GITHUB_STEP_SUMMARY
         shell: bash
 
       - name: 📦 (APK) تصدير التطبيق السيادي الموحد
