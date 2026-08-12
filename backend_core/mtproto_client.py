@@ -20,25 +20,25 @@ def create_resilient_telegram_client(session_name: str, api_id: int, api_hash: s
     while attempt < max_retries:
         proxy_config = proxy_manager.get_active_proxy()
         try:
-            print(f"🔄 محاولة الاتصال بجلسة {session_name} عبر البروكسي (المحاولة {attempt + 1})...")
-            
+            print(f"[Info]: محاولة الاتصال لجلسة {session_name} عبر البروكسي (المحاولة {attempt + 1})...")
+
             client = TelegramClient(
-                session_name, 
-                api_id, 
-                api_hash, 
+                session_name,
+                api_id,
+                api_hash,
                 proxy=proxy_config,
                 connection_retries=5,
                 timeout=30
             )
-            
+
             # محاولة الاتصال الفعلي
-            # client.connect()
-            print(f"✅ تم الاتصال بنجاح واستقرار تام لجلسة {session_name}")
+            # await client.connect()
+            print(f"[Success]: تم الاتصال بنجاح واستقرار تام لجلسة {session_name}")
             return client
 
         except Exception as e:
-            print(فشل الاتصال عبر البروكسي الحالي: {e})
+            print(f"[Error]: فشل الاتصال عبر البروكسي الحالي: {e}")
             attempt += 1
-            time.sleep(2)  # انتظار قصير قبل تجربة بروكسي بديل
+            time.sleep(2) # انتظار قصير قبل تجربة بروكسي بديل
 
-    raise ConnectionError("❌ فشلت كافة محاولات الاتصال بسيرفرات تيليجرام عبر مسبح البروكسيات المتاح.")
+    raise ConnectionError("[Fatal]: فشلت كافة محاولات الاتصال بسيرفرات تيليجرام عبر مسبح البروكسيات المتاح.")
