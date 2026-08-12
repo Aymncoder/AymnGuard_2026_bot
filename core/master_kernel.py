@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Enterprise v5.0 : Master Kernel & Database Models
+AymnGuard Enterprise v18.1.0 : Master Kernel & Database Models
 ==============================================================================
 النواة الرئيسية للإمبراطورية: تعريف جداول التراخيص الصارمة (ORM)،
 إدارة الاتصالات غير المتزامنة (Async)، وضمان استقرار قواعد البيانات.
+تم تصحيح أخطاء الاستيراد والروابط لتتطابق مع بيئة الإنتاج السحابية.
+==============================================================================
 """
 
 import os
@@ -12,15 +14,14 @@ import logging
 from datetime import datetime, timezone
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import Mapped, mapped_column, declarative_base
-from sqlalchemy.Integer import Integer
-from sqlalchemy.String import String
-from sqlalchemy.DateTime import DateTime
-from sqlalchemy.Boolean import Boolean
+from sqlalchemy import Integer, String, DateTime, Boolean
 
 logger = logging.getLogger("SovereignMasterKernel")
+logger.setLevel(logging.INFO)
 
 # 1. جلب رابط قاعدة البيانات مع دعم كامل للاتصال اللامتزامن (aiosqlite)
-DATABASE_URL = os.getenv("CORE_DATABASE_URL", "sqlite+aiosqlite+aiosqlite:///./aymnguard_empire.db")
+DATABASE_URL = os.getenv("CORE_DATABASE_URL", "sqlite+aiosqlite:///./aymnguard_empire.db")
+
 # تصحيح مسار الاتصال ليتوافق مع معيار async sqlite
 if DATABASE_URL.startswith("sqlite:///"):
     DATABASE_URL = DATABASE_URL.replace("sqlite:///", "sqlite+aiosqlite:///")
@@ -61,9 +62,9 @@ async def init_master_kernel():
     """
     try:
         async with engine.begin() as conn:
-            logger.info("⚙️ [Master Kernel]: جاري فحص وبناء جداول التراخيص السيادية...")
+            logger.info("[Master Kernel]: جاري فحص وبناء جداول التراخيص السيادية...")
             await conn.run_sync(Base.metadata.create_all)
-            logger.info("🛡️ [Master Kernel]: تم إرساء قاعدة بيانات المفاتيح والصلاحيات الشاملة بنجاح [الدولة الإمبراطورية].")
+            logger.info("[Master Kernel]: تم إرساء قاعدة بيانات المفاتيح والصلاحيات الشاملة بنجاح [الدولة الإمبراطورية].")
     except Exception as e:
-        logger.critical(f"❌ [Master Kernel Critical Error]: فشل إقلاع النواة الرئيسية وقاعدة البيانات: {e}")
+        logger.critical(f"[Master Kernel Critical Error]: فشل إقلاع النواة الرئيسية وقاعدة البيانات: {e}")
         raise
