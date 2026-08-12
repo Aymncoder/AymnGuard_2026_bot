@@ -1,14 +1,59 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+"""
+==============================================================================
+AymnGuard Sovereign Database Core (v18.0.0-Master)
+==============================================================================
+نواة قاعدة البيانات الإمبراطورية: اتصال غير متزامن (Async)، 
+إدارة متقدمة للاتصالات، وحماية مطلقة من تجميد السيرفر (Non-blocking).
+"""
+
+import os
+import logging
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from core.models import Base
 
-# استخدام SQLite للمرحلة الحالية، وسهولة التحويل لـ PostgreSQL لاحقاً
-DATABASE_URL = "sqlite:///./sovereign_empire.db"
+logger = logging.getLogger("SovereignDatabaseCore")
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# 1. جلب الرابط ديناميكياً (جاهز للانتقال لـ PostgreSQL بضغطة زر)
+# استخدمنا aiosqlite لضمان اللاتزامن الكامل
+DATABASE_URL = os.getenv("CORE_DATABASE_URL", "sqlite+aiosqlite:///./sovereign_empire.db")
 
-def init_db():
-    # بناء الجداول تلقائياً عند أول تشغيل
-    Base.metadata.create_all(bind=engine)
+# 2. بناء المحرك غير المتزامن (Async Engine)
+engine_kwargs = {"echo": False, "future": True}
+
+if "sqlite" in DATABASE_URL:
+    # إعدادات خاصة لـ SQLite لتعمل بكفاءة مع اللاتزامن والضغط العالي
+    engine_kwargs["connect_args"] = {"timeout": 30}
+else:
+    # إعدادات متقدمة لقواعد البيانات الضخمة (عند الترقية لـ PostgreSQL)
+    engine_kwargs.update({
+        "pool_size": 20,
+        "max_overflow": 10,
+        "pool_recycle": 1800,
+        "pool_pre_ping": True
+    })
+
+engine = create_async_engine(DATABASE_URL, **engine_kwargs)
+
+# 3. صانع الجلسات اللامتزامن (Async Session Factory)
+SessionLocal = async_sessionmaker(
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+    autoflush=False,
+    autocommit=False
+)
+
+async def init_db():
+    """
+    بناء الجداول تلقائياً بأسلوب غير متزامن (Async) لكي لا يجمد السيرفر عند الإقلاع
+    """
+    try:
+        async with engine.begin() as conn:
+            logger.info("⚙️ [DB Core]: جاري تهيئة وهندسة جداول قاعدة البيانات المركزية...")
+            # استخدام run_sync لتشغيل أوامر البناء التقليدية داخل بيئة لامتزامنة
+            await conn.run_sync(Base.metadata.create_all)
+            logger.info("✅ [DB Core]: تمت تهيئة كافة الجداول والهياكل بنجاح مؤسسي.")
+    except Exception as e:
+        logger.critical(f"❌ [DB Core Error]: فشل حرج في بناء قاعدة البيانات: {e}")
+        raise
