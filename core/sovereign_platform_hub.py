@@ -9,9 +9,8 @@ AymnGuard Sovereign Independent Ecosystem Hub (v18.0.0-Master)
 """
 
 import logging
-import importlib
-import pkgutil
-from typing import Dict, Any, Callable, List, Optional
+import asyncio
+from typing import Dict, Any, Callable, Optional
 from datetime import datetime, timezone
 
 # إعداد السجلات المؤسسية للمنصة المستقلة
@@ -29,7 +28,13 @@ class SovereignPlatformHub:
     _registered_bots: Dict[str, Callable] = {}
     
     @classmethod
-    def register_service(cls, service_id: str, service_name: str, handler_func: Callable, metadata: Optional[Dict[str, Any]] = None):
+    def register_service(
+        cls, 
+        service_id: str, 
+        service_name: str, 
+        handler_func: Callable, 
+        metadata: Optional[Dict[str, Any]] = None
+    ):
         """تسجيل خدمة أو أداة جديدة ديناميكياً داخل المنصة دون الحاجة لتعديل النواة."""
         if service_id in cls._registered_services:
             logger.warning(f"⚠️ [Platform Hub]: الخدمة '{service_id}' مسجلة مسبقاً، جاري التحديث...")
@@ -51,7 +56,7 @@ class SovereignPlatformHub:
 
     @classmethod
     async def dispatch_request_to_service(cls, service_id: str, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """توجيه الطلب الوارد إلى الخدمة المطلوبة بدقة تامة ومعالجة استثناءات آمنة."""
+        """توجيه الطلب الوارد إلى الخدمة المطلوبة بدقة تامة مع درع حماية يدعم الدوال المتزامنة واللامتزامنة."""
         service = cls._registered_services.get(service_id)
         if not service:
             logger.error(f"❌ [Platform Dispatcher]: خطأ، الخدمة المستهدفة '{service_id}' غير موجودة أو معطلة.")
@@ -64,7 +69,15 @@ class SovereignPlatformHub:
         try:
             handler = service["handler"]
             logger.info(f"⚡ [Platform Execution]: تنفيذ الخدمة المستقلة '{service['name']}'...")
-            result = await handler(payload) if callable(handler) else {"status": "success", "data": "Static Service"}
+            
+            if not callable(handler):
+                result = {"status": "success", "data": "Static Service"}
+            elif asyncio.iscoroutinefunction(handler):
+                result = await handler(payload)
+            else:
+                # دعم آمن للدوال المتزامنة العادية داخل البيئة اللامتزامنة
+                result = handler(payload)
+
             return {
                 "status": "success",
                 "service_id": service_id,
