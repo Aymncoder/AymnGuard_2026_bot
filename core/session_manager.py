@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign Session Manager (v18.0.0-Master Enterprise Integrated)
+AymnGuard Sovereign Session Manager (v18.1.0-Cloud Enterprise Integrated)
 ==============================================================================
 مدير الجلسات السيادي المتكامل: إدارة الأسطول، الفحص الحي للاتصال،
 توزيع الأحمال الديناميكي (Load Balancing)، المراقبة الذاتية (Self-Healing)، 
-والتحليلات المؤسسية اللحظية.
+والتحليلات المؤسسية اللحظية. خالي من الرموز ومتوافق مع بيئة السحابة.
+==============================================================================
 """
 
 import logging
@@ -17,7 +18,7 @@ from pyrogram import Client
 from pyrogram.errors import UserDeactivated, SessionRevoked
 
 # إعداد السجلات الأمنية والتحليلية
-logger = logging.getLogger("SovereignSessionManager")
+logger = logging.getLogger("AymnGuard.SovereignSessionManager")
 logger.setLevel(logging.INFO)
 
 @dataclass
@@ -42,6 +43,7 @@ class SovereignSessionManager:
     # السجل المركزي المعزول للجلسات النشطة
     _active_sessions: Dict[str, Dict[str, Any]] = {}
     _ai_monitor_running: bool = False
+    _monitor_task: Optional[asyncio.Task] = None # حماية المهمة من التفريغ العشوائي للذاكرة
 
     # -------------------------------------------------------------------------
     # تهيئة الجلسات (Initialization & Verification)
@@ -65,11 +67,11 @@ class SovereignSessionManager:
         try:
             await client.connect()
             me = await client.get_me()
-            logger.info(f"✅ [Session Verified]: Connected as {me.first_name} (ID: {me.id})")
+            logger.info(f"[Session Verified]: Connected as {me.first_name} (ID: {me.id})")
             exported_string = await client.export_session_string()
             await client.disconnect()
         except Exception as e:
-            logger.error(f"❌ [Session Error]: Verification failed for {session_name}: {e}")
+            logger.error(f"[Session Error]: Verification failed for {session_name}: {e}")
             return {"status": "error", "message": str(e)}
 
         # 2. التسجيل في السجل المركزي (In-Memory) مع الاحتفاظ بطاقة الجلسة
@@ -82,9 +84,9 @@ class SovereignSessionManager:
             "created_at": datetime.now(timezone.utc)
         }
 
-        # تفعيل المراقب الذاتي (مفاعل الطاقة) إذا لم يكن يعمل
+        # تفعيل المراقب الذاتي (مفاعل الطاقة) إذا لم يكن يعمل مع حماية مرجع المهمة
         if not cls._ai_monitor_running:
-            asyncio.create_task(cls._autonomous_health_monitor())
+            cls._monitor_task = asyncio.create_task(cls._autonomous_health_monitor())
             cls._ai_monitor_running = True
 
         return {"status": "success", "message": f"تم تهيئة وعزل الجلسة {session_name} بنجاح."}
@@ -105,17 +107,17 @@ class SovereignSessionManager:
                     candidates.append(data)
                     
             if not candidates:
-                logger.warning(f"⚠️ [Load Balancer]: لا توجد جلسات نشطة أو صحية للمفتاح {license_key}!")
+                logger.warning(f"[Load Balancer Warning]: لا توجد جلسات نشطة أو صحية للمفتاح {license_key}!")
                 return None
                 
             # الفرز المزدوج: الأولوية للصحة العالية، ثم الأقل استخداماً في الساعة الأخيرة
             candidates.sort(key=lambda x: (x["metrics"].health_score, -x["metrics"].transfers_this_hour), reverse=True)
             
             best_session = candidates[0]
-            logger.debug(f"⚖️ [Load Balancer]: تم اختيار الجلسة {best_session['session_name']} (الصحة: {best_session['metrics'].health_score})")
+            logger.debug(f"[Load Balancer Optimal]: تم اختيار الجلسة {best_session['session_name']} (الصحة: {best_session['metrics'].health_score})")
             return best_session
         except Exception as e:
-            logger.error(f"❌ [Load Balancer Error]: فشل اختيار الجلسة المثلى: {e}")
+            logger.error(f"[Load Balancer Error]: فشل اختيار الجلسة المثلى: {e}")
             return None
 
     # -------------------------------------------------------------------------
@@ -151,9 +153,9 @@ class SovereignSessionManager:
 
             if metrics.health_score <= 40.0:
                 cls._active_sessions[session_id]["status"] = "QUARANTINED"
-                logger.critical(f"🚨 [Security Alert]: تم عزل الجلسة {session_name} لحمايتها من الحظر النهائي (الصحة: {metrics.health_score}).")
+                logger.critical(f"[Security Alert]: تم عزل الجلسة {session_name} لحمايتها من الحظر النهائي (الصحة: {metrics.health_score}).")
         except Exception as e:
-            logger.error(f"❌ [Record Transfer Error]: فشل تسجيل تفاصيل العملية: {e}")
+            logger.error(f"[Record Transfer Error]: فشل تسجيل تفاصيل العملية: {e}")
 
     # -------------------------------------------------------------------------
     # تقارير الأداء (Enterprise Analytics)
@@ -165,8 +167,9 @@ class SovereignSessionManager:
         session_details = []
 
         try:
-            from core.database import SessionLocal
-            from core.models import BotInstance
+            # تصحيح مسارات الاستيراد لتتوافق مع الهيكل المعماري للنظام
+            from database.db import SessionLocal
+            from database.models import BotInstance
             from sqlalchemy.future import select
             
             async with SessionLocal() as db:
@@ -195,8 +198,10 @@ class SovereignSessionManager:
                     "total_success": metrics.successful_transfers,
                     "rate_limits": metrics.rate_limit_hits
                 })
+        except ImportError as ie:
+            logger.warning(f"[Analytics Module Warning]: لم يتم العثور على قاعدة البيانات بعد، يتم تجاوز الدمج. {ie}")
         except Exception as e:
-            logger.error(f"⚠️ [Analytics Merge Error]: {e}")
+            logger.error(f"[Analytics Merge Error]: {e}")
 
         return {
             "status": "success",
@@ -214,7 +219,7 @@ class SovereignSessionManager:
     @classmethod
     async def _autonomous_health_monitor(cls):
         """وكيل ذكاء اصطناعي يعمل 24/7 للمراقبة والإصلاح الذاتي العميق."""
-        logger.info("🛡️ [Auto-Healer]: تم تفعيل درع المراقبة والإنعاش الذاتي للجلسات.")
+        logger.info("[Auto-Healer]: تم تفعيل درع المراقبة والإنعاش الذاتي للجلسات.")
         while True:
             try:
                 await asyncio.sleep(300) # فحص كل 5 دقائق
@@ -234,11 +239,11 @@ class SovereignSessionManager:
                             metrics.health_score = 80.0
                             metrics.rate_limit_hits = 0
                             data["status"] = "ACTIVE_AND_SECURED"
-                            logger.info(f"✨ [Self-Healing]: تم إنعاش الجلسة {session_name} بنجاح وإعادتها للخدمة.")
+                            logger.info(f"[Self-Healing]: تم إنعاش الجلسة {session_name} بنجاح وإعادتها للخدمة.")
                             
                     # 2. تبريد تدريجي للصحة للجلسات النشطة
                     if status == "ACTIVE_AND_SECURED" and metrics.health_score < 100.0:
                          metrics.health_score = min(100.0, metrics.health_score + 2.0)
             except Exception as e:
-                logger.error(f"❌ [Auto-Healer Exception]: خطأ في حلقة المراقبة الذاتية: {e}")
+                logger.error(f"[Auto-Healer Exception]: خطأ في حلقة المراقبة الذاتية: {e}")
                 await asyncio.sleep(60)
