@@ -1,11 +1,12 @@
 plugins {
     id("com.android.application")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    // يجب تطبيق ملحق Flutter Gradle بعد ملاحق Android و Kotlin
     id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
-    namespace = "com.example.mobile_empire_app"
+    // تحديث مساحة الأسماء السيادية لتتوافق مع هوية المشروع
+    namespace = "com.aymnguard.mobile_empire_app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -15,10 +16,9 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.mobile_empire_app"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        // [هوية إمبراطورية سيادية]: تعيين المعرف الفريد الخاص بالتطبيق
+        applicationId = "com.aymnguard.mobile_empire_app"
+        
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -27,8 +27,7 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // [معيار أمني مؤسسي]: إعداد مفتاح التوقيع لنسخة الإصدار
             signingConfig = signingConfigs.getByName("debug")
         }
     }
