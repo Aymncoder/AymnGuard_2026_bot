@@ -22,7 +22,7 @@ except ImportError:
         return {"status": "mocked_execution", "detail": "Core not fully compiled yet."}
     SovereignTradingEngine = None
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s 🚀 [Mega-Main] %(levelname)s: %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [Mega-Main] %(levelname)s: %(message)s')
 logger = logging.getLogger("AymnGuard.MegaMainCore")
 
 app = FastAPI(
@@ -66,7 +66,7 @@ async def execute_trade_endpoint(payload: TradeRequestModel):
         )
         return {"status": "success", "data": result}
     except Exception as e:
-        logger.error(f"❌ خطأ فادح أثناء تنفيذ الصفقة عبر البوابة المركزية: {e}")
+        logger.error(f"خطأ فادح أثناء تنفيذ الصفقة عبر البوابة المركزيه: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Execution Failed: {str(e)}"
