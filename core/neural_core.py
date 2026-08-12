@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Enterprise v18.0.0 : Adaptive Multilingual Neural Core & Psychological Adaptation Engine
+AymnGuard Enterprise v18.1.0 : Adaptive Multilingual Neural Core
 ==============================================================================
 المحرك العصبي متعدد اللغات والتكيف النفسي واللساني:
-يحلل لهجات المستخدمين، حالاتهم المزاجية، ونفسيتهم بدقة متناهية لصياغة ردود إنسانية طبيعية ومقنعة.
+يحلل لهجات المستخدمين، حالاتهم المزاجية، ونفسيتهم بدقة متناهية لصياغة ردود إنسانية.
+تم تطهير الكود من الرموز غير القياسية ليتوافق مع البيئة السحابية وخطوط البناء.
+==============================================================================
 """
 
 import logging
@@ -20,14 +22,15 @@ class AdaptiveNeuralCore:
     وتكييف أسلوب التخاطب لضمان أعلى مستوى من الإقناع والتفاعل الإنساني الفطري.
     """
     def __init__(self):
-        logger.info("🧠 [Neural Core]: تم إقلاع المحرك العصبي متعدد اللغات والتكيف النفسي بنجاح.")
+        logger.info("[Neural Core]: تم إقلاع المحرك العصبي متعدد اللغات والتكيف النفسي بنجاح.")
 
     async def analyze_psychology_and_dialect(self, user_text: str, user_history: Optional[List[dict]] = None) -> Dict[str, Any]:
         """
-        تحليل النفسية، اللهجة، والنية العميقة لرسالة المستخدم مع درع حماية ضد النصوص الفارغة.
+        تحليل النفسية، اللهجة، والنية العميقة لرسالة المستخدم مع درع حماية ضد النصوص الفارغة والتالفة.
         """
         try:
-            if not user_text or not user_text.strip():
+            # حماية متقدمة ضد البيانات غير النصية
+            if not user_text or not str(user_text).strip():
                 return {
                     "detected_mood": "neutral",
                     "recommended_tone": "professional_and_persuasive",
@@ -35,7 +38,7 @@ class AdaptiveNeuralCore:
                     "confidence_score": 0.5
                 }
 
-            text_lower = user_text.lower()
+            text_lower = str(user_text).lower()
             
             mood = "neutral"
             tone_required = "professional_and_persuasive"
@@ -51,7 +54,7 @@ class AdaptiveNeuralCore:
                 mood = "welcoming"
                 tone_required = "warm_sovereign_welcome"
 
-            logger.info(f"🧬 [Neural Analysis]: رصد الحالة النفسية للمستخدم [{mood}] والتبرير اللغوي المطلوب [{tone_required}].")
+            logger.info(f"[Neural Analysis]: رصد الحالة النفسية للمستخدم [{mood}] والتبرير اللغوي المطلوب [{tone_required}].")
             
             return {
                 "detected_mood": mood,
@@ -60,7 +63,7 @@ class AdaptiveNeuralCore:
                 "confidence_score": 0.98
             }
         except Exception as e:
-            logger.error(f"❌ [Neural Analysis Error]: خطأ في تحليل نفسية المستخدم: {e}")
+            logger.error(f"[Neural Analysis Error]: خطأ في تحليل نفسية المستخدم: {e}")
             return {
                 "detected_mood": "neutral",
                 "recommended_tone": "professional_and_persuasive",
@@ -88,12 +91,12 @@ class AdaptiveNeuralCore:
                 )
             else:
                 response = (
-                    "مرحباً بك في صرح AymnGuard Enterprise v18.0. أنا خبيرك الذكي المرافق لك على مدار الساعة، "
+                    "مرحباً بك في صرح AymnGuard Enterprise v18.1. أنا خبيرك الذكي المرافق لك على مدار الساعة، "
                     "أخبرني بما تشغل به فكرك اليوم لنحوله سوياً إلى إنجاز عظيم."
                 )
                 
-            logger.info("💬 [Neural Response]: تم تخليق وصياغة الرد العصبي التكيفي بنجاح.")
+            logger.info("[Neural Response]: تم تخليق وصياغة الرد العصبي التكيفي بنجاح.")
             return response
         except Exception as e:
-            logger.error(f"❌ [Neural Synthesis Error]: فشل تخليق الرد العصبي: {e}")
+            logger.error(f"[Neural Synthesis Error]: فشل تخليق الرد العصبي: {e}")
             return "مرحباً بك يا قائد. النظام يعمل بأمان تام، أخبرني كيف يمكنني مساعدتك اليوم؟"
