@@ -62,7 +62,7 @@ def read_root():
 # ==============================================================================
 # 1. إعدادات التسجيل والبيئة المركزية (Logging & Config Settings)
 # ==============================================================================
-logging.basicConfig(level=logging.INFO, format="%(asctime)s | 👑 IMPERIAL-%(levelname)-7s | %(name)s - %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s |IMPERIAL-%(levelname)-7s | %(name)s - %(message)s")
 logger = logging.getLogger("AegisAICore.ImperialMasterHub")
 
 class SovereignSettings(BaseSettings):
@@ -114,7 +114,7 @@ class SovereignShieldEngine:
     @staticmethod
     def suppress_service_messages(message_data: dict) -> bool:
         if "new_chat_members" in message_data or "left_chat_member" in message_data:
-            logger.info("🛡️ [الدرع السيادي]: تم رصد وإسقاط إشعار انضمام/مغادرة تشغيلي صامت.")
+            logger.info("[الدرع السيادي]: تم رصد وإسقاط إشعار انضمام/مغادرة تشغيلي صامت.")
             return True
         return False
 
@@ -163,7 +163,7 @@ class EnterpriseSessionModel(Base):
 try:
     from core.trading_execution import execute_binance_order
     from services.trading import SovereignTradingEngine
-    logger.info("📈 [Master Hub]: تم ربط محركات التداول بنجاح.")
+    logger.info("[Master Hub]: تم ربط محركات التداول بنجاح.")
 except ImportError:
     async def execute_binance_order(*args, **kwargs): return {"status": "mocked_execution", "detail": "Trading core simulated."}
     SovereignTradingEngine = None
@@ -240,15 +240,15 @@ pyrogram_client = PyroClient("aymnguard_pyrogram_session", api_id=settings.TELEG
 async def start_automation_nodes():
     try: 
         await telethon_client.start()
-        logger.info("🟢 [Telethon Worker]: تم إقلاع عقدة Telethon بنجاح.")
+        logger.info("[Telethon Worker]: تم إقلاع عقدة Telethon بنجاح.")
     except Exception as e:
-        logger.warning(f"⚠️ [Telethon Worker]: تعذر الإقلاع الفوري: {e}")
+        logger.warning(f"[Telethon Worker]: تعذر الإقلاع الفوري: {e}")
         
     try: 
         await pyrogram_client.start()
-        logger.info("🟢 [Pyrogram Worker]: تم إقلاع عقدة Pyrogram بنجاح.")
+        logger.info("[Pyrogram Worker]: تم إقلاع عقدة Pyrogram بنجاح.")
     except Exception as e:
-        logger.warning(f"⚠️ [Pyrogram Worker]: تعذر الإقلاع الفوري: {e}")
+        logger.warning(f"[Pyrogram Worker]: تعذر الإقلاع الفوري: {e}")
 
 async def register_telegram_webhook():
     set_webhook_api = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/setWebhook"
@@ -259,16 +259,16 @@ async def register_telegram_webhook():
             if res.json().get("ok"): 
                 logger.info(f"🔗 [Webhook Master]: تم تسجيل الويب هوك بنجاح سيادياً -> {settings.WEBHOOK_URL}")
     except Exception as e:
-        logger.error(f"⚠️ خطأ في تسجيل الويب هوك: {e}")
+        logger.error(f" خطأ في تسجيل الويب هوك: {e}")
 
 @asynccontextmanager
 async def sovereign_lifespan(app: FastAPI):
-    logger.info("🚀 [Aegis Master Hub v19]: جاري الإقلاع السيادي الكامل للـ Backend والخدمات المصغرة...")
+    logger.info("[Aegis Master Hub v19]: جاري الإقلاع السيادي الكامل للـ Backend والخدمات المصغرة...")
     await init_master_kernel()
     await register_telegram_webhook()
     asyncio.create_task(start_automation_nodes())
     yield
-    logger.info("🛑 [Aegis Master Hub]: إيقاف آمن للنواة الإمبراطورية وتفريغ الموارد...")
+    logger.info("[Aegis Master Hub]: إيقاف آمن للنواة الإمبراطورية وتفريغ الموارد...")
 
 # ==============================================================================
 # 7. تعريف التطبيق المركزي (FastAPI Master Instance)
@@ -316,18 +316,18 @@ try:
     app.include_router(empire_app_gateway_router)
     from backend_core.core_routes import router as core_routes_router
     app.include_router(core_routes_router)
-    logger.info("🌉 [Bridges]: تم ربط المسارات الإمبراطورية الأساسية بنجاح.")
+    logger.info("[Bridges]: تم ربط المسارات الإمبراطورية الأساسية بنجاح.")
 except ImportError as e:
-    logger.debug(f"ℹ️ [Bridges Alert]: بعض المسارات قيد التطوير ولم يتم تحميلها: {e}")
+    logger.debug(f"[Bridges Alert]: بعض المسارات قيد التطوير ولم يتم تحميلها: {e}")
 
 try:
     from bots.telegram_bot import register_bot_handlers
     @app.on_event("startup")
     async def startup_event():
         register_bot_handlers(pyrogram_client)
-        logger.info("🚀 [Master Hub]: Bot handlers successfully bound to the operational pipeline.")
+        logger.info("[Master Hub]: Bot handlers successfully bound to the operational pipeline.")
 except ImportError:
-    logger.warning("⚠️ [Master Hub]: ملف telegram_bot غير محمل حالياً، سيتم تجاوزه.")
+    logger.warning("[Master Hub]: ملف telegram_bot غير محمل حالياً، سيتم تجاوزه.")
 
 FRONTEND_DIR = os.path.join(ROOT_DIR, "frontend_core")
 MINI_APP_DIR = os.path.join(FRONTEND_DIR, "mini_app")
@@ -335,7 +335,7 @@ TEMPLATES_DIR = os.path.join(ROOT_DIR, "templates")
 
 if os.path.exists(MINI_APP_DIR):
     app.mount("/mini-app", StaticFiles(directory=MINI_APP_DIR, html=True), name="mini_app")
-    logger.info("🌐 [Master Hub]: تم دمج واجهة Mini App بنجاح تحت سيطرة الـ Backend.")
+    logger.info("[Master Hub]: تم دمج واجهة Mini App بنجاح تحت سيطرة الـ Backend.")
 
 if os.path.exists(FRONTEND_DIR):
     app.mount("/frontend", StaticFiles(directory=FRONTEND_DIR), name="frontend_assets")
@@ -344,7 +344,7 @@ if os.path.exists(FRONTEND_DIR):
 # 8. محرك الاكتشاف والمسح الشامل التلقائي (Total Auto-Discovery Engine)
 # ==============================================================================
 def register_all_enterprise_modules(fastapi_app, base_root_dir):
-    logger.info("🛡️ [Auto-Discovery]: بدء مسح واكتشاف كافة ملفات ومجلدات المستودع الشاملة...")
+    logger.info("[Auto-Discovery]: بدء مسح واكتشاف كافة ملفات ومجلدات المستودع الشاملة...")
     target_folders = ["services", "bots", "security", "core", "src", "app", "backend_core"]
     discovered_count = 0
     
@@ -372,7 +372,7 @@ def register_all_enterprise_modules(fastapi_app, base_root_dir):
                     except Exception:
                         pass
                         
-    logger.info(f"✨ [Auto-Discovery Complete]: تم بنجاح اكتشاف وربط {discovered_count} مكوناً برمجياً بالكتلة التشغيلية.")
+    logger.info(f"[Auto-Discovery Complete]: تم بنجاح اكتشاف وربط {discovered_count} مكوناً برمجياً بالكتلة التشغيلية.")
 
 register_all_enterprise_modules(app, ROOT_DIR)
 
@@ -428,14 +428,14 @@ async def process_telegram_update(data: Dict[str, Any]):
                 await session.commit()
 
             if text.startswith("/start"):
-                await send_telegram_response(chat_id, "🛡️ **أهلاً بك في AymnGuard Sovereign Enterprise Core**\nاستخدم الأمر `/initialize_transfer` لبدء عملية النقل.")
+                await send_telegram_response(chat_id, " **أهلاً بك في AymnGuard Sovereign Enterprise Core**\nاستخدم الأمر `/initialize_transfer` لبدء عملية النقل.")
             elif text.startswith("/initialize_transfer"):
                 response = await EnterpriseTransferEngine.initialize_interactive_workflow(license_key="DEFAULT_LICENSE", user_id=user_id, sessions_to_use=["session_1", "session_2"])
                 await send_telegram_response(chat_id, response)
             else:
-                await send_telegram_response(chat_id, f"✅ تم استقبال الأمر ومعالجته عبر الـ Backend بنجاح: `{text}`")
+                await send_telegram_response(chat_id, f"تم استقبال الأمر ومعالجته عبر الـ Backend بنجاح: `{text}`")
     except Exception as e:
-        logger.error(f"❌ خطأ في معالجة تليجرام الفرعية: {e}")
+        logger.error(f"خطأ في معالجة تليجرام الفرعية: {e}")
 
 # ==============================================================================
 # 11. مسارات الـ API التشغيلية الأساسية للـ Master Hub (تمت الترقية للسرعة الخارقة)
@@ -507,13 +507,13 @@ async def auth_send_code(request: AuthSendCodeRequest, bg_tasks: BackgroundTasks
             ),
             timeout=20.0
         )
-        bg_tasks.add_task(logger.info, f"📱 [Auth]: نجح طلب الرمز للرقم {request.phone_number}")
+        bg_tasks.add_task(logger.info, f"[Auth]: نجح طلب الرمز للرقم {request.phone_number}")
         return result
     except asyncio.TimeoutError:
-        logger.error("❌ [Auth Timeout]: انتهت مهلة استجابة مزود الخدمة (تيليجرام).")
+        logger.error("[Auth Timeout]: انتهت مهلة استجابة مزود الخدمة (تيليجرام).")
         raise HTTPException(status_code=504, detail="تأخر رد خوادم تيليجرام، يرجى إعادة المحاولة.")
     except Exception as e:
-        logger.error(f"❌ [Auth Error]: {str(e)}")
+        logger.error(f"[Auth Error]: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/v1/empire/auth/verify-code", tags=["Sovereign Auth"])
@@ -530,7 +530,7 @@ async def auth_verify_code(request: AuthVerifyCodeRequest, bg_tasks: BackgroundT
                     await db.commit()
                 except Exception as db_err:
                     await db.rollback()
-                    logger.error(f"❌ [DB Error]: فشل حفظ الجلسة: {db_err}")
+                    logger.error(f"[DB Error]: فشل حفظ الجلسة: {db_err}")
         return result
     except asyncio.TimeoutError:
         raise HTTPException(status_code=504, detail="انتهت المهلة أثناء التحقق من الكود.")
