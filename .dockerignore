@@ -1,41 +1,58 @@
 # ==============================================================================
 # AymnGuard Enterprise - Sovereign .dockerignore Security Shield
-# درع تجاهل الملفات لتقليص حجم الحاوية وحماية الأسرار وقواعد البيانات
+# درع تجاهل الملفات لتقليص حجم الحاوية السحابية وحماية الأسرار وقواعد البيانات
 # ==============================================================================
 
-# Git Version Control
+# 1. Git Version Control & CI/CD
 .git
 .gitignore
+.gitmodules
+.github/
 
-# Virtual Environments & Python Caches
+# 2. Virtual Environments & Python Caches
 venv/
 env/
+.venv/
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
 .pytest_cache/
+*.egg-info/
+build/
+dist/
 
-# Sensitive Environment Configurations & Secrets (الأسرار البيئية الحجووبة)
+# 3. Sensitive Environment Configurations & Secrets (الأسرار البيئية المحجوبة)
 .env
 *.env
 secret_keys.json
+credentials.json
 
-# Logs & Local Sovereign Databases (حجب السجلات وقواعد البيانات المحلية بجميع أنماطها)
+# 4. Logs & Local Sovereign Databases (حجب السجلات وقواعد البيانات المحلية)
 logs/
 *.log
 *.sqlite
 *.sqlite3
+*.db
 aymnguard_enterprise.db
 aymnguard_local.db
 
-# OS Generated Metadata
+# 5. OS Generated Metadata & IDEs (ملفات النظام ومحررات الأكواد)
 .DS_Store
 Thumbs.db
+.vscode/
+.idea/
 
-# Archive, Temp Files & Binaries
+# 6. Archive, Temp Files & Binaries
 old_code_archive/
 cloudflare.deb
 nohup.out
 tmp/
+*.bak
+*.swp
+
+# 7. Docker Configs (لا حاجة لوجودها داخل الحاوية نفسها)
+Dockerfile
+docker-compose.yml
+.dockerignore
