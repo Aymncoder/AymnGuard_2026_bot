@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Enterprise - Sovereign Telemetry & Logging System (v18.0.0-Master)
+AymnGuard Enterprise - Sovereign Telemetry & Logging System (v18.1.0-Cloud)
 ==============================================================================
 نظام الاستشعار المركزي: تسجيل الأحداث المؤسسية مع دعم التتبع العميق للعمليات،
 التدوير التلقائي للملفات، والحماية من امتلاء المساحة التخزينية.
+تم تطهيره بالكامل من الرموز التعبيرية لضمان الاستقرار المطلق في بيئة السحابة.
+==============================================================================
 """
 
 import logging
@@ -47,8 +49,9 @@ def setup_logger(name: str = "AymnGuard", default_level: int = logging.INFO) -> 
 
     # 2. معالج الملفات (File Handler) مع التدوير الذاتي (Self-Healing Storage)
     try:
-        # التأكد من إنشاء مجلد السجلات بأمان تام ودون أخطاء صلاحيات
-        log_dir = Path("logs")
+        # استخدام المسار المطلق لضمان الاستقرار التام داخل بيئة السيرفر السحابي و Docker
+        base_dir = Path(__file__).resolve().parent.parent
+        log_dir = base_dir / "logs"
         log_dir.mkdir(parents=True, exist_ok=True)
         
         log_file_path = log_dir / "aymnguard_sys.log"
@@ -65,12 +68,12 @@ def setup_logger(name: str = "AymnGuard", default_level: int = logging.INFO) -> 
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
     except Exception as e:
-        sys.stderr.write(f"⚠️ [Logger Warning]: تعذر إنشاء ملف السجلات المحلي، سيتم الاكتفاء بالشاشة: {e}\n")
+        sys.stderr.write(f"[Logger Warning]: تعذر إنشاء ملف السجلات المحلي، سيتم الاكتفاء بالشاشة: {e}\n")
 
     logger._init_done = True
     
-    # تسجيل لحظة الاستيقاظ
-    logger.info("🔭 [Telemetry Engine]: تم تشغيل نظام الاستشعار المركزي بنجاح.")
+    # تسجيل لحظة الاستيقاظ بنظام نظيف خالٍ من الرموز
+    logger.info("[Telemetry Engine]: تم تشغيل نظام الاستشعار المركزي بنجاح.")
 
     return logger
 
