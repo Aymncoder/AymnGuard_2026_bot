@@ -43,7 +43,7 @@ class SovereignAuthManager:
         api_hash: str
     ) -> Dict[str, Any]:
         """الخطوة الأولى: الاتصال بخوادم تيليجرام وطلب كود التحقق مع درع التخطي الآلي (Auto-Retry)."""
-        logger.info(f"🔑 [Auth Engine]: Requesting verification code for phone: {phone_number} [Session: {session_name}]")
+        logger.info(f"[Auth Engine]: Requesting verification code for phone: {phone_number} [Session: {session_name}]")
         
         # تنظيف أي جلسة معلقة بنفس الاسم لضمان عدم تداخل البيانات
         await cls._safe_cleanup_session(session_name)
@@ -83,43 +83,43 @@ class SovereignAuthManager:
                     "api_hash": api_hash
                 }
                 
-                logger.info(f"✅ [Auth Engine]: Code sent successfully via {delivery_method} for session '{session_name}'")
+                logger.info(f"[Auth Engine]: Code sent successfully via {delivery_method} for session '{session_name}'")
                 return {
                     "status": "code_sent", 
                     "session_name": session_name,
                     "delivery_method": delivery_method,
                     "is_new_account": isinstance(code_type, SentCodeTypeSms),
-                    "message": f"✅ تم إرسال كود التحقق بنجاح عبر {delivery_method} للرقم {phone_number}."
+                    "message": f" تم إرسال كود التحقق بنجاح عبر {delivery_method} للرقم {phone_number}."
                 }
                 
             except FloodWait as e:
                 wait_time = e.value
                 # الدرع الذكي: إذا كان الحظر أقل من 15 ثانية، ننتظر بصمت ونعيد المحاولة
                 if wait_time <= 15:
-                    logger.warning(f"⚠️ [Auth FloodWait]: حظر مؤقت لـ {wait_time} ثانية. جاري الانتظار بصمت (محاولة {attempt}/{max_retries})...")
+                    logger.warning(f"[Auth FloodWait]: حظر مؤقت لـ {wait_time} ثانية. جاري الانتظار بصمت (محاولة {attempt}/{max_retries})...")
                     await asyncio.sleep(wait_time)
                     continue
                 else:
                     await cls._safe_disconnect_client(client)
-                    logger.error(f"🛑 [Auth FloodWait]: حظر طويل لـ {wait_time} ثانية لجلسة '{session_name}'.")
-                    return {"status": "error", "message": f"⏳ حماية تيليجرام نشطة: يرجى الانتظار {wait_time} ثانية قبل المحاولة مرة أخرى."}
+                    logger.error(f"[Auth FloodWait]: حظر طويل لـ {wait_time} ثانية لجلسة '{session_name}'.")
+                    return {"status": "error", "message": f" حماية تيليجرام نشطة: يرجى الانتظار {wait_time} ثانية قبل المحاولة مرة أخرى."}
                     
             except (NetworkMigrate, BadRequest) as e:
                 if attempt < max_retries:
-                    logger.warning(f"⚠️ [Auth Network/BadReq]: خطأ في الشبكة، جاري إعادة المحاولة... ({e})")
+                    logger.warning(f"[Auth Network/BadReq]: خطأ في الشبكة، جاري إعادة المحاولة... ({e})")
                     await asyncio.sleep(2)
                     continue
                 await cls._safe_disconnect_client(client)
-                return {"status": "error", "message": f"❌ فشل الاتصال بخوادم تيليجرام بعد عدة محاولات: {str(e)}"}
+                return {"status": "error", "message": f" فشل الاتصال بخوادم تيليجرام بعد عدة محاولات: {str(e)}"}
                 
             except Exception as e:
                 await cls._safe_disconnect_client(client)
-                logger.error(f"❌ [Auth Engine Error]: Failed to send code for '{session_name}': {str(e)}")
-                return {"status": "error", "message": f"❌ حدث خطأ تقني غير متوقع أثناء إرسال الكود: {str(e)}"}
+                logger.error(f"[Auth Engine Error]: Failed to send code for '{session_name}': {str(e)}")
+                return {"status": "error", "message": f"حدث خطأ تقني غير متوقع أثناء إرسال الكود: {str(e)}"}
         
         # في حال استنفاد جميع المحاولات
         await cls._safe_disconnect_client(client)
-        return {"status": "error", "message": "❌ تعذر إرسال الكود بسبب عدم استقرار الشبكة."}
+        return {"status": "error", "message": "تعذر إرسال الكود بسبب عدم استقرار الشبكة."}
 
     @classmethod
     async def verify_code(
@@ -128,11 +128,11 @@ class SovereignAuthManager:
         phone_code: str
     ) -> Dict[str, Any]:
         """الخطوة الثانية: استقبال كود الـ OTP، إتمام تسجيل الدخول، واستخراج مفتاح الجلسة (Session String)."""
-        logger.info(f"🔐 [Auth Engine]: Verifying OTP code for session: {session_name}")
+        logger.info(f"[Auth Engine]: Verifying OTP code for session: {session_name}")
         
         auth_data = cls._auth_sessions.get(session_name)
         if not auth_data:
-            return {"status": "error", "message": "❌ الجلسة غير موجودة، انتهت صلاحيتها، أو لم يتم طلب كود مسبقاً."}
+            return {"status": "error", "message": " الجلسة غير موجودة، انتهت صلاحيتها، أو لم يتم طلب كود مسبقا."}
             
         client: Client = auth_data["client"]
         phone_number = auth_data["phone_number"]
@@ -153,33 +153,33 @@ class SovereignAuthManager:
             await cls._safe_disconnect_client(client)
             cls._auth_sessions.pop(session_name, None)
             
-            logger.info(f"🎉 [Auth Success]: Session '{session_name}' successfully authenticated & string exported.")
+            logger.info(f"[Auth Success]: Session '{session_name}' successfully authenticated & string exported.")
             return {
                 "status": "success", 
                 "session_name": session_name,
                 "session_string": session_string, 
-                "message": "✅ تم تسجيل الدخول بنجاح! تم استخراج مفتاح الجلسة السيادي وتأمينه."
+                "message": "تم تسجيل الدخول بنجاح! تم استخراج مفتاح الجلسة السيادي وتأمينه."
             }
             
         except SessionPasswordNeeded:
-            logger.warning(f"⚠️ [Auth 2FA Required]: Session '{session_name}' requires Two-Step Verification password.")
+            logger.warning(f"[Auth 2FA Required]: Session '{session_name}' requires Two-Step Verification password.")
             return {
                 "status": "2fa_required", 
                 "session_name": session_name,
-                "message": "⚠️ الحساب محمي بكلمة مرور التحقق بخطوتين (2FA). يرجى إرسال كلمة المرور."
+                "message": " الحساب محمي بكلمة مرور التحقق بخطوتين (2FA). يرجى إرسال كلمة المرور."
             }
             
         except (PhoneCodeInvalid, PhoneCodeExpired) as e:
-            logger.warning(f"⚠️ [Auth Invalid Code]: Code error for session '{session_name}': {str(e)}")
-            return {"status": "error", "message": "❌ كود التحقق غير صحيح أو منتهي الصلاحية."}
+            logger.warning(f"[Auth Invalid Code]: Code error for session '{session_name}': {str(e)}")
+            return {"status": "error", "message": "كود التحقق غير صحيح أو منتهي الصلاحية."}
             
         except FloodWait as e:
-            logger.error(f"🛑 [Auth FloodWait]: حظر أثناء التحقق {e.value} ثانية لجلسة '{session_name}'.")
-            return {"status": "error", "message": f"⏳ محاولات خاطئة كثيرة! يرجى الانتظار {e.value} ثانية."}
+            logger.error(f"[Auth FloodWait]: حظر أثناء التحقق {e.value} ثانية لجلسة '{session_name}'.")
+            return {"status": "error", "message": f"محاولات خاطئة كثيرة! يرجى الانتظار {e.value} ثانية."}
             
         except Exception as e:
-            logger.error(f"❌ [Auth Verification Error]: Unexpected exception for '{session_name}': {str(e)}")
-            return {"status": "error", "message": f"❌ فشل تسجيل الدخول بسبب خطأ غير متوقع: {str(e)}"}
+            logger.error(f"[Auth Verification Error]: Unexpected exception for '{session_name}': {str(e)}")
+            return {"status": "error", "message": f"فشل تسجيل الدخول بسبب خطأ غير متوقع: {str(e)}"}
 
     @classmethod
     async def verify_2fa_password(
@@ -192,7 +192,7 @@ class SovereignAuthManager:
         
         auth_data = cls._auth_sessions.get(session_name)
         if not auth_data:
-            return {"status": "error", "message": "❌ الجلسة غير موجودة أو انتهت صلاحية بيانات المصادقة المؤقتة."}
+            return {"status": "error", "message": "الجلسة غير موجودة أو انتهت صلاحية بيانات المصادقة المؤقتة."}
             
         client: Client = auth_data["client"]
 
@@ -206,20 +206,20 @@ class SovereignAuthManager:
             await cls._safe_disconnect_client(client)
             cls._auth_sessions.pop(session_name, None)
             
-            logger.info(f"🎉 [Auth 2FA Success]: Session '{session_name}' authenticated via 2FA and string exported.")
+            logger.info(f"[Auth 2FA Success]: Session '{session_name}' authenticated via 2FA and string exported.")
             return {
                 "status": "success", 
                 "session_name": session_name,
                 "session_string": session_string, 
-                "message": "✅ تم تخطي حماية 2FA وتوليد سلسلة الجلسة السيادية بنجاح تام!"
+                "message": "تم تخطي حماية 2FA وتوليد سلسلة الجلسة السيادية بنجاح تام!"
             }
             
         except FloodWait as e:
-            return {"status": "error", "message": f"⏳ تجاوزت الحد المسموح. يرجى الانتظار {e.value} ثانية."}
+            return {"status": "error", "message": f"تجاوزت الحد المسموح. يرجى الانتظار {e.value} ثانية."}
             
         except Exception as e:
-            logger.error(f"❌ [Auth 2FA Error]: Invalid password or connection issue for '{session_name}': {str(e)}")
-            return {"status": "error", "message": "❌ كلمة مرور التحقق بخطوتين غير صحيحة، يرجى المحاولة مجدداً."}
+            logger.error(f"[Auth 2FA Error]: Invalid password or connection issue for '{session_name}': {str(e)}")
+            return {"status": "error", "message": "كلمة مرور التحقق بخطوتين غير صحيحة، يرجى المحاولة مجدداً."}
 
     @classmethod
     async def _safe_disconnect_client(cls, client: Optional[Client]):
@@ -229,7 +229,7 @@ class SovereignAuthManager:
                 if client.is_connected:
                     await client.disconnect()
             except Exception as e:
-                logger.debug(f"ℹ️ [Cleanup Notice]: Error while disconnecting temp client: {e}")
+                logger.debug(f"[Cleanup Notice]: Error while disconnecting temp client: {e}")
 
     @classmethod
     async def _safe_cleanup_session(cls, session_name: str):
