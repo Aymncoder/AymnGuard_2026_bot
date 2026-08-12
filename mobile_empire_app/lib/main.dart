@@ -1,8 +1,9 @@
 // -*- coding: utf-8 -*-
 /// ==============================================================================
-/// AymnGuard Sovereign Enterprise : Main Application Entry Point v35.0 (Operational Core)
+/// AymnGuard Sovereign Enterprise : Main Application Entry Point v35.1 (Hardened Core)
 /// ==============================================================================
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'app_config.dart';
@@ -13,11 +14,16 @@ import 'package:mobile_empire_app/app_drawers.dart';
 import 'package:mobile_empire_app/models/bot_model.dart';
 import 'package:mobile_empire_app/neural_core_screen.dart';
 
-// --- SOVEREIGN_IMPORT_MARKER ---
-
 void main() {
-  // --- SOVEREIGN_INIT_MARKER ---
-  runApp(const AymnGuardPlusApp());
+  // صندوق حماية عالمي لالتقاط أي استثناء قاتل ومنع الانهيار الفوري
+  runZonedGuarded(() async {
+    // 1. ربط فلاتر بنظام أندرويد قبل إطلاق أي واجهة أو خدمة
+    WidgetsFlutterBinding.ensureInitialized();
+
+    runApp(const AymnGuardPlusApp());
+  }, (error, stackTrace) {
+    debugPrint('🚨 [Sovereign Fatal Catch]: $error');
+  });
 }
 
 class AymnGuardPlusApp extends StatelessWidget {
@@ -59,7 +65,6 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
   final TextEditingController _phoneController = TextEditingController();
   String _selectedCountryName = "اليمن";
   String _selectedCountryCode = "+967";
-  bool _syncContacts = false;
 
   final List<Map<String, String>> _countriesList = [
     {'name': 'اليمن', 'code': '+967', 'flag': '🇾🇪'},
@@ -253,7 +258,7 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
 }
 
 // ==============================================================================
-// 2. المحرك الرئيسي (Main Screen) - مربوط بالدراور والأدوات الحقيقية
+// 2. المحرك الرئيسي (Main Screen)
 // ==============================================================================
 class MainSovereignScreen extends StatefulWidget {
   final String userAccount;
@@ -270,19 +275,13 @@ class _MainSovereignScreenState extends State<MainSovereignScreen> {
     return Scaffold(
       extendBody: true,
       backgroundColor: Colors.transparent, 
-      
       appBar: AppBar(
         backgroundColor: Colors.transparent, elevation: 0,
-        // هذه الأزرار تفتح أدواتك الأصلية التي تحتوي على المنطق الحقيقي
         leading: Builder(builder: (c) => IconButton(icon: const Icon(Icons.manage_accounts_rounded, color: AppColors.accentGold, size: 28), onPressed: () => Scaffold.of(c).openDrawer())),
         actions: [Builder(builder: (c) => IconButton(icon: const Icon(Icons.handyman_rounded, color: AppColors.accentGold, size: 26), onPressed: () => Scaffold.of(c).openEndDrawer()))],
       ),
-      
-      // الدوال المستوردة من ملفاتك الأصلية
       drawer: const MultiAccountDrawer(),     
       endDrawer: const AdvancedToolsDrawer(), 
-      
-      // التغليف بالخلفية السيبرانية
       body: CyberEnterpriseBackground(
         child: IndexedStack(
           index: _currentIndex,
@@ -295,14 +294,13 @@ class _MainSovereignScreenState extends State<MainSovereignScreen> {
           ],
         ),
       ), 
-      
       bottomNavigationBar: SafeArea(child: Padding(padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16), child: FloatingGlassyNavBar(currentIndex: _currentIndex, onTap: (i) => setState(() => _currentIndex = i)))),
     );
   }
 }
 
 // ==============================================================================
-// 3. الواجهة السيادية المدمجة (تحتوي على أزرار تشغل ميزاتك الحقيقية)
+// 3. الواجهة السيادية المدمجة
 // ==============================================================================
 class SovereignDashboardTab extends StatelessWidget {
   const SovereignDashboardTab({super.key});
@@ -319,7 +317,6 @@ class SovereignDashboardTab extends StatelessWidget {
           const SizedBox(height: 20),
           const Text('THE COMMAND HUB', style: TextStyle(color: Color(0xFFD4AF37), fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
           const SizedBox(height: 12),
-          // شبكة التحكم (الآن كل زر مربوط بدالة حقيقية)
           GridView.count(
             shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), crossAxisCount: 2, crossAxisSpacing: 12, mainAxisSpacing: 12, childAspectRatio: 1.3,
             children: [
@@ -331,7 +328,6 @@ class SovereignDashboardTab extends StatelessWidget {
               _buildButton(context, 'مجموعة الدعم', Icons.group, const Color(0xFF3FB950), () => launchUrl(Uri.parse('https://t.me/AymnGuard'), mode: LaunchMode.externalApplication)),
             ],
           ),
-          // --- SOVEREIGN_WIDGET_MARKER ---
           const SizedBox(height: 100),
         ],
       ),
@@ -344,7 +340,7 @@ class SovereignDashboardTab extends StatelessWidget {
 }
 
 // ==============================================================================
-// 4. المحرك البصري (الخلفية السيبرانية المؤسسية)
+// 4. المحرك البصري
 // ==============================================================================
 class CyberEnterpriseBackground extends StatelessWidget {
   final Widget child;
@@ -374,7 +370,7 @@ class CyberEnterpriseBackground extends StatelessWidget {
 }
 
 // ==============================================================================
-// 5. العناصر الجمالية المتبقية (العناوين والأشرطة)
+// 5. العناصر الجمالية المتبقية
 // ==============================================================================
 class SovereignBrandingHeader extends StatelessWidget {
   const SovereignBrandingHeader({Key? key}) : super(key: key);
@@ -468,9 +464,6 @@ class FloatingGlassyNavBar extends StatelessWidget {
   }
 }
 
-// ==============================================================================
-// 6. واجهات مساعدة تم الاحتفاظ بها من النسخة الأصلية لتجنب أخطاء الاستدعاء
-// ==============================================================================
 class TelegramCoreChatsScreen extends StatelessWidget {
   const TelegramCoreChatsScreen({super.key});
   @override
@@ -531,7 +524,3 @@ class ContactsScreen extends StatelessWidget {
     return const Scaffold(backgroundColor: Colors.transparent, body: Center(child: Text("جهات الاتصال الإمبراطورية", style: TextStyle(color: Colors.grey))));
   }
 }
-
-
-// --- تم الحقن الآلي بواسطة المحرك السيادي ---
-// ============================================================================== // واجهة الدخول السيبرانية (تم حقنها آلياً بواسطة محرك الخياطة) // ============================================================================== class CyberAccountLoginScreen extends StatefulWidget {   const CyberAccountLoginScreen({super.key});   @override   State<CyberAccountLoginScreen> createState() => _CyberAccountLoginScreenState(); }  class _CyberAccountLoginScreenState extends State<CyberAccountLoginScreen> {   final TextEditingController _phoneController = TextEditingController();   final String _selectedCountryName = "اليمن";   final String _selectedCountryCode = "+967";    void _loginAndConnect() async {     String rawPhone = _phoneController.text.trim();     if (rawPhone.isEmpty) return;     if (rawPhone.startsWith('0')) rawPhone = rawPhone.substring(1);     String fullPhoneNumber = "$_selectedCountryCode$rawPhone";      showDialog(       context: context, barrierDismissible: false,       builder: (context) => const Center(child: CircularProgressIndicator(color: AppColors.accentGold)),     );      try {       var response = await BackendCoreEcosystem.requestTelegramOtp("AymnGuard_Session", fullPhoneNumber, 2040, "b18441a1ff607e10a989891a5462e627");       if (mounted) Navigator.pop(context);        if (response['error'] == true) {         if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("تعذر الاتصال: ${response['message']}")));       } else {         if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainSovereignScreen(userAccount: fullPhoneNumber)));       }     } catch (e) {       if (mounted) {         Navigator.pop(context);         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("خطأ: $e")));       }     }   }    @override   Widget build(BuildContext context) {     return Scaffold(       backgroundColor: Colors.transparent,       extendBodyBehindAppBar: true,       appBar: AppBar(         backgroundColor: Colors.transparent, elevation: 0,         actions: [           Container(             margin: const EdgeInsets.all(8),             decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [BoxShadow(color: AppColors.accentGold.withOpacity(0.5), blurRadius: 10)]),             child: IconButton(icon: const Icon(Icons.security, color: AppColors.accentGold), onPressed: () {}),           )         ],       ),       body: CyberEnterpriseBackground(         child: SafeArea(           child: Padding(             padding: const EdgeInsets.all(24.0),             child: Column(               crossAxisAlignment: CrossAxisAlignment.start,               children: [                 const SizedBox(height: 20),                 Text("بوابة العبور السيادية", style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Colors.white, shadows: [Shadow(color: AppColors.accentGold.withOpacity(0.5), blurRadius: 10)])),                 const SizedBox(height: 8),                 Text("يرجى تأكيد مفتاح بلدك وإدخال رقم هاتفك للاتصال بالشبكة المشفرة.", style: TextStyle(color: Colors.grey[400], fontSize: 14, height: 1.5)),                 const SizedBox(height: 40),                 Container(                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),                   decoration: BoxDecoration(color: const Color(0xFF161B22).withOpacity(0.6), borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.accentGold.withOpacity(0.4)), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10)]),                   child: Row(                     mainAxisAlignment: MainAxisAlignment.spaceBetween,                     children: [                       Text("الدولة: $_selectedCountryName ($_selectedCountryCode)", style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),                       const Icon(Icons.radar, size: 20, color: AppColors.accentGold),                     ],                   ),                 ),                 const SizedBox(height: 20),                 Directionality(                   textDirection: TextDirection.ltr,                   child: TextField(                     controller: _phoneController, keyboardType: TextInputType.phone, textAlign: TextAlign.right,                     style: const TextStyle(color: Colors.white, fontSize: 20, letterSpacing: 2.0),                     decoration: InputDecoration(                       labelText: "رقم الهاتف", labelStyle: const TextStyle(color: Colors.grey),                       filled: true, fillColor: const Color(0xFF0D1117).withOpacity(0.7),                       prefixText: "$_selectedCountryCode ", prefixStyle: const TextStyle(color: AppColors.accentGold, fontSize: 20, fontWeight: FontWeight.bold),                       enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.blueAccent.withOpacity(0.3), width: 1.5)),                       focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.accentGold, width: 2)),                     ),                   ),                 ),                 const Spacer(),                 Container(                   width: double.infinity, height: 55,                   decoration: BoxDecoration(                     borderRadius: BorderRadius.circular(16),                     gradient: const LinearGradient(colors: [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)]),                     boxShadow: [BoxShadow(color: Colors.blueAccent.withOpacity(0.3), blurRadius: 15, spreadRadius: 1, offset: const Offset(0, 4))]                   ),                   child: ElevatedButton(                     style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),                     onPressed: _loginAndConnect,                     child: const Text("إطلاق الجلسة المشفرة 🚀", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.0)),                   ),                 ),                 const SizedBox(height: 20),               ],             ),           ),         ),       ),     );   } }
