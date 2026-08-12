@@ -340,7 +340,7 @@ class SovereignDashboardTab extends StatelessWidget {
 }
 
 // ==============================================================================
-// 4. المحرك البصري
+// 4. المحرك البصري (تشغيل صورتك الخاصة كخلفية)
 // ==============================================================================
 class CyberEnterpriseBackground extends StatelessWidget {
   final Widget child;
@@ -352,19 +352,15 @@ class CyberEnterpriseBackground extends StatelessWidget {
       width: double.infinity,
       height: double.infinity,
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft, end: Alignment.bottomRight,
-          colors: [Color(0xFF060D1A), Color(0xFF020409), Color(0xFF0A1628)],
-          stops: [0.0, 0.5, 1.0],
+        // سحب الصورة التي قمت برفعها مسبقاً
+        image: DecorationImage(
+          image: AssetImage('assets/images/bg.jpg'),
+          fit: BoxFit.cover, // لتتمدد الصورة وتغطي الشاشة بالكامل
+          // تعتيم خفيف جداً فوق الصورة لكي تظل النصوص واضحة ومقروءة
+          colorFilter: ColorFilter.mode(Colors.black54, BlendMode.darken),
         ),
       ),
-      child: Stack(
-        children: [
-          Positioned(top: -100, left: -50, child: Container(width: 250, height: 250, decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFFD4AF37).withOpacity(0.03), boxShadow: [BoxShadow(color: const Color(0xFFD4AF37).withOpacity(0.08), blurRadius: 120, spreadRadius: 60)]))),
-          Positioned(bottom: -150, right: -80, child: Container(width: 350, height: 350, decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFF2FA4E7).withOpacity(0.03), boxShadow: [BoxShadow(color: const Color(0xFF2FA4E7).withOpacity(0.06), blurRadius: 150, spreadRadius: 80)]))),
-          SafeArea(child: child),
-        ],
-      ),
+      child: SafeArea(child: child),
     );
   }
 }
