@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Enterprise v18.0.0 : Sovereign Web3 & Smart Contract Nexus
+AymnGuard Enterprise v18.0.1 : Sovereign Web3 & Smart Contract Nexus
 ==============================================================================
 الذراع اللامركزي: محرك متقدم لمراقبة العقود الذكية، تدقيق محافظ التسويق، 
 وفحص سيولة إطلاقات التوكنز وعملات الميم لحظياً مع حماية مطلقة ضد الأخطاء.
@@ -14,6 +14,11 @@ from typing import Dict, Any, Optional
 
 # إعداد نظام السجلات السيادي
 logger = logging.getLogger("AymnGuard.Web3Nexus")
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
 class SovereignWeb3Nexus:
@@ -27,7 +32,7 @@ class SovereignWeb3Nexus:
 
     async def rpc_call(self, rpc_url: str, method: str, params: list) -> Optional[Any]:
         """
-        تنفيذ نداء منخفض المستوى (Low-level RPC Call) للشبكة مع درع حماية وإعادة محاولة.
+        تنفيذ نداء منخفض المستوى (Low-level RPC Call) للشبكة مع درع حماية وإعادة محاولة وإدارة جلسة فعالة.
         """
         payload = {
             "jsonrpc": "2.0",
@@ -37,22 +42,26 @@ class SovereignWeb3Nexus:
         }
         
         max_retries = 3
-        for attempt in range(1, max_retries + 1):
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.post(rpc_url, json=payload, timeout=10) as response:
+        # إدارة الجلسة خارج حلقة المحاولات لرفع كفاءة الأداء وتقليل استهلاك الموارد
+        async with aiohttp.ClientSession() as session:
+            for attempt in range(1, max_retries + 1):
+                try:
+                    async with session.post(rpc_url, json=payload, timeout=aiohttp.ClientTimeout(total=10)) as response:
                         if response.status == 200:
                             data = await response.json()
                             return data.get("result")
                         else:
                             logger.warning(f"⚠️ [Web3 Nexus]: فشل الاتصال بالشبكة (محاولة {attempt}/{max_retries}) - الكود: {response.status}")
                             await asyncio.sleep(1)
-            except asyncio.TimeoutError:
-                logger.warning(f"⚠️ [Web3 Timeout]: انقضت مهلة الاتصال بنداء RPC (محاولة {attempt})")
-                await asyncio.sleep(1.5)
-            except Exception as e:
-                logger.error(f"❌ [Web3 Nexus Error]: استثناء في نداء RPC -> {e}")
-                await asyncio.sleep(1)
+                except asyncio.TimeoutError:
+                    logger.warning(f"⚠️ [Web3 Timeout]: انقضت مهلة الاتصال بنداء RPC (محاولة {attempt})")
+                    await asyncio.sleep(1.5)
+                except aiohttp.ClientError as e:
+                    logger.error(f"❌ [Web3 Client Error]: خطأ في اتصال HTTP -> {e}")
+                    await asyncio.sleep(1)
+                except Exception as e:
+                    logger.error(f"❌ [Web3 Nexus Error]: استثناء غير متوقع في نداء RPC -> {e}")
+                    await asyncio.sleep(1)
 
         logger.error(f"❌ [Web3 Failure]: تعذر إتمام نداء RPC بعد استنفاد المحاولات.")
         return None
@@ -70,7 +79,7 @@ class SovereignWeb3Nexus:
             
             rpc_url = self.bsc_rpc_url if network.lower() == "bsc" else self.eth_rpc_url
             
-            # 1. جبط رصيد العقد بأمان تام
+            # 1. جلب رصيد العقد بأمان تام (تم تصحيح الخطأ الإملائي)
             balance_hex = await self.rpc_call(rpc_url, "eth_getBalance", [cleaned_address, "latest"])
             balance_eth = 0.0
             if balance_hex and isinstance(balance_hex, str):
