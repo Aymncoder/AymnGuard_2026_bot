@@ -4,9 +4,11 @@
 AymnGuard Sovereign Auth Manager (v18.0.0-Master Enterprise Unified)
 ==============================================================================
 محرك المصادقة السيادي الموحد: إدارة دورة حياة تسجيل الدخول (OTP & 2FA) 
-بشكل آمن، معالجة استباقية للأخطاء، تحديد دقيق لجهات الاستلام، وتصدير Session Strings.
+بشكل آمن، معالجة استباقية للأخطاء (Auto-Retry Shield)، تحديد دقيق لجهات الاستلام، 
+وتصدير Session Strings باحترافية عالية.
 """
 
+import asyncio
 import logging
 from typing import Dict, Any, Optional
 from pyrogram import Client
@@ -15,7 +17,9 @@ from pyrogram.errors import (
     PhoneCodeInvalid, 
     PhoneCodeExpired, 
     FloodWait, 
-    BadRequest
+    BadRequest,
+    NetworkMigrate,
+    ApiIdInvalid
 )
 from pyrogram.raw.types.auth import SentCodeTypeSms, SentCodeTypeApp, SentCodeTypeCall
 
@@ -38,10 +42,10 @@ class SovereignAuthManager:
         api_id: int, 
         api_hash: str
     ) -> Dict[str, Any]:
-        """الخطوة الأولى: الاتصال بخوادم تيليجرام وطلب كود التحقق (OTP) مع تحديد جهة الاستلام بدقة."""
+        """الخطوة الأولى: الاتصال بخوادم تيليجرام وطلب كود التحقق مع درع التخطي الآلي (Auto-Retry)."""
         logger.info(f"🔑 [Auth Engine]: Requesting verification code for phone: {phone_number} [Session: {session_name}]")
         
-        # تنظيف أي جلسة سلقة معلقة بنفس الاسم لضمان عدم تداخل البيانات
+        # تنظيف أي جلسة معلقة بنفس الاسم لضمان عدم تداخل البيانات
         await cls._safe_cleanup_session(session_name)
         
         client = Client(
@@ -51,48 +55,71 @@ class SovereignAuthManager:
             in_memory=True
         )
         
-        try:
-            await client.connect()
-            sent_code = await client.send_code(phone_number)
-            
-            # تحليل ذكي لجهة استلام كود التحقق
-            code_type = sent_code.type
-            delivery_method = "غير معروف"
-            
-            if isinstance(code_type, SentCodeTypeSms):
-                delivery_method = "رسالة نصية (SMS)"
-            elif isinstance(code_type, SentCodeTypeApp):
-                delivery_method = "تطبيق تيليجرام الرسمي (App)"
-            elif isinstance(code_type, SentCodeTypeCall):
-                delivery_method = "مكالمة هاتفية (Call)"
-            
-            # تخزين البيانات في السجل المركزي الموحد
-            cls._auth_sessions[session_name] = {
-                "client": client,
-                "phone_number": phone_number,
-                "phone_code_hash": sent_code.phone_code_hash,
-                "api_id": api_id,
-                "api_hash": api_hash
-            }
-            
-            logger.info(f"✅ [Auth Engine]: Code sent successfully via {delivery_method} for session '{session_name}'")
-            return {
-                "status": "code_sent", 
-                "session_name": session_name,
-                "delivery_method": delivery_method,
-                "is_new_account": isinstance(code_type, SentCodeTypeSms),
-                "message": f"✅ تم إرسال كود التحقق بنجاح عبر {delivery_method} للرقم {phone_number}."
-            }
-            
-        except FloodWait as e:
-            await cls._safe_disconnect_client(client)
-            logger.error(f"🛑 [Auth FloodWait]: Must wait {e.value} seconds for session '{session_name}'.")
-            return {"status": "error", "message": f"🛑 تجاوزت الحد المسموح من المحاولات. يجِب الانتظار لمدة {e.value} ثانية."}
-            
-        except Exception as e:
-            await cls._safe_disconnect_client(client)
-            logger.error(f"❌ [Auth Engine Error]: Failed to send code for '{session_name}': {str(e)}")
-            return {"status": "error", "message": f"❌ حدث خطأ تقني أثناء إرسال الكود: {str(e)}"}
+        max_retries = 3
+        for attempt in range(1, max_retries + 1):
+            try:
+                if not client.is_connected:
+                    await client.connect()
+                
+                sent_code = await client.send_code(phone_number)
+                
+                # تحليل ذكي لجهة استلام كود التحقق
+                code_type = sent_code.type
+                delivery_method = "غير معروف"
+                
+                if isinstance(code_type, SentCodeTypeSms):
+                    delivery_method = "رسالة نصية (SMS)"
+                elif isinstance(code_type, SentCodeTypeApp):
+                    delivery_method = "تطبيق تيليجرام الرسمي (App)"
+                elif isinstance(code_type, SentCodeTypeCall):
+                    delivery_method = "مكالمة هاتفية (Call)"
+                
+                # تخزين البيانات في السجل المركزي الموحد
+                cls._auth_sessions[session_name] = {
+                    "client": client,
+                    "phone_number": phone_number,
+                    "phone_code_hash": sent_code.phone_code_hash,
+                    "api_id": api_id,
+                    "api_hash": api_hash
+                }
+                
+                logger.info(f"✅ [Auth Engine]: Code sent successfully via {delivery_method} for session '{session_name}'")
+                return {
+                    "status": "code_sent", 
+                    "session_name": session_name,
+                    "delivery_method": delivery_method,
+                    "is_new_account": isinstance(code_type, SentCodeTypeSms),
+                    "message": f"✅ تم إرسال كود التحقق بنجاح عبر {delivery_method} للرقم {phone_number}."
+                }
+                
+            except FloodWait as e:
+                wait_time = e.value
+                # الدرع الذكي: إذا كان الحظر أقل من 15 ثانية، ننتظر بصمت ونعيد المحاولة
+                if wait_time <= 15:
+                    logger.warning(f"⚠️ [Auth FloodWait]: حظر مؤقت لـ {wait_time} ثانية. جاري الانتظار بصمت (محاولة {attempt}/{max_retries})...")
+                    await asyncio.sleep(wait_time)
+                    continue
+                else:
+                    await cls._safe_disconnect_client(client)
+                    logger.error(f"🛑 [Auth FloodWait]: حظر طويل لـ {wait_time} ثانية لجلسة '{session_name}'.")
+                    return {"status": "error", "message": f"⏳ حماية تيليجرام نشطة: يرجى الانتظار {wait_time} ثانية قبل المحاولة مرة أخرى."}
+                    
+            except (NetworkMigrate, BadRequest) as e:
+                if attempt < max_retries:
+                    logger.warning(f"⚠️ [Auth Network/BadReq]: خطأ في الشبكة، جاري إعادة المحاولة... ({e})")
+                    await asyncio.sleep(2)
+                    continue
+                await cls._safe_disconnect_client(client)
+                return {"status": "error", "message": f"❌ فشل الاتصال بخوادم تيليجرام بعد عدة محاولات: {str(e)}"}
+                
+            except Exception as e:
+                await cls._safe_disconnect_client(client)
+                logger.error(f"❌ [Auth Engine Error]: Failed to send code for '{session_name}': {str(e)}")
+                return {"status": "error", "message": f"❌ حدث خطأ تقني غير متوقع أثناء إرسال الكود: {str(e)}"}
+        
+        # في حال استنفاد جميع المحاولات
+        await cls._safe_disconnect_client(client)
+        return {"status": "error", "message": "❌ تعذر إرسال الكود بسبب عدم استقرار الشبكة."}
 
     @classmethod
     async def verify_code(
@@ -112,6 +139,9 @@ class SovereignAuthManager:
         phone_code_hash = auth_data["phone_code_hash"]
 
         try:
+            if not client.is_connected:
+                await client.connect()
+                
             await client.sign_in(
                 phone_number=phone_number,
                 phone_code_hash=phone_code_hash,
@@ -139,9 +169,13 @@ class SovereignAuthManager:
                 "message": "⚠️ الحساب محمي بكلمة مرور التحقق بخطوتين (2FA). يرجى إرسال كلمة المرور."
             }
             
-        except (PhoneCodeInvalid, PhoneCodeExpired, BadRequest) as e:
+        except (PhoneCodeInvalid, PhoneCodeExpired) as e:
             logger.warning(f"⚠️ [Auth Invalid Code]: Code error for session '{session_name}': {str(e)}")
-            return {"status": "error", "message": "❌ كود التحقق غير صحيح، منتهي الصلاحية، أو تم إدخاله بشكل خاطئ."}
+            return {"status": "error", "message": "❌ كود التحقق غير صحيح أو منتهي الصلاحية."}
+            
+        except FloodWait as e:
+            logger.error(f"🛑 [Auth FloodWait]: حظر أثناء التحقق {e.value} ثانية لجلسة '{session_name}'.")
+            return {"status": "error", "message": f"⏳ محاولات خاطئة كثيرة! يرجى الانتظار {e.value} ثانية."}
             
         except Exception as e:
             logger.error(f"❌ [Auth Verification Error]: Unexpected exception for '{session_name}': {str(e)}")
@@ -163,6 +197,9 @@ class SovereignAuthManager:
         client: Client = auth_data["client"]
 
         try:
+            if not client.is_connected:
+                await client.connect()
+                
             await client.check_password(password.strip())
             
             session_string = await client.export_session_string()
@@ -177,9 +214,12 @@ class SovereignAuthManager:
                 "message": "✅ تم تخطي حماية 2FA وتوليد سلسلة الجلسة السيادية بنجاح تام!"
             }
             
+        except FloodWait as e:
+            return {"status": "error", "message": f"⏳ تجاوزت الحد المسموح. يرجى الانتظار {e.value} ثانية."}
+            
         except Exception as e:
             logger.error(f"❌ [Auth 2FA Error]: Invalid password or connection issue for '{session_name}': {str(e)}")
-            return {"status": "error", "message": f"❌ كلمة مرور التحقق بخطوتين غير صحيحة أو حدث خطأ تقني: {str(e)}"}
+            return {"status": "error", "message": "❌ كلمة مرور التحقق بخطوتين غير صحيحة، يرجى المحاولة مجدداً."}
 
     @classmethod
     async def _safe_disconnect_client(cls, client: Optional[Client]):
