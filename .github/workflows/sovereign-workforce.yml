@@ -27,7 +27,7 @@ jobs:
   # ==============================================================================
   Sovereign_Heal_And_Validate:
     name: "🚀 الشفاء الذاتي والتحليل الهيكلي (Hyper-Static Healing)"
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: 🛡️ Checkout Sovereign Repository
         uses: actions/checkout@v4
@@ -69,7 +69,7 @@ jobs:
   # ==============================================================================
   Hyper_Security_And_Smart_Contracts:
     name: "🛡️ الفحص الأمني الاستباقي والعقود (Security & Crypto Audit)"
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: Sovereign_Heal_And_Validate
     steps:
       - name: 🛡️ Checkout Repository
