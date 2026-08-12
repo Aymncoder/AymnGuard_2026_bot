@@ -16,7 +16,7 @@ concurrency:
 jobs:
   run_master_engine:
     name: "🚀 تنفيذ المحرك السيادي الشامل بمعايير العمالقة العالمية"
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       actions: read
