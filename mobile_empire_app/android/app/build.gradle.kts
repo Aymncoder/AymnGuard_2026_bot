@@ -27,18 +27,11 @@ android {
 
     buildTypes {
         release {
-            // [معيار أمني مؤسسي]: إعداد مفتاح التوقيع لنسخة الإصدار
+            // إيقاف مقصلة الأكواد التي تدمر ملفات الإقلاع وتسبب الانهيار
+            isMinifyEnabled = false
+            isShrinkResources = false
+            
+            // إعداد مفتاح التوقيع لنسخة الإصدار (معيار أمني مؤسسي) //
             signingConfig = signingConfigs.getByName("debug")
         }
     }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
-    }
-}
-
-flutter {
-    source = "../.."
-}
