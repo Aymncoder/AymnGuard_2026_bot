@@ -18,7 +18,7 @@ from typing import Dict, List, Any
 # إعداد السجلات المؤسسية الفائقة
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s 🌐 [Mega-Sovereign Engine v17.0] %(levelname)s: %(message)s'
+    format='%(asctime)s[Mega-Sovereign Engine v17.0] %(levelname)s: %(message)s'
 )
 logger = logging.getLogger("GlobalSovereignMegaCore")
 
@@ -37,9 +37,9 @@ class GlobalSovereignMegaEngine:
         الزر السيادي الشامل: إطلاق عمليات التطهير، الإصلاح المعماري،
         تدقيق الأمان، والربط اللوجستي بمعايير العمالقة التكنولوجيين.
         """
-        logger.info("👑 ========================================================")
-        logger.info("👑 إطلاق محرك التطوير والهندسة السيادية الشاملة (Mega-Transformation)...")
-        logger.info("👑 ========================================================")
+        logger.info("========================================================")
+        logger.info("إطلاق محرك التطوير والهندسة السيادية الشاملة (Mega-Transformation)...")
+        logger.info("========================================================")
 
         metrics = {
             "fixed_imports": self._refactor_and_heal_imports(),
@@ -48,13 +48,13 @@ class GlobalSovereignMegaEngine:
             "resilience_audit": self._run_chaos_resilience_simulation()
         }
 
-        logger.info("👑 ========================================================")
-        logger.info(f"🏆 [تقرير السيادة والجاهزية المؤسسية العالمية 100%]:")
+        logger.info("========================================================")
+        logger.info(f"[تقرير السيادة والجاهزية المؤسسية العالمية 100%]:")
         logger.info(f"   - إجمالي الملفات المعالجة والمصححة مسارياً: {metrics['fixed_imports']}")
         logger.info(f"   - ترقيعات الحماية والأمان السيادي: {'مفعلة بنجاح تام' if metrics['security_hardened'] else 'تحت المراجعة'}")
         logger.info(f"   - حالة الربط التشغيلي المركزي (Mega-Main): {'مكتمل 100%'}")
         logger.info(f"   - نتائج محاكاة الكسر والصمود (Chaos Testing): {'ممتاز - النظام منيع'}")
-        logger.info("👑 ========================================================")
+        logger.info("========================================================")
 
         return metrics
 
@@ -63,7 +63,7 @@ class GlobalSovereignMegaEngine:
         فحص وإصلاح المسارات المتداخلة، وإعادة بناء الاستيرادات المكسورة
         باستخدام خوارزميات المعالجة النصية المتقدمة (AST & Regex Heuristics).
         """
-        logger.info("🔍 [Mega-Step 1]: بدء المسح الهيكلي الشامل وإصلاح الاستيرادات المتداخلة...")
+        logger.info("[Mega-Step 1]: بدء المسح الهيكلي الشامل وإصلاح الاستيرادات المتداخلة...")
         fixed_count = 0
         python_files = list(self.root_path.glob("**/*.py"))
 
@@ -83,11 +83,11 @@ class GlobalSovereignMegaEngine:
 
                 if content != original:
                     file_path.write_text(content, encoding="utf-8")
-                    logger.info(f"✨ [Mega-Healed]: تم تطهير وتصحيح مسارات الملف: {file_path}")
+                    logger.info(f"[Mega-Healed]: تم تطهير وتصحيح مسارات الملف: {file_path}")
                     fixed_count += 1
 
             except Exception as e:
-                logger.error(f"❌ خطأ أثناء معالجة الملف الهيكلي {file_path}: {e}")
+                logger.error(f"خطأ أثناء معالجة الملف الهيكلي {file_path}: {e}")
 
         return fixed_count
 
@@ -96,7 +96,7 @@ class GlobalSovereignMegaEngine:
         ترسيخ معايير الأمان المؤسسي العالمية ومنع حقن الثغرات الشائعة
         عبر فحص الأنماط البرمجية وحقن حواجز الحماية التلقائية.
         """
-        logger.info("🛡️ [Mega-Step 2]: حقن الحماية السيادية وترسيخ معايير الأمان العالمية...")
+        logger.info("[Mega-Step 2]: حقن الحماية السيادية وترسيخ معايير الأمان العالمية...")
         # التأكد من وجود مجلدات الحماية والأمان الأساسية
         for module in self.target_modules:
             mod_path = self.root_path / module
@@ -112,7 +112,7 @@ class GlobalSovereignMegaEngine:
         إنشاء أو ترقية الملف التشغيلي المركزي الشامل (main.py) ليربط
         كافة الخدمات، المحركات المالية، والوكلاء الإدراكيين بربط لوجستي فائق.
         """
-        logger.info("🔗 [Mega-Step 3]: الهندسة الشاملة والربط المؤسسي للملف التشغيلي المركزي (main.py)...")
+        logger.info("[Mega-Step 3]: الهندسة الشاملة والربط المؤسسي للملف التشغيلي المركزي (main.py)...")
         main_file = self.root_path / "main.py"
         
         mega_boilerplate = '''# -*- coding: utf-8 -*-
@@ -139,7 +139,7 @@ except ImportError:
         return {"status": "mocked_execution", "detail": "Core not fully compiled yet."}
     SovereignTradingEngine = None
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s 🚀 [Mega-Main] %(levelname)s: %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s[Mega-Main] %(levelname)s: %(message)s')
 logger = logging.getLogger("AymnGuard.MegaMainCore")
 
 app = FastAPI(
@@ -183,7 +183,7 @@ async def execute_trade_endpoint(payload: TradeRequestModel):
         )
         return {"status": "success", "data": result}
     except Exception as e:
-        logger.error(f"❌ خطأ فادح أثناء تنفيذ الصفقة عبر البوابة المركزية: {e}")
+        logger.error(f"خطأ فادح أثناء تنفيذ الصفقة عبر البوابة المركزية: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Execution Failed: {str(e)}"
@@ -194,7 +194,7 @@ if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
 '''
         main_file.write_text(mega_boilerplate, encoding="utf-8")
-        logger.info("🚀 [Mega-Core Built]: تم تكوين الملف التشغيلي المركزي الشامل (main.py) بنجاح مذهل.")
+        logger.info("[Mega-Core Built]: تم تكوين الملف التشغيلي المركزي الشامل (main.py) بنجاح مذهل.")
         return True
 
     def _run_chaos_resilience_simulation(self) -> str:
@@ -202,7 +202,7 @@ if __name__ == "__main__":
         محاكاة اختبارات الكسر والصمود (Chaos Engineering & Mutation Testing)
         للتأكد من أن النظام قادر على امتصاص الأخطاء المفاجئة والتعافي الذاتي الفوري.
         """
-        logger.info("⚡ [Mega-Step 4]: تنفيذ محاكاة الصمود واختبارات الكسر البرمجي (Chaos Simulation)...")
+        logger.info("[Mega-Step 4]: تنفيذ محاكاة الصمود واختبارات الكسر البرمجي (Chaos Simulation)...")
         # التحقق من أن بيئة الاختبارات أو المجلدات الأساسية جاهزة
         tests_dir = self.root_path / "tests"
         tests_dir.mkdir(exist_ok=True)
