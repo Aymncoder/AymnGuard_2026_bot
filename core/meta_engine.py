@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Enterprise v17.0.0 : Autonomous Mega-Meta-Engine & Cognitive Agent
+AymnGuard Enterprise v18.0.0 : Autonomous Mega-Meta-Engine & Cognitive Agent
 ==============================================================================
 النظام السيادي الخارق للبرمجة الذاتية، التطور التلقائي، توليد الميزات الحية،
 مع محرك الحماية الشجري (AST Security Sandbox) والتحميل الحي الآمن (Hot-Reloading).
-==============================================================================
 """
 
 import logging
@@ -17,27 +16,16 @@ import asyncio
 from typing import Dict, Any, Optional
 from pydantic import BaseModel
 
-# =============================================================================
-# 1. إعداد السجلات المؤسسية للنواة الخارقة
-# =============================================================================
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s 🧠 [Sovereign-MegaMeta-Secure] %(levelname)s: %(message)s"
-)
+# ربط السجلات بنظام الاستشعار المركزي للإمبراطورية
 logger = logging.getLogger("AymnGuard.MegaMetaEngine")
+logger.setLevel(logging.INFO)
 
-# =============================================================================
-# 2. نماذج البيانات والتحكم (Pydantic Models)
-# =============================================================================
 class FeatureRequestModel(BaseModel):
     feature_prompt: str
     target_module: Optional[str] = "custom_dynamic_module"
     execution_mode: str = "autonomous"  # autonomous, review_only
 
 
-# =============================================================================
-# 3. محرك الميتا والوكيل الإدراكي الذاتي المدعم بالأمان الشجري
-# =============================================================================
 class SovereignMegaMetaEngine:
     """
     النواة السيادية المدمجة للبرمجة الذاتية والوكيل الإدراكي مع حماية أمنية مطلقة:
@@ -49,7 +37,12 @@ class SovereignMegaMetaEngine:
         self.modules_dir = modules_dir
         self.active_dynamic_modules: Dict[str, Any] = {}
         self._lock = asyncio.Lock()  # قفل تزامن مؤسسي لحماية عمليات الحقن الحية
-        os.makedirs(self.modules_dir, exist_ok=True)
+        
+        try:
+            os.makedirs(self.modules_dir, exist_ok=True)
+        except Exception as e:
+            logger.error(f"⚠️ [Meta-Engine]: تحذير في إنشاء مجلد الوحدات الديناميكية: {e}")
+            
         logger.info("⚙️ [MegaMeta-Engine]: تم إقلاع محرك الابتكار والتطوير الذاتي الآلي بنجاح تام.")
 
     def _validate_ast_security(self, code_content: str) -> bool:
@@ -59,7 +52,7 @@ class SovereignMegaMetaEngine:
         """
         try:
             tree = ast.parse(code_content)
-            forbidden_modules = {"subprocess", "shutil", "pickle"}
+            forbidden_modules = {"subprocess", "shutil", "pickle", "os", "sys"}
             forbidden_funcs = {"eval", "exec", "compile", "globals", "locals"}
 
             for node in ast.walk(tree):
@@ -87,13 +80,13 @@ class SovereignMegaMetaEngine:
       
     async def analyze_and_synthesize_feature(self, prompt: str, module_name: str = "dynamic_addon") -> Dict[str, Any]:
         """
-        الوكيل الإدراكي لتخليق وبناء الميزات البرمجية طياراً مع صياغة آمنة تماماً:
+        الوكيل الإدراكي لتخليق وبناء الميزات البرمجية طياراً مع صياغة آمنة تماماً.
         """
         logger.info(f"🔍 [Cognitive Agent]: جاري تفكيك وتحليل الطلب الابتكاري: '{prompt}'")
 
         sanitized_module_name = module_name.replace(" ", "_").lower()
         
-        # صياغة الكود البرمجي بطريقة نصية نظيفة وآمنة تماماً تخلو من أي تداخل في التنصيص
+        # صياغة الكود البرمجي بطريقة نصية نظيفة وآمنة
         synthesized_code = (
             "# -*- coding: utf-8 -*-\n"
             f"# --- [Auto-Generated Sovereign Feature by Mega-Meta Agent] ---\n"
@@ -116,6 +109,7 @@ class SovereignMegaMetaEngine:
             "        \"message\": \"تم تنفيذ الكود المُولد ذاتياً بنجاح تام وفق أعلى معايير الأمان المؤسسي.\"\n"
             "    }\n"
         )
+        
         validation_result = await self.synthesize_and_validate_module(sanitized_module_name, synthesized_code)
         return {
             "status": validation_result.get("status"),
@@ -174,17 +168,21 @@ class SovereignMegaMetaEngine:
         """
         تشغيل الوظائف والدوال المُحدثة ذاتياً ديناميكياً مع حماية ضد الاستثناءات.
         """
-        module = self.active_dynamic_modules.get(module_name)
-        if not module and module_name in sys.modules:
-            module = sys.modules[module_name]
-            
-        if module and hasattr(module, function_name):
-            func = getattr(module, function_name)
-            logger.info(f"⚡ [Dynamic Execution]: تشغيل القدرة المبتكرة [{module_name}.{function_name}] بنجاح.")
-            return await func(*args, **kwargs) if callable(func) else func
-            
-        logger.warning(f"⚠️ [Dynamic Execution]: الوحدة أو الوظيفة المطلوبة [{module_name}.{function_name}] غير متاحة.")
-        return None
+        try:
+            module = self.active_dynamic_modules.get(module_name)
+            if not module and module_name in sys.modules:
+                module = sys.modules[module_name]
+                
+            if module and hasattr(module, function_name):
+                func = getattr(module, function_name)
+                logger.info(f"⚡ [Dynamic Execution]: تشغيل القدرة المبتكرة [{module_name}.{function_name}] بنجاح.")
+                return await func(*args, **kwargs) if callable(func) else func
+                
+            logger.warning(f"⚠️ [Dynamic Execution]: الوحدة أو الوظيفة المطلوبة [{module_name}.{function_name}] غير متاحة.")
+            return None
+        except Exception as e:
+            logger.error(f"❌ [Dynamic Execution Error]: فشل تنفيذ القدرة الديناميكية {module_name}: {e}")
+            return None
         
 # تهيئة النسخة العامة للمحرك المدمج لاستخدامها في النظام المركزي
 sovereign_mega_meta = SovereignMegaMetaEngine()
