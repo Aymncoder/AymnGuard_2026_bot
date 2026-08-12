@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign Enterprise : Master Orchestrator (v19.1.1-Port8000-Clean)
+AymnGuard Sovereign Enterprise : Master Orchestrator (v19.1.2-Cloud-Production)
 ==============================================================================
 نظام الإقلاع التشغيلي الشامل والموحد والمحصن ضد الانهيار: يدمج فحص البنية التحتية، 
-تهيئة قاعدة البيانات بأمان تام، ويطلق النواة الإمبراطورية العظمى على البورت 8000.
+تهيئة قاعدة البيانات بأمان تام (معالجة دوال Async)، ويطلق النواة الإمبراطورية العظمى 
+على البورت 8000 لتعمل حصرياً على السيرفر السحابي المدفوع.
 ==============================================================================
 """
 
@@ -12,6 +13,7 @@ import os
 import sys
 import logging
 import asyncio
+import inspect
 import uvicorn
 from contextlib import asynccontextmanager
 
@@ -24,13 +26,14 @@ if ROOT_DIR not in sys.path:
 try:
     from core.database import init_db
 except ImportError:
-    def init_db():
+    async def init_db():
         pass
 
 # --- إعداد السجلات المؤسسية (Enterprise Logging) ---
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s | [%(levelname)-8s] | %(name)s - %(message)s"
+    format="%(asctime)s | [%(levelname)-8s] | %(name)s - %(message)s",
+    stream=sys.stdout
 )
 logger = logging.getLogger("AymnGuard.SovereignMasterOrchestrator")
 
@@ -46,10 +49,13 @@ def verify_infrastructure():
         except Exception as e:
             logger.error(f"[Directory Error]: تعذر إنشاء المجلد {d}: {e}")
     
-    # تهيئة قاعدة البيانات مع التقاط أي استثناء لتجنب الانهيار المفاجئ
+    # تهيئة قاعدة البيانات بطريقة متزامنة أو غير متزامنة لتفادي خطأ (was never awaited)
     try:
-        init_db()
-        logger.info("[Database]: تم فحص وهيكلة قاعدة البيانات بنجاح.")
+        if inspect.iscoroutinefunction(init_db):
+            asyncio.run(init_db())
+        else:
+            init_db()
+        logger.info("[Database]: تم فحص وهيكلة قواعد البيانات بنجاح.")
     except Exception as e:
         logger.warning(f"[Database Notice]: تنبيه أثناء تهيئة قاعدة البيانات، سيتم الاعتماد على النواة العظمى: {e}")
 
@@ -64,13 +70,13 @@ except ImportError as err:
     sys.exit(1)
 
 # ==============================================================================
-# 3. إطلاق التشغيل المركزي الآمن على البورت 8000
+# 3. إطلاق التشغيل المركزي الآمن للسيرفر السحابي المدفوع
 # ==============================================================================
 if __name__ == "__main__":
     # تنفيذ الفحص القبلي للبنية التحتية
     verify_infrastructure()
     
-    # قراءة متغيرات البيئة وضبط البورت الافتراضي على 8000
+    # 0.0.0.0 ضروري هنا لكي يسمح للحاوية بالاتصال بعنوان IP السحابي الخارجي (135.181.86.199)
     host = os.getenv("HOST", "0.0.0.0")
     
     raw_port = os.getenv("PORT", "8000")
@@ -80,7 +86,7 @@ if __name__ == "__main__":
         port = 8000
         logger.warning(f"[Config Notice]: قيمة البورت المستلمة غير صالحة ('{raw_port}'). تم استخدام البورت الافتراضي 8000.")
     
-    logger.info(f"[Master Launcher]: جاري إطلاق الإمبراطورية السيادية على الشبكة {host}:{port}...")
+    logger.info(f"[Master Launcher]: جاري إطلاق الإمبراطورية السحابية المدفوعة على الشبكة المنفذ {port}...")
     
     try:
         uvicorn.run(
@@ -89,7 +95,9 @@ if __name__ == "__main__":
             port=port,
             reload=False,
             workers=1, # ضمان استقرار جلسات الـ WebSockets والـ Background Tasks
-            log_level="info"
+            log_level="info",
+            proxy_headers=True,       # ضروري جداً للسيرفرات السحابية لمعرفة IP المستخدم الحقيقي
+            forwarded_allow_ips="*"   # السماح باستقبال الطلبات عبر Docker/Nginx
         )
     except Exception as e:
         logger.critical(f"[Fatal Startup Error]: حدث خطأ فادح أثناء إقلاع خادم Uvicorn: {e}")
