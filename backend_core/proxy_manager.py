@@ -1,60 +1,108 @@
+# -*- coding: utf-8 -*-
+"""
+=============================================================================
+AymnGuard Enterprise - Ultra-Speed Sovereign Proxy Manager (v34.9.0)
+محرك التوجيه السيادي الخارق للسرعة والذكاء للبروكسيات
+=============================================================================
+"""
+
 import socks
 import random
 import logging
+import time
+import socket
 from typing import List, Tuple, Optional
 
-logger = logging.getLogger("AymnGuard.EnterpriseProxy")
+logger = logging.getLogger("AymnGuard.EnterpriseUltraProxy")
 
-class SovereignProxyManager:
+class SovereignUltraProxyManager:
     """
-    محرك إدارة وتدوير البروكسيات السيادي (Enterprise SOCKS5/MTProto Pool)
-    يضمن استمرارية الاتصال بـ Telegram 24/7 دون انقطاع عبر التبديل التلقائي.
+    مدير بروكسيات سيادي متطور يعتمد على خوارزمية أقل زمن استجابة (Lowest-Latency)
+    لضمان سرعة فائقة واستقرار تام للاتصال 24/7.
     """
     def __init__(self, proxy_pool: List[dict]):
         """
-        proxy_pool: قائمة تحتوي على إعدادات البروكسيات المتعددة
-        [
-            {"host": "IP1", "port": 1080, "username": "...", "password": "..."},
-            {"host": "IP2", "port": 1080, "username": "...", "password": "..."}
-        ]
+        proxy_pool: قائمة تحتوي على إعدادات البروكسيات مع تتبع الأداء (السرعة والحالة)
         """
-        self.proxy_pool = proxy_pool
-        self.current_index = 0
+        self.proxy_pool = []
+        for p in proxy_pool:
+            self.proxy_pool.append({
+                "host": p.get("host"),
+                "port": p.get("port"),
+                "username": p.get("username"),
+                "password": p.get("password"),
+                "latency": 9999.0,  # زمن الاستجابة الابتدائي (افتراضي كبير)
+                "is_healthy": True,
+                "fail_count": 0
+            })
+        self._refresh_latencies()
 
-    def get_active_proxy(self) -> Optional[Tuple]:
+    def _test_proxy_latency(self, host: str, port: int, timeout: float = 1.5) -> float:
         """
-        استخراج البروكسي الحالي بالتناوب (Round-Robin) وتنسيقه لـ Telethon / Pyrogram
+        قياس سرعة استجابة البروكسي (Ping/Latency Test) بدقة عالية بالمللي ثانية.
         """
-        if not self.proxy_pool:
-            logger.warning("⚠️ لا توجد بروكسيات مسجلة في المسبح! سيتم استخدام الاتصال المباشر.")
-            return None
+        start_time = time.perf_counter()
+        try:
+            with socket.create_connection((host, int(port)), timeout=timeout):
+                elapsed = (time.perf_counter() - start_time) * 1000.0  # تحويل إلى ميللي ثانية
+                return elapsed
+        except Exception:
+            return 9999.0  # في حال فشل الاتصال
 
-        p_config = self.proxy_pool[self.current_index]
-        # التبديل للبروكسي التالي في المرة القادمة
-        self.current_index = (self.current_index + 1) % len(self.proxy_pool)
+    def _refresh_latencies(self):
+        """
+        فحص سريع لجميع البروكسيات وترتيبها حسب الأسرع لتوجيه حركة البيانات فوراً.
+        """
+        for p in self.proxy_pool:
+            lat = self._test_proxy_latency(p["host"], p["port"])
+            p["latency"] = lat
+            if lat < 5000.0:
+                p["is_healthy"] = True
+                p["fail_count"] = 0
+            else:
+                p["fail_count"] += 1
+                if p["fail_count"] > 3:
+                    p["is_healthy"] = False
 
-        # صيغة التنسيق المتوافقة مع مكتبات تيليجرام (SOCKS5)
+        # فرز القائمة بحيث يكون الأسرع والأصح في المقدمة دائماً
+        self.proxy_pool.sort(key=lambda x: (not x["is_healthy"], x["latency"]))
+
+    def get_fastest_proxy_config(self) -> Optional[Tuple]:
+        """
+        إرجاع إعدادات البروكسي الأسرع على الإطلاق (Lowest Latency) لمكتبات تيليجرام (Pyrogram/Telethon).
+        """
+        # تحديث الدوري للسرعات إذا لزم الأمر
+        healthy_proxies = [p for p in self.proxy_pool if p["is_healthy"]]
+        
+        if not healthy_proxies:
+            logger.warning("⚠️ تحذير سيادي: جميع البروكسيات مسجلة كغير صالحة، سيتم إعادة ضبط الشبكة أو الاتصال المباشر.")
+            if self.proxy_pool:
+                best = self.proxy_pool[0] # العودة لأفضل المتاح اضطرارياً
+            else:
+                return None
+        else:
+            # اختيار الأسرع (الأول في القائمة المرتبة)
+            best = healthy_proxies[0]
+
+        logger.info(f"🚀 توجيه فائق السرعة عبر البروكسي: {best['host']}:{best['port']} (زمن الاستجابة: {best['latency']:.2f}ms)")
+
         return (
             socks.SOCKS5,
-            p_config["host"],
-            p_config["port"],
+            best["host"],
+            int(best["port"]),
             True,  # rdns
-            p_config.get("username"),
-            p_config.get("password")
+            best.get("username"),
+            best.get("password")
         )
 
-    def get_resilient_client_config(self) -> Optional[Tuple]:
+    def report_failure(self, host: str):
         """
-        اختيار بروكسي عشوائي ذكي في حال فشل الاتصال الأساسي
+        نظام استجابة فورية لعزل البروكسي الفاشل وتحويل الاتصال لبروكسي بديل في أجزاء من الثانية.
         """
-        if not self.proxy_pool:
-            return None
-        p_config = random.choice(self.proxy_pool)
-        return (
-            socks.SOCKS5,
-            p_config["host"],
-            p_config["port"],
-            True,
-            p_config.get("username"),
-            p_config.get("password")
-        )
+        for p in self.proxy_pool:
+            if p["host"] == host:
+                p["fail_count"] += 1
+                if p["fail_count"] >= 2:
+                    p["is_healthy"] = False
+                    logger.error(🔥 عزل البروكسي البطيء/الميت: {host})
+                break
