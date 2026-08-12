@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign Auth Manager (v18.0.0-Master Enterprise Unified)
+AymnGuard Sovereign Auth Manager (v18.1.0-Cloud Enterprise Unified)
 ==============================================================================
 محرك المصادقة السيادي الموحد: إدارة دورة حياة تسجيل الدخول (OTP & 2FA) 
 بشكل آمن، معالجة استباقية للأخطاء (Auto-Retry Shield)، تحديد دقيق لجهات الاستلام، 
-وتصدير Session Strings باحترافية عالية.
+وتصدير Session Strings باحترافية عالية. خالي من الرموز لتوافق السحابة.
+==============================================================================
 """
 
 import asyncio
@@ -23,7 +24,8 @@ from pyrogram.errors import (
 )
 from pyrogram.raw.types.auth import SentCodeTypeSms, SentCodeTypeApp, SentCodeTypeCall
 
-logger = logging.getLogger("SovereignAuthManager")
+logger = logging.getLogger("AymnGuard.SovereignAuthManager")
+logger.setLevel(logging.INFO)
 
 class SovereignAuthManager:
     """
@@ -89,7 +91,7 @@ class SovereignAuthManager:
                     "session_name": session_name,
                     "delivery_method": delivery_method,
                     "is_new_account": isinstance(code_type, SentCodeTypeSms),
-                    "message": f" تم إرسال كود التحقق بنجاح عبر {delivery_method} للرقم {phone_number}."
+                    "message": f"تم إرسال كود التحقق بنجاح عبر {delivery_method} للرقم {phone_number}."
                 }
                 
             except FloodWait as e:
@@ -102,7 +104,7 @@ class SovereignAuthManager:
                 else:
                     await cls._safe_disconnect_client(client)
                     logger.error(f"[Auth FloodWait]: حظر طويل لـ {wait_time} ثانية لجلسة '{session_name}'.")
-                    return {"status": "error", "message": f" حماية تيليجرام نشطة: يرجى الانتظار {wait_time} ثانية قبل المحاولة مرة أخرى."}
+                    return {"status": "error", "message": f"حماية تيليجرام نشطة: يرجى الانتظار {wait_time} ثانية قبل المحاولة مرة أخرى."}
                     
             except (NetworkMigrate, BadRequest) as e:
                 if attempt < max_retries:
@@ -110,7 +112,7 @@ class SovereignAuthManager:
                     await asyncio.sleep(2)
                     continue
                 await cls._safe_disconnect_client(client)
-                return {"status": "error", "message": f" فشل الاتصال بخوادم تيليجرام بعد عدة محاولات: {str(e)}"}
+                return {"status": "error", "message": f"فشل الاتصال بخوادم تيليجرام بعد عدة محاولات: {str(e)}"}
                 
             except Exception as e:
                 await cls._safe_disconnect_client(client)
@@ -132,7 +134,7 @@ class SovereignAuthManager:
         
         auth_data = cls._auth_sessions.get(session_name)
         if not auth_data:
-            return {"status": "error", "message": " الجلسة غير موجودة، انتهت صلاحيتها، أو لم يتم طلب كود مسبقا."}
+            return {"status": "error", "message": "الجلسة غير موجودة، انتهت صلاحيتها، أو لم يتم طلب كود مسبقا."}
             
         client: Client = auth_data["client"]
         phone_number = auth_data["phone_number"]
@@ -166,7 +168,7 @@ class SovereignAuthManager:
             return {
                 "status": "2fa_required", 
                 "session_name": session_name,
-                "message": " الحساب محمي بكلمة مرور التحقق بخطوتين (2FA). يرجى إرسال كلمة المرور."
+                "message": "الحساب محمي بكلمة مرور التحقق بخطوتين (2FA). يرجى إرسال كلمة المرور."
             }
             
         except (PhoneCodeInvalid, PhoneCodeExpired) as e:
@@ -188,7 +190,7 @@ class SovereignAuthManager:
         password: str
     ) -> Dict[str, Any]:
         """الخطوة الثالثة: إدخال وتأكيد كلمة مرور التحقق بخطوتين (2FA) وتصدير الجلسة النهائية."""
-        logger.info(f"🗝️ [Auth Engine]: Verifying 2FA password for session: {session_name}")
+        logger.info(f"[Auth Engine]: Verifying 2FA password for session: {session_name}")
         
         auth_data = cls._auth_sessions.get(session_name)
         if not auth_data:
@@ -211,7 +213,7 @@ class SovereignAuthManager:
                 "status": "success", 
                 "session_name": session_name,
                 "session_string": session_string, 
-                "message": "تم تخطي حماية 2FA وتوليد سلسلة الجلسة السيادية بنجاح تام!"
+                "message": "تم تخطي حماية 2FA وتوليد سلسلة الجلسة السيادية بنجاح تام."
             }
             
         except FloodWait as e:
