@@ -1,13 +1,12 @@
 # ==============================================================================
 # AymnGuard Enterprise v5.0 - Sovereign Multi-Service Docker Compose Architecture
-# البنية المؤسسية المتكاملة: Redis للذاكرة المؤقتة والطوابير، خادم FastAPI السيادي،
-# وعامل المهام الخلفية (Worker) مع شبكات معزولة، سجلات دوارة، وفحوصات سلامة.
+# مُعدل للعمل حصرياً على البورت السحابي 8000 لضمان الاتصال المباشر والمستقر
 # ==============================================================================
 
 version: '3.8'
 
 services:
-  # 1. خدمة الذاكرة المؤقتة وموجه الطوابير (Redis Cache & Message Broker)
+  # 1. خدمة الذاكرة المؤقتة وموجه الطوابير
   redis:
     image: redis:7-alpine
     container_name: aymnguard_redis
@@ -27,7 +26,7 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # 2. خادم الويب المركزي وواجهة النبض (Backend FastAPI Core)
+  # 2. خادم الويب المركزي (Backend FastAPI Core)
   backend:
     build:
       context: .
@@ -35,7 +34,6 @@ services:
     container_name: aymnguard-master-node
     restart: always
     ports:
-      - "10000:10000"
       - "8000:8000"
     depends_on:
       - redis
@@ -50,7 +48,7 @@ services:
       - API_HASH=${API_HASH}
       - OWNER_ID=${OWNER_ID}
       - APP_ENV=${APP_ENV:-production}
-      - PORT=10000
+      - PORT=8000
       - WEBHOOK_URL=${WEBHOOK_URL}
       - MINI_APP_URL=${MINI_APP_URL}
     volumes:
@@ -64,7 +62,7 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # 3. عامل المهام الخلفية غير المتزامنة (Background Worker Service)
+  # 3. عامل المهام الخلفية
   worker:
     build:
       context: .
