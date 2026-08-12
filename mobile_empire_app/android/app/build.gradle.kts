@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.aymnguard.mobile_empire_app"
+    namespace = "com.example.mobile_empire_app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -14,7 +14,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.aymnguard.mobile_empire_app"
+        applicationId = "com.example.mobile_empire_app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
