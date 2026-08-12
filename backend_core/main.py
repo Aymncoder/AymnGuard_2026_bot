@@ -42,14 +42,10 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
-# from telethon import TelegramClient
-# from pyrogram import Client as PyroClient
-
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column
 from sqlalchemy import String, Integer, DateTime, Text
 from sqlalchemy.future import select
-from fastapi import FastAPI
 
 app = FastAPI(title="AymnGuard Sovereign Core")
 
@@ -169,8 +165,7 @@ try:
     from services.trading import SovereignTradingEngine
     logger.info("📈 [Master Hub]: تم ربط محركات التداول بنجاح.")
 except ImportError:
-    async def execute_binance_order(*args, **kwargs):
-        return {"status": "mocked_execution", "detail": "Trading core simulated successfully."}
+    async def execute_binance_order(*args, **kwargs): return {"status": "mocked_execution", "detail": "Trading core simulated."}
     SovereignTradingEngine = None
 
 try:
@@ -236,7 +231,6 @@ except ImportError:
 # ==============================================================================
 # 6. عُقد الأتمتة الخلفية (Telethon & Pyrogram Background Workers)
 # ==============================================================================
-
 from telethon import TelegramClient
 from pyrogram import Client as PyroClient
 
@@ -279,7 +273,6 @@ async def sovereign_lifespan(app: FastAPI):
 # ==============================================================================
 # 7. تعريف التطبيق المركزي (FastAPI Master Instance)
 # ==============================================================================
-# تم تصحيح بناء الـ FastAPI هنا ليكون متوافقاً مع معايير بايثون
 app = FastAPI(
     title="AymnCoder Plus Sovereign Enterprise Core",
     version="19.0.0-ImperialMaster",
@@ -300,8 +293,7 @@ async def imperial_telemetry_middleware(request: Request, call_next):
     return response
 
 # ==============================================================================
-# 🌟 دمج المسارات والروابط السيادية (Auto-Wired Bridges) بشكل صحيح هندسياً 🌟
-# تم نقلها إلى هنا (بعد تعريف app) لتفادي أخطاء الانهيار
+# 🌟 دمج المسارات والروابط السيادية (Auto-Wired Bridges) 🌟
 # ==============================================================================
 try:
     from core.meta_engine import router as meta_engine_router
@@ -377,7 +369,7 @@ def register_all_enterprise_modules(fastapi_app, base_root_dir):
                             fastapi_app.include_router(module.router, prefix=endpoint_prefix, tags=[tag_name])
                             logger.info(f"🔗 [Auto-Linked Router]: {module_path} -> [{endpoint_prefix}]")
                             discovered_count += 1
-                    except Exception as e:
+                    except Exception:
                         pass
                         
     logger.info(f"✨ [Auto-Discovery Complete]: تم بنجاح اكتشاف وربط {discovered_count} مكوناً برمجياً بالكتلة التشغيلية.")
@@ -446,15 +438,13 @@ async def process_telegram_update(data: Dict[str, Any]):
         logger.error(f"❌ خطأ في معالجة تليجرام الفرعية: {e}")
 
 # ==============================================================================
-# 11. مسارات الـ API التشغيلية الأساسية للـ Master Hub
+# 11. مسارات الـ API التشغيلية الأساسية للـ Master Hub (تمت الترقية للسرعة الخارقة)
 # ==============================================================================
-
-# 🌟 الإضافة الجديدة: مسار تحديث إصدار التطبيق التلقائي (Version Checker) 🌟
 @app.get("/api/v1/system/version", tags=["System Management"])
 async def get_system_version():
     return {
-        "latest_version": 35.1, # هذا الرقم تغيره عندما ترفع تحديث جديد
-        "download_url": "https://raw.githubusercontent.com/YourName/YourRepo/main/app-release.apk", # ضع رابط الـ APK الحقيقي هنا
+        "latest_version": 35.1,
+        "download_url": "https://raw.githubusercontent.com/YourName/YourRepo/main/app-release.apk",
         "is_mandatory": True
     }
 
@@ -501,37 +491,108 @@ async def ws_security(websocket: WebSocket):
     except WebSocketDisconnect:
         alert_manager.disconnect(websocket)
 
-# --- مسارات المصادقة وتأكيد الدخول ---
+# ------------------------------------------------------------------------------
+# 🌟 [ترقية سيادية]: مسارات المصادقة وتأكيد الدخول - معالجة الأخطاء والتسريع 🌟
+# ------------------------------------------------------------------------------
 @app.post("/api/v1/empire/auth/send-code", tags=["Sovereign Auth"])
-async def auth_send_code(request: AuthSendCodeRequest): return await SovereignAuthManager.send_verification_code(session_name=request.session_name, phone_number=request.phone_number, api_id=request.api_id, api_hash=request.api_hash)
+async def auth_send_code(request: AuthSendCodeRequest, bg_tasks: BackgroundTasks): 
+    try:
+        # إضافة مهلة حماية (Timeout Wrapper) تمنع تجمد التطبيق إذا تأخر تيليجرام
+        result = await asyncio.wait_for(
+            SovereignAuthManager.send_verification_code(
+                session_name=request.session_name, 
+                phone_number=request.phone_number, 
+                api_id=request.api_id, 
+                api_hash=request.api_hash
+            ),
+            timeout=20.0
+        )
+        bg_tasks.add_task(logger.info, f"📱 [Auth]: نجح طلب الرمز للرقم {request.phone_number}")
+        return result
+    except asyncio.TimeoutError:
+        logger.error("❌ [Auth Timeout]: انتهت مهلة استجابة مزود الخدمة (تيليجرام).")
+        raise HTTPException(status_code=504, detail="تأخر رد خوادم تيليجرام، يرجى إعادة المحاولة.")
+    except Exception as e:
+        logger.error(f"❌ [Auth Error]: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/v1/empire/auth/verify-code", tags=["Sovereign Auth"])
-async def auth_verify_code(request: AuthVerifyCodeRequest):
-    result = await SovereignAuthManager.verify_code(session_name=request.session_name, phone_code=request.phone_code)
-    if result.get("status") == "success":
-        async with async_session() as db:
-            db.add(EnterpriseSessionModel(session_name=request.session_name, session_string=result["session_string"]))
-            await db.commit()
-    return result
+async def auth_verify_code(request: AuthVerifyCodeRequest, bg_tasks: BackgroundTasks):
+    try:
+        result = await asyncio.wait_for(
+            SovereignAuthManager.verify_code(session_name=request.session_name, phone_code=request.phone_code),
+            timeout=15.0
+        )
+        if result.get("status") == "success":
+            async with async_session() as db:
+                try:
+                    db.add(EnterpriseSessionModel(session_name=request.session_name, session_string=result["session_string"]))
+                    await db.commit()
+                except Exception as db_err:
+                    await db.rollback()
+                    logger.error(f"❌ [DB Error]: فشل حفظ الجلسة: {db_err}")
+        return result
+    except asyncio.TimeoutError:
+        raise HTTPException(status_code=504, detail="انتهت المهلة أثناء التحقق من الكود.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/v1/empire/auth/verify-2fa", tags=["Sovereign Auth"])
 async def auth_verify_2fa(request: AuthVerify2FARequest):
-    result = await SovereignAuthManager.verify_2fa_password(session_name=request.session_name, password=request.password)
-    if result.get("status") == "success":
-        async with async_session() as db:
-            db.add(EnterpriseSessionModel(session_name=request.session_name, session_string=result["session_string"]))
-            await db.commit()
-    return result
+    try:
+        result = await asyncio.wait_for(
+            SovereignAuthManager.verify_2fa_password(session_name=request.session_name, password=request.password),
+            timeout=15.0
+        )
+        if result.get("status") == "success":
+            async with async_session() as db:
+                try:
+                    db.add(EnterpriseSessionModel(session_name=request.session_name, session_string=result["session_string"]))
+                    await db.commit()
+                except Exception:
+                    await db.rollback()
+        return result
+    except Exception as e:
+         raise HTTPException(status_code=500, detail=str(e))
 
+# ------------------------------------------------------------------------------
+# 🌟 [ترقية سيادية]: نقل تجهيز الجلسات المعقدة للعمال الخلفيين 🌟
+# ------------------------------------------------------------------------------
 @app.post("/api/v1/empire/sessions/register", tags=["Sovereign Sessions"])
-async def register_new_session(request: SessionInitRequest): return await SovereignSessionManager.initialize_session(license_key=request.license_key, session_name=request.session_name, api_id=request.api_id, api_hash=request.api_hash, phone_number=request.phone_number)
+async def register_new_session(request: SessionInitRequest, bg_tasks: BackgroundTasks): 
+    # يتم الرد على واجهة فلاتر فوراً لتجنب أي Timeout، وترك العمل الثقيل للخلفية
+    bg_tasks.add_task(
+        SovereignSessionManager.initialize_session,
+        license_key=request.license_key, 
+        session_name=request.session_name, 
+        api_id=request.api_id, 
+        api_hash=request.api_hash, 
+        phone_number=request.phone_number
+    )
+    return {
+        "status": "processing", 
+        "message": "تم استلام الطلب. جاري تهيئة الجلسة وبناء وكلاء الذكاء الاصطناعي في الخلفية بسرعة فائقة."
+    }
 
 @app.get("/api/v1/empire/sessions/analytics", tags=["Sovereign Sessions"])
 async def get_session_analytics(license_key: str): return await SovereignSessionManager.get_enterprise_analytics_report(license_key)
 
+# ------------------------------------------------------------------------------
+# 🌟 [ترقية سيادية]: فصل الذكاء الاصطناعي عن الواجهة الأمامية 🌟
+# ------------------------------------------------------------------------------
 @app.post("/api/v1/empire/transfer/start-workflow", tags=["Sovereign Transfer"])
-async def start_transfer_workflow(request: TransferInitRequest):
-    return {"status": "workflow_initialized", "ai_response": await EnterpriseTransferEngine.initialize_interactive_workflow(license_key=request.license_key, user_id=request.user_id, sessions_to_use=request.sessions_to_use)}
+async def start_transfer_workflow(request: TransferInitRequest, bg_tasks: BackgroundTasks):
+    # الذكاء الاصطناعي قد يأخذ وقتاً، نرسله لعمال الخلفية!
+    bg_tasks.add_task(
+        EnterpriseTransferEngine.initialize_interactive_workflow,
+        license_key=request.license_key, 
+        user_id=request.user_id, 
+        sessions_to_use=request.sessions_to_use
+    )
+    return {
+        "status": "workflow_initialized", 
+        "message": "تم إطلاق عمال النقل والذكاء الاصطناعي في الخلفية بنجاح سيادي."
+    }
 
 @app.post("/api/v1/empire/transfer/interactive-input", tags=["Sovereign Transfer"])
 async def handle_transfer_input(request: InteractiveInputRequest):
