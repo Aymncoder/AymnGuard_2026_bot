@@ -18,6 +18,7 @@ from pyrogram.errors import UserDeactivated, SessionRevoked
 
 # إعداد السجلات الأمنية والتحليلية
 logger = logging.getLogger("SovereignSessionManager")
+logger.setLevel(logging.INFO)
 
 @dataclass
 class SessionMetrics:
@@ -59,7 +60,7 @@ class SovereignSessionManager:
         """تهيئة جلسة جديدة واختبار صلاحيتها حقيقياً قبل تسجيلها في الخزنة."""
         session_id = f"{license_key}_{session_name}"
         
-        # 1. اختبار الاتصال الحقيقي عبر Pyrogram
+        # 1. اختبار الاتصال الحقيقي عبر Pyrogram مع حماية تامة ضد الاستثناءات
         client = Client(name=session_name, api_id=api_id, api_hash=api_hash, session_string=session_string, in_memory=True)
         try:
             await client.connect()
@@ -89,7 +90,7 @@ class SovereignSessionManager:
         return {"status": "success", "message": f"تم تهيئة وعزل الجلسة {session_name} بنجاح."}
 
     # -------------------------------------------------------------------------
-    # موزع الأحمال الذكي (Enterprise Load Balancer) - [إضافة نوعية]
+    # موزع الأحمال الذكي (Enterprise Load Balancer)
     # -------------------------------------------------------------------------
     @classmethod
     async def get_optimal_session(cls, license_key: str) -> Optional[Dict[str, Any]]:
@@ -97,79 +98,84 @@ class SovereignSessionManager:
         خوارزمية الذكاء الاصطناعي لاختيار أفضل جلسة:
         يستبعد الجلسات المحظورة، ويختار الجلسة الأعلى صحة والأقل ضغطاً في الساعة الحالية.
         """
-        candidates = []
-        for s_id, data in cls._active_sessions.items():
-            if s_id.startswith(license_key) and data["status"] == "ACTIVE_AND_SECURED" and not data["metrics"].is_dead:
-                candidates.append(data)
+        try:
+            candidates = []
+            for s_id, data in cls._active_sessions.items():
+                if s_id.startswith(license_key) and data["status"] == "ACTIVE_AND_SECURED" and not data["metrics"].is_dead:
+                    candidates.append(data)
+                    
+            if not candidates:
+                logger.warning(f"⚠️ [Load Balancer]: لا توجد جلسات نشطة أو صحية للمفتاح {license_key}!")
+                return None
                 
-        if not candidates:
-            logger.warning(f"⚠️ [Load Balancer]: لا توجد جلسات نشطة أو صحية للمفتاح {license_key}! النظام في خطر.")
-            return None
+            # الفرز المزدوج: الأولوية للصحة العالية، ثم الأقل استخداماً في الساعة الأخيرة
+            candidates.sort(key=lambda x: (x["metrics"].health_score, -x["metrics"].transfers_this_hour), reverse=True)
             
-        # الفرز المزدوج: الأولوية للصحة العالية، ثم الأقل استخداماً في الساعة الأخيرة
-        candidates.sort(key=lambda x: (x["metrics"].health_score, -x["metrics"].transfers_this_hour), reverse=True)
-        
-        best_session = candidates[0]
-        logger.debug(f"⚖️ [Load Balancer]: تم اختيار الجلسة {best_session['session_name']} (الصحة: {best_session['metrics'].health_score})")
-        return best_session
+            best_session = candidates[0]
+            logger.debug(f"⚖️ [Load Balancer]: تم اختيار الجلسة {best_session['session_name']} (الصحة: {best_session['metrics'].health_score})")
+            return best_session
+        except Exception as e:
+            logger.error(f"❌ [Load Balancer Error]: فشل اختيار الجلسة المثلى: {e}")
+            return None
 
     # -------------------------------------------------------------------------
     # إدارة العمليات (Operations Recording & Analytics)
     # -------------------------------------------------------------------------
     @classmethod
     async def record_transfer_action(cls, session_name: str, license_key: str, success: bool, is_rate_limit: bool = False):
-        """تسجيل العمليات وتحديث الصحة الأمنية للحساب."""
-        session_id = f"{license_key}_{session_name}"
-        if session_id not in cls._active_sessions:
-            return
+        """تسجيل العمليات وتحديث الصحة الأمنية للحساب بصرامة تامة."""
+        try:
+            session_id = f"{license_key}_{session_name}"
+            if session_id not in cls._active_sessions:
+                return
 
-        metrics: SessionMetrics = cls._active_sessions[session_id]["metrics"]
-        now = datetime.now(timezone.utc)
+            metrics: SessionMetrics = cls._active_sessions[session_id]["metrics"]
+            now = datetime.now(timezone.utc)
 
-        if (now - metrics.hourly_reset_time) > timedelta(hours=1):
-            metrics.transfers_this_hour = 0
-            metrics.hourly_reset_time = now
+            if (now - metrics.hourly_reset_time) > timedelta(hours=1):
+                metrics.transfers_this_hour = 0
+                metrics.hourly_reset_time = now
 
-        metrics.total_transfers += 1
-        metrics.last_action_time = now
+            metrics.total_transfers += 1
+            metrics.last_action_time = now
 
-        if success:
-            metrics.successful_transfers += 1
-            metrics.transfers_this_hour += 1
-            # مكافأة النجاح: زيادة الصحة تدريجياً
-            metrics.health_score = min(100.0, metrics.health_score + 0.5)
-        else:
-            metrics.failed_transfers += 1
-            # عقاب قاسي عند الحظر لتجنب حرق الرقم
-            metrics.health_score -= 20.0 if is_rate_limit else 5.0
-            if is_rate_limit:
-                metrics.rate_limit_hits += 1
+            if success:
+                metrics.successful_transfers += 1
+                metrics.transfers_this_hour += 1
+                metrics.health_score = min(100.0, metrics.health_score + 0.5)
+            else:
+                metrics.failed_transfers += 1
+                metrics.health_score -= 20.0 if is_rate_limit else 5.0
+                if is_rate_limit:
+                    metrics.rate_limit_hits += 1
 
-        # العزل التلقائي لحماية الرقم من الحظر النهائي
-        if metrics.health_score <= 40.0:
-            cls._active_sessions[session_id]["status"] = "QUARANTINED"
-            logger.critical(f"🚨 [Security Alert]: تم عزل الجلسة {session_name} لحمايتها من الحظر النهائي (الصحة: {metrics.health_score}).")
+            if metrics.health_score <= 40.0:
+                cls._active_sessions[session_id]["status"] = "QUARANTINED"
+                logger.critical(f"🚨 [Security Alert]: تم عزل الجلسة {session_name} لحمايتها من الحظر النهائي (الصحة: {metrics.health_score}).")
+        except Exception as e:
+            logger.error(f"❌ [Record Transfer Error]: فشل تسجيل تفاصيل العملية: {e}")
 
     # -------------------------------------------------------------------------
     # تقارير الأداء (Enterprise Analytics)
     # -------------------------------------------------------------------------
     @classmethod
     async def get_enterprise_analytics_report(cls, license_key: str) -> Dict[str, Any]:
-        """توليد تقرير استخباراتي يدمج بين الذاكرة وقاعدة البيانات."""
+        """توليد تقرير استخباراتي يدمج بين الذاكرة وقاعدة البيانات بأمان تام."""
         total_active, total_quarantined, total_dead = 0, 0, 0
         session_details = []
 
         try:
-            from backend_core.main import async_session, EnterpriseSessionModel
+            from core.database import SessionLocal
+            from core.models import BotInstance
             from sqlalchemy.future import select
             
-            async with async_session() as db:
-                result = await db.execute(select(EnterpriseSessionModel))
+            async with SessionLocal() as db:
+                result = await db.execute(select(BotInstance))
                 db_sessions = result.scalars().all()
                 
             for s in db_sessions:
-                s_id = f"{license_key}_{s.session_name}"
-                data = cls._active_sessions.get(s_id, {"status": s.status, "metrics": SessionMetrics()})
+                s_id = f"{license_key}_{s.name}"
+                data = cls._active_sessions.get(s_id, {"status": "ACTIVE_AND_SECURED", "metrics": SessionMetrics()})
                 
                 status = data["status"]
                 metrics: SessionMetrics = data["metrics"]
@@ -183,14 +189,14 @@ class SovereignSessionManager:
                     total_quarantined += 1
 
                 session_details.append({
-                    "name": s.session_name,
+                    "name": s.name,
                     "status": status,
                     "health_score": round(metrics.health_score, 2),
                     "total_success": metrics.successful_transfers,
                     "rate_limits": metrics.rate_limit_hits
                 })
         except Exception as e:
-            logger.error(f"⚠️ Analytics Merge Error: {e}")
+            logger.error(f"⚠️ [Analytics Merge Error]: {e}")
 
         return {
             "status": "success",
@@ -203,33 +209,36 @@ class SovereignSessionManager:
         }
 
     # -------------------------------------------------------------------------
-    # المراقبة الذاتية (Autonomous Health Monitor) - [النقلة النوعية]
+    # المراقبة الذاتية (Autonomous Health Monitor)
     # -------------------------------------------------------------------------
     @classmethod
     async def _autonomous_health_monitor(cls):
         """وكيل ذكاء اصطناعي يعمل 24/7 للمراقبة والإصلاح الذاتي العميق."""
         logger.info("🛡️ [Auto-Healer]: تم تفعيل درع المراقبة والإنعاش الذاتي للجلسات.")
         while True:
-            await asyncio.sleep(300) # فحص كل 5 دقائق
-            now = datetime.now(timezone.utc)
-            
-            for s_id, data in cls._active_sessions.items():
-                metrics: SessionMetrics = data["metrics"]
-                status = data["status"]
-                session_name = data["session_name"]
+            try:
+                await asyncio.sleep(300) # فحص كل 5 دقائق
+                now = datetime.now(timezone.utc)
                 
-                if metrics.is_dead:
-                    continue # لا نضيع الموارد على الجلسات الميتة تماماً
-                
-                # 1. التعافي الذاتي (Rehabilitation) للجلسات المعزولة
-                if status == "QUARANTINED" and metrics.last_action_time:
-                    # إذا مرت ساعتان على العزل دون نشاط، نعتبر أن الحظر قد زال
-                    if (now - metrics.last_action_time) > timedelta(hours=2):
-                        metrics.health_score = 80.0
-                        metrics.rate_limit_hits = 0
-                        data["status"] = "ACTIVE_AND_SECURED"
-                        logger.info(f"✨ [Self-Healing]: تم إنعاش الجلسة {session_name} بنجاح وإعادتها للخدمة.")
-                        
-                # 2. تبريد تدريجي للصحة (Healing) للجلسات النشطة المجهدة
-                if status == "ACTIVE_AND_SECURED" and metrics.health_score < 100.0:
-                     metrics.health_score = min(100.0, metrics.health_score + 2.0)
+                for s_id, data in cls._active_sessions.items():
+                    metrics: SessionMetrics = data["metrics"]
+                    status = data["status"]
+                    session_name = data["session_name"]
+                    
+                    if metrics.is_dead:
+                        continue
+                    
+                    # 1. التعافي الذاتي للجلسات المعزولة
+                    if status == "QUARANTINED" and metrics.last_action_time:
+                        if (now - metrics.last_action_time) > timedelta(hours=2):
+                            metrics.health_score = 80.0
+                            metrics.rate_limit_hits = 0
+                            data["status"] = "ACTIVE_AND_SECURED"
+                            logger.info(f"✨ [Self-Healing]: تم إنعاش الجلسة {session_name} بنجاح وإعادتها للخدمة.")
+                            
+                    # 2. تبريد تدريجي للصحة للجلسات النشطة
+                    if status == "ACTIVE_AND_SECURED" and metrics.health_score < 100.0:
+                         metrics.health_score = min(100.0, metrics.health_score + 2.0)
+            except Exception as e:
+                logger.error(f"❌ [Auto-Healer Exception]: خطأ في حلقة المراقبة الذاتية: {e}")
+                await asyncio.sleep(60)
