@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign License Manager (v18.0.0-Master)
+AymnGuard Sovereign License Manager (v18.1.0-Cloud Enterprise)
 ==============================================================================
 محرك إدارة التراخيص والصلاحيات المؤسسي: يمنع اختطاف التراخيص (Hijack Protection)،
 يدير الاشتراكات (Maintenance)، ويحمي قواعد البيانات من التداخل.
+تم تطهيره بالكامل من الرموز التعبيرية لضمان الاستقرار المطلق في بيئة الإنتاج السحابية.
+==============================================================================
 """
 
 import secrets
@@ -15,6 +17,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from core.master_kernel import async_session, MasterLicenseModel
 
 logger = logging.getLogger("SovereignLicenseManager")
+logger.setLevel(logging.INFO)
 
 class SovereignLicenseManager:
     """محرك إدارة التراخيص والصلاحيات المؤسسي والإمبراطوري الشامل"""
@@ -43,10 +46,10 @@ class SovereignLicenseManager:
                 )
                 session.add(new_license)
                 await session.commit()
-                logger.info(f"🗝️ [License Vault]: تم إصدار مفتاح سيادي جديد بنجاح: {key}")
+                logger.info(f"[License Vault]: تم إصدار مفتاح سيادي جديد بنجاح: {key}")
                 return key
         except SQLAlchemyError as e:
-            logger.error(f"❌ [License Vault Error]: فشل في توليد المفتاح: {e}")
+            logger.error(f"[License Vault Error]: فشل في توليد المفتاح: {e}")
             return "ERROR_GENERATING_KEY"
 
     @staticmethod
@@ -60,26 +63,26 @@ class SovereignLicenseManager:
                 license_obj = result.scalars().first()
 
                 if not license_obj:
-                    logger.warning(f"⚠️ [License Vault]: محاولة استخدام مفتاح غير صالح: {license_key}")
-                    return {"status": "error", "message": "❌ المفتاح غير موجود في السجلات السيادية."}
+                    logger.warning(f"[License Vault Warning]: محاولة استخدام مفتاح غير صالح: {license_key}")
+                    return {"status": "error", "message": "المفتاح غير موجود في السجلات السيادية."}
                 
                 if not license_obj.is_active:
-                    return {"status": "error", "message": "❌ هذا المفتاح موقوف أو محظور إدارياً."}
+                    return {"status": "error", "message": "هذا المفتاح موقوف أو محظور إدارياً."}
 
-                # 🛡️ الحماية من اختطاف التراخيص (Anti-Hijack Lock)
+                # الحماية من اختطاف التراخيص (Anti-Hijack Lock)
                 new_chat_id_str = str(new_chat_id)
                 if license_obj.owner_chat_id and license_obj.owner_chat_id != new_chat_id_str:
-                    logger.critical(f"🚨 [Security Breach]: محاولة اختطاف مفتاح! الحساب {new_chat_id_str} حاول سرقة مفتاح {license_obj.owner_chat_id}")
-                    return {"status": "error", "message": "❌ هذا المفتاح مستخدم ومربوط بحساب آخر مسبقاً. يرجى التواصل مع الإدارة."}
+                    logger.critical(f"[Security Breach]: محاولة اختطاف مفتاح! الحساب {new_chat_id_str} حاول سرقة مفتاح {license_obj.owner_chat_id}")
+                    return {"status": "error", "message": "هذا المفتاح مستخدم ومربوط بحساب آخر مسبقاً. يرجى التواصل مع الإدارة."}
 
                 # تحديث أو ربط الحساب الجديد بالمفتاح السيادي
                 license_obj.owner_chat_id = new_chat_id_str
                 await session.commit()
                 
-                logger.info(f"✅ [License Vault]: تم ربط المفتاح {license_key} بالحساب {new_chat_id_str}")
+                logger.info(f"[License Vault]: تم ربط المفتاح {license_key} بالحساب {new_chat_id_str}")
                 return {
                     "status": "success",
-                    "message": "✅ تمت استعادة الصلاحيات وربط المفتاح بنجاح بالحساب.",
+                    "message": "تمت استعادة الصلاحيات وربط المفتاح بنجاح بالحساب.",
                     "details": {
                         "migration_tool": license_obj.has_migration_tool,
                         "trading_analyzer": license_obj.has_trading_analyzer,
@@ -90,8 +93,8 @@ class SovereignLicenseManager:
                     }
                 }
         except SQLAlchemyError as e:
-            logger.error(f"❌ [Database Error]: فشل التحقق من المفتاح {license_key}: {e}")
-            return {"status": "error", "message": "❌ خطأ في الاتصال بخزنة التراخيص."}
+            logger.error(f"[Database Error]: فشل التحقق من المفتاح {license_key}: {e}")
+            return {"status": "error", "message": "خطأ في الاتصال بخزنة التراخيص."}
 
     @staticmethod
     async def check_service_access(license_key: str, service_name: str) -> bool:
@@ -108,7 +111,7 @@ class SovereignLicenseManager:
 
                 # فحص حالة اشتراك الصيانة التشغيلية والدعم
                 if license_obj.maintenance_expires_at and license_obj.maintenance_expires_at < datetime.now(timezone.utc):
-                    logger.debug(f"💳 [License Expired]: انتهت صلاحية الدعم للمفتاح {license_key}")
+                    logger.debug(f"[License Expired]: انتهت صلاحية الدعم للمفتاح {license_key}")
                     return False
 
                 # فحص الخدمة المستهدفة بدقة
@@ -134,25 +137,25 @@ class SovereignLicenseManager:
                 license_obj = result.scalars().first()
 
                 if not license_obj or not license_obj.is_active:
-                    return {"status": "error", "message": "❌ المفتاح غير صالح أو موقوف."}
+                    return {"status": "error", "message": "المفتاح غير صالح أو موقوف."}
 
                 if action == "ADD":
                     if license_obj.used_protection_slots >= license_obj.max_protection_slots:
                         return {
                             "status": "limit_exceeded", 
-                            "message": "⚠️ تم استنفاد الحد الأقصى لخانات الحماية. يرجى إلغاء حماية مجموعة سابقة أو التوسع بـ 10$."
+                            "message": "تم استنفاد الحد الأقصى لخانات الحماية. يرجى إلغاء حماية مجموعة سابقة أو ترقية الاشتراك."
                         }
                     license_obj.used_protection_slots += 1
                     await session.commit()
-                    return {"status": "success", "message": f"✅ تمت الإضافة بنجاح. الخانات المستخدمة: {license_obj.used_protection_slots}/{license_obj.max_protection_slots}"}
+                    return {"status": "success", "message": f"تمت الإضافة بنجاح. الخانات المستخدمة: {license_obj.used_protection_slots}/{license_obj.max_protection_slots}"}
 
                 elif action == "REMOVE":
                     if license_obj.used_protection_slots > 0:
                         license_obj.used_protection_slots -= 1
                         await session.commit()
-                    return {"status": "success", "message": f"✅ تم تحرير الخانة بنجاح. الخانات المستخدمة: {license_obj.used_protection_slots}/{license_obj.max_protection_slots}"}
+                    return {"status": "success", "message": f"تم تحرير الخانة بنجاح. الخانات المستخدمة: {license_obj.used_protection_slots}/{license_obj.max_protection_slots}"}
 
-                return {"status": "error", "message": "❌ إجراء غير معروف."}
+                return {"status": "error", "message": "إجراء غير معروف."}
         except SQLAlchemyError as e:
-            logger.error(f"❌ [Database Error]: فشل إدارة خانات الحماية: {e}")
-            return {"status": "error", "message": "❌ خطأ في التواصل مع الخزنة."}
+            logger.error(f"[Database Error]: فشل إدارة خانات الحماية: {e}")
+            return {"status": "error", "message": "خطأ في التواصل مع الخزنة."}
