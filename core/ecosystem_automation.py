@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign Ecosystem Automation (v18.0.0-Master)
+AymnGuard Sovereign Ecosystem Automation (v18.1.0-Cloud Enterprise)
 ==============================================================================
-محرك الأتمتة السيادي (نسخة التوافق المطلق مع Pyrogram):
+محرك الأتمتة السيادي (نسخة التوافق المطلق مع Pyrogram والبيئة السحابية):
 سحب البيانات، النشر الفيروسي، وإدارة الأرقام الافتراضية مع حماية صارمة ضد الحظر.
+تم تطهيره بالكامل من الرموز التعبيرية لضمان الاستقرار المطلق في بيئة الإنتاج.
+==============================================================================
 """
 
 import os
@@ -16,6 +18,7 @@ from pyrogram import Client
 from pyrogram.errors import FloodWait
 
 logger = logging.getLogger("AymnGuard.AutomationEngine")
+logger.setLevel(logging.INFO)
 
 class EcosystemAutomationEngine:
     """محرك أتمتة الشبكات والتوسع الفيروسي السيادي"""
@@ -27,17 +30,17 @@ class EcosystemAutomationEngine:
         self.sms_api_key = os.getenv("VIRTUAL_NUMBER_API_KEY", "")
         self.sms_api_url = "https://api.sms-activate.org/stubs/handler_api.php"
         
-        logger.info("🤖 [Automation Engine]: تمت تهيئة محرك الأتمتة السيادي بنجاح وبسرية تامة.")
+        logger.info("[Automation Engine]: تمت تهيئة محرك الأتمتة السيادي بنجاح وبسرية تامة.")
 
     # =========================================================================
     # 1. وحدة الاستخراج والترحيل (Scraping & Migration) مع درع الحظر
     # =========================================================================
     async def scrape_active_users(self, client: Client, group_username: str, limit: int = 100) -> Dict[str, Any]:
         """سحب بيانات الأعضاء النشطين مع درع الحماية من الحظر (FloodWait)."""
-        logger.info(f"🕸️ [Data Scraping]: بدء سحب الأعضاء من {group_username}...")
+        logger.info(f"[Data Scraping]: بدء سحب الأعضاء من {group_username}...")
         
         if not client.is_connected:
-            return {"status": "error", "message": "❌ الوكيل غير متصل بالشبكة، يرجى تمرير جلسة نشطة."}
+            return {"status": "error", "message": "الوكيل غير متصل بالشبكة، يرجى تمرير جلسة نشطة."}
             
         users_data = []
         try:
@@ -56,14 +59,14 @@ class EcosystemAutomationEngine:
                 if len(users_data) % 50 == 0:
                     await asyncio.sleep(1)
 
-            logger.info(f"✅ [Data Scraping]: تم سحب {len(users_data)} عضو بنجاح.")
+            logger.info(f"[Data Scraping]: تم سحب {len(users_data)} عضو بنجاح.")
             return {"status": "success", "data": users_data}
 
         except FloodWait as e:
-            logger.warning(f"🛑 [Scrape FloodWait]: حماية تيليجرام نشطة، يجب الانتظار {e.value} ثانية.")
+            logger.warning(f"[Scrape FloodWait]: حماية تيليجرام نشطة، يجب الانتظار {e.value} ثانية.")
             return {"status": "rate_limit", "wait_time": e.value, "partial_data": users_data}
         except Exception as e:
-            logger.error(f"❌ [Scrape Error]: فشل السحب من {group_username}: {e}")
+            logger.error(f"[Scrape Error]: فشل السحب من {group_username}: {e}")
             return {"status": "error", "message": str(e)}
 
     # =========================================================================
@@ -71,7 +74,7 @@ class EcosystemAutomationEngine:
     # =========================================================================
     async def broadcast_sovereign_announcement(self, client: Client, target_users: List[int], message: str) -> Dict[str, Any]:
         """النشر الفيروسي الآمن مع فترات راحة ديناميكية لتجنب حرق الرقم (Anti-Spam Shield)."""
-        logger.info(f"📢 [Mass Broadcast]: بدء النشر الفيروسي لـ {len(target_users)} مستخدم...")
+        logger.info(f"[Mass Broadcast]: بدء النشر الفيروسي لـ {len(target_users)} مستخدم...")
         
         success_count = 0
         failed_count = 0
@@ -83,19 +86,19 @@ class EcosystemAutomationEngine:
                 
                 # درع التبريد الديناميكي (Dynamic Cool-down) يحاكي السلوك البشري
                 if index > 0 and index % 10 == 0:
-                    logger.debug("⏳ [Broadcast]: تبريد الأنابيب لـ 5 ثواني لتجنب الحظر...")
+                    logger.debug("[Broadcast]: تبريد الأنابيب لـ 5 ثواني لتجنب الحظر...")
                     await asyncio.sleep(5)
                 else:
-                    await asyncio.sleep(0.8) #หน استراحة خفيفة بين كل رسالة وأخرى
+                    await asyncio.sleep(0.8) # استراحة خفيفة بين كل رسالة وأخرى
                     
             except FloodWait as e:
-                logger.warning(f"🛑 [Broadcast FloodWait]: إيقاف إجباري لـ {e.value} ثانية. جاري الانتظار...")
+                logger.warning(f"[Broadcast FloodWait]: إيقاف إجباري لـ {e.value} ثانية. جاري الانتظار...")
                 await asyncio.sleep(e.value)
             except Exception as e:
                 failed_count += 1
-                logger.debug(f"⚠️ فشل الإرسال للمستخدم {user_id}: {e}")
+                logger.debug(f"[Broadcast Warning]: فشل الإرسال للمستخدم {user_id}: {e}")
 
-        logger.info(f"✅ [Broadcast Finished]: تم التسليم: {success_count} | فشل: {failed_count}")
+        logger.info(f"[Broadcast Finished]: تم التسليم: {success_count} | فشل: {failed_count}")
         return {"status": "success", "sent": success_count, "failed": failed_count}
         
     # =========================================================================
@@ -104,7 +107,7 @@ class EcosystemAutomationEngine:
     async def request_virtual_number(self, country: str = "ru", service: str = "tg") -> Dict[str, Any]:
         """طلب رقم افتراضي عبر واجهة API بشكل غير متزامن تماماً (Async)."""
         if not self.sms_api_key:
-            return {"status": "error", "message": "⚠️ لم يتم إعداد مفتاح API للأرقام الافتراضية في بيئة النظام."}
+            return {"status": "error", "message": "لم يتم إعداد مفتاح API للأرقام الافتراضية في بيئة النظام."}
             
         params = {
             "api_key": self.sms_api_key,
