@@ -1,37 +1,52 @@
+# -*- coding: utf-8 -*-
+"""
+==============================================================================
+AymnGuard Sovereign Enterprise : Image Branding Processor
+==============================================================================
+معالج الهوية البصرية السيادية: يتعامل مع مسارات الأصول بدقة، ويضيف العلامات
+والنصوص بدقة عالية دون أي رموز تعبيرية معترضة.
+==============================================================================
+"""
+
 import os
 from PIL import Image, ImageDraw, ImageFont
 
 def process_sovereign_image():
+    # المسار الحقيقي والدقيق للصورة ومجلد الحفظ
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     
-        # مسار الصورة الأصلية الفعلية بعد الرفع
-    input_path = "retouch_1786491084607.JPEG" 
-    output_path = "assets/command_center_sovereign.png"
+    # تحديد مسار الإدخال والإخراج بناءً على هيكل المشروع الفعلي
+    input_path = os.path.join(BASE_DIR, "mobile_empire_app", "assets", "images", "bg.jpg")
+    output_path = os.path.join(BASE_DIR, "mobile_empire_app", "assets", "images", "command_center_sovereign.png")
 
-    # التأكد من وجود مجلد الأصول والصورة
+    # التأكد من وجود مجلد الحفظ
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    # فحص وجود الصورة قبل المعالجة
     if not os.path.exists(input_path):
-        print(f"خطأ: الملف غير موجود في المسار {input_path}")
+        print(f"[Error]: الملف غير موجود في المسار: {input_path}")
         return
-
+    
     # فتح الصورة الأصلية
     img = Image.open(input_path)
     
-    # إعداد زاوية التدوير مع فلتر LANCZOS لضمان دقة وتجنب التعرجات البكسلية
+    # ضمان دقة وتجنب التعرجات البكسلية LANCZOS لإعادة التدوير أو الفلتر
     rotation_angle = 0
     rotated_img = img.rotate(rotation_angle, expand=True, resample=Image.Resampling.LANCZOS)
     
-    # تحضير أدوات الرسم السيادي
+    # تجهيز أدوات الرسم السيادي
     draw = ImageDraw.Draw(rotated_img)
     width, height = rotated_img.size
     
     # الاسم السيادي الرسمي المعتمد
     text = "AymnGuard Plus"
     
-    # محاولة تحميل خط احترافي أو استخدام الافتراضي بنسب ديناميكية
+    # محاولة تحميل خط احترافي أو استخدام الافتراضي حسب ديناميكية النظام
     try:
         font = ImageFont.truetype("arial.ttf", size=int(width * 0.052))
     except IOError:
         font = ImageFont.load_default()
-        
+
     # حساب أبعاد النص لتوسيطه بدقة مذهلة في المكان الأكثر جاذبية
     bbox = draw.textbbox((0, 0), text, font=font)
     text_width = bbox[2] - bbox[0]
@@ -49,9 +64,8 @@ def process_sovereign_image():
     draw.text((x, y), text, fill=gold_sovereign_color, font=font)
     
     # حفظ النتيجة النهائية بجودة فائقة داخل مجلد الأصول مع تحسين الحجم
-    os.makedirs("assets", exist_ok=True)
     rotated_img.save(output_path, "PNG", optimize=True)
-    print(f"تمت المعالجة وتوليد الهوية الذهبية الملكية بنجاح بمعايير الجودة الفائقة: {output_path}")
+    print(f"[Success]: تمت المعالجة وتوليد الهوية البصرية بنجاح بمعايير الجودة الفائقة: {output_path}")
 
 if __name__ == "__main__":
     process_sovereign_image()
