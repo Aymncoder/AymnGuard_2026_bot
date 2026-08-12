@@ -6,9 +6,9 @@ services:
       context: ./backend_core
     container_name: aymnguard_core_app
     restart: always
-    ports:
-      - "10000:10000"
-    env_file:
+        ports:
+      - "8000:8000"
+     env_file:
       - .env
     volumes:
       - .:/app
