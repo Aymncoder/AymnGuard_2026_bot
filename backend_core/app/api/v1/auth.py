@@ -16,7 +16,6 @@ from pydantic import BaseModel
 from datetime import datetime, timedelta, timezone
 import jwt
 
-# تم تحديد المسار الأساسي هنا، وهو ما يجب أن يُستدعى من التطبيق
 router = APIRouter(prefix="/api/v1/auth", tags=["Authentication"])
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "your_telegram_bot_token_here")
@@ -31,7 +30,6 @@ class TelegramAuthPayload(BaseModel):
 def verify_telegram_init_data(init_data: str, bot_token: str) -> tuple[bool, dict]:
     """
     التحقق الرياضي المشفر من توقيع Telegram WebApp InitData وفقاً للبروتوكول الرسمي.
-    يعيد قيمة منطقية لنجاح التحقق، بالإضافة إلى قاموس البيانات الموثوقة لاستخراج تفاصيل المستخدم.
     """
     try:
         parsed_url = urllib.parse.parse_qsl(init_data, keep_blank_values=True)
@@ -65,7 +63,6 @@ async def telegram_auth_endpoint(payload: TelegramAuthPayload, authorization: st
     نقطة النهاية السيادية لاستلام بيانات Telegram Mini App والتحقق منها ثم إصدار JWT Token.
     """
     try:
-        # استخراج initData من رأس الطلب (Authorization Header بصيغة: tma <init_data>)
         if not authorization.startswith("tma "):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -83,7 +80,32 @@ async def telegram_auth_endpoint(payload: TelegramAuthPayload, authorization: st
                 detail="فشل التحقق الرياضي المشفر لتوقيع تيليجرام. البيانات غير موثوقة!"
             )
         
-        # [تعديل أمني جوهري]: استخراج بيانات المستخدم من التوقيع المشفر وليس من جسم الطلب
+        # [إضافة أمنية حرجة]: التحقق من وقت الإصدار لمنع هجمات إعادة التشغيل (Replay Attacks)
+        auth_date_str = secure_data.get("auth_date")
+        if not auth_date_str:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="حقل تاريخ المصادقة (auth_date) مفقود من البيانات."
+            )
+            
+        try:
+            auth_date = int(auth_date_str)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="قيمة تاريخ المصادقة غير صالحة."
+            )
+            
+        current_timestamp = int(datetime.now(timezone.utc).timestamp())
+        max_age_seconds = 86400  # السماح بصلاحية البيانات لمدة 24 ساعة كحد أقصى (يمكن تقليلها)
+        
+        if current_timestamp - auth_date > max_age_seconds:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="انتهت صلاحية بيانات المصادقة (Auth data expired). يرجى إعادة تشغيل التطبيق."
+            )
+
+        # استخراج بيانات المستخدم من التوقيع المشفر وليس من جسم الطلب
         user_data_str = secure_data.get("user", "{}")
         secure_user = json.loads(user_data_str)
         
