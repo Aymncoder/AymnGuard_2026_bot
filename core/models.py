@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Enterprise v18.0.0 : Sovereign Database Models (ORM)
+AymnGuard Enterprise v18.1.0 : Sovereign Database Models (Cloud ORM)
 ==============================================================================
 مخطط الهياكل والجداول المركزية لإمبراطورية AymnGuard:
 تعريف جداول المستخدمين، التراخيص، البوتات الديناميكية، وسجلات التدقيق الأمني.
+تم تحسين أنواع البيانات (BigInteger) وتوحيد التسميات لبيئة السحابة المدفوعة.
+==============================================================================
 """
 
 from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, JSON, ForeignKey
+from sqlalchemy import Column, Integer, BigInteger, String, Boolean, DateTime, JSON, ForeignKey
+from sqlalchemy.sql import func
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
@@ -20,10 +23,13 @@ class SovereignUser(Base):
     __tablename__ = 'sovereign_users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String, unique=True, nullable=False, index=True)
-    role = Column(String, default="subscriber")  # owner, admin, subscriber
+    # استخدام BigInteger ضروري جداً لمعرفات تليجرام لمنع الانهيار
+    telegram_id = Column(BigInteger, unique=True, nullable=False, index=True)
+    username = Column(String(255), unique=True, nullable=True, index=True)
+    role = Column(String(50), default="subscriber")  # owner, admin, subscriber
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    # الاعتماد على توقيت السيرفر السحابي لضمان الدقة
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # علاقة ربط مع التراخيص
     licenses = relationship("LicenseKey", back_populates="owner", cascade="all, delete-orphan")
@@ -36,8 +42,8 @@ class LicenseKey(Base):
     __tablename__ = 'license_keys'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    key = Column(String, unique=True, nullable=False, index=True)  # المفتاح السيادي
-    tier = Column(String, default="Premium")  # Premium, Enterprise
+    key = Column(String(255), unique=True, nullable=False, index=True)
+    tier = Column(String(50), default="Premium")  # Premium, Enterprise
     expiry_date = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     is_used = Column(Boolean, default=False)
     owner_id = Column(Integer, ForeignKey('sovereign_users.id'), nullable=True)
@@ -53,21 +59,22 @@ class BotInstance(Base):
     __tablename__ = 'bot_instances'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)  # مثل: "التداول الذكي"
-    module_type = Column(String, nullable=False)  # مثال: "transfer_bot"
-    config = Column(JSON, default={})  # حفظ الإعدادات بصيغة JSON (التوسع المستقل)
+    name = Column(String(255), nullable=False)
+    module_type = Column(String(100), nullable=False)
+    config = Column(JSON, default={})
     is_enabled = Column(Boolean, default=False)
     last_run = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
 
 # ==============================================================================
-# 4. جدول السجلات (التدقيق الأمني والتشغيل)
+# 4. جدول سجلات التدقيق الأمني (Sovereign Audit Logs)
 # ==============================================================================
-class SystemLog(Base):
-    __tablename__ = 'system_logs'
+class SovereignAuditLog(Base):
+    __tablename__ = 'sovereign_audit_logs'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    action = Column(String, nullable=False)
-    status = Column(String, default="Success")  # Success, Failed, Alert
-    timestamp = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    telegram_id = Column(BigInteger, nullable=True, index=True)
+    action = Column(String(255), nullable=False)
+    status = Column(String(50), default="Success")  # Success, Failed, Alert
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
     details = Column(String, nullable=True)
