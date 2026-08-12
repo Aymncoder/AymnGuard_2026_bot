@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Enterprise v18.0.0 : Autonomous Mega-Meta-Engine & Cognitive Agent
+AymnGuard Enterprise v18.1.0 : Autonomous Mega-Meta-Engine & Cognitive Agent
 ==============================================================================
 النظام السيادي الخارق للبرمجة الذاتية، التطور التلقائي، توليد الميزات الحية،
 مع محرك الحماية الشجري (AST Security Sandbox) والتحميل الحي الآمن (Hot-Reloading).
+تم تجهيزه لبيئات السحابة وتأمين التنفيذ الديناميكي ضد تجميد مسار العمليات (Event Loop).
+==============================================================================
 """
 
 import logging
@@ -30,20 +32,21 @@ class SovereignMegaMetaEngine:
     """
     النواة السيادية المدمجة للبرمجة الذاتية والوكيل الإدراكي مع حماية أمنية مطلقة:
     - تحليل الطلبات وتوليد الأكواد البرمجية الديناميكية بأمان تام.
-    - فحص النحو والسلامة الشجربة (AST Security Inspection).
+    - فحص النحو والسلامة الشجرية (AST Security Inspection).
     - التزامن الآمن والتحميل الحي (Hot-Reloading) دون تعريض الخادم للخطر.
     """
     def __init__(self, modules_dir: str = "core/dynamic_modules"):
-        self.modules_dir = modules_dir
+        # استخدام المسار المطلق لضمان التوافق التام مع السيرفرات السحابية وحاويات Docker
+        self.modules_dir = os.path.abspath(modules_dir)
         self.active_dynamic_modules: Dict[str, Any] = {}
         self._lock = asyncio.Lock()  # قفل تزامن مؤسسي لحماية عمليات الحقن الحية
         
         try:
             os.makedirs(self.modules_dir, exist_ok=True)
         except Exception as e:
-            logger.error(f"⚠️ [Meta-Engine]: تحذير في إنشاء مجلد الوحدات الديناميكية: {e}")
+            logger.error(f"[Meta-Engine Warning]: تحذير في إنشاء مجلد الوحدات الديناميكية: {e}")
             
-        logger.info("⚙️ [MegaMeta-Engine]: تم إقلاع محرك الابتكار والتطوير الذاتي الآلي بنجاح تام.")
+        logger.info("[MegaMeta-Engine]: تم إقلاع محرك الابتكار والتطوير الذاتي الآلي بنجاح تام.")
 
     def _validate_ast_security(self, code_content: str) -> bool:
         """
@@ -60,29 +63,29 @@ class SovereignMegaMetaEngine:
                 if isinstance(node, ast.Import):
                     for alias in node.names:
                         if alias.name in forbidden_modules:
-                            logger.error(f"🚨 [Security Violation]: محاولة استيراد وحدة محظورة أمنياً: {alias.name}")
+                            logger.error(f"[Security Violation]: محاولة استيراد وحدة محظورة أمنياً: {alias.name}")
                             return False
                 elif isinstance(node, ast.ImportFrom):
                     if node.module in forbidden_modules:
-                        logger.error(f"🚨 [Security Violation]: محاولة استيراد من وحدة محظورة أمنياً: {node.module}")
+                        logger.error(f"[Security Violation]: محاولة استيراد من وحدة محظورة أمنياً: {node.module}")
                         return False
                 
                 # فحص الدوال الخطرة
                 elif isinstance(node, ast.Call):
                     if isinstance(node.func, ast.Name) and node.func.id in forbidden_funcs:
-                        logger.error(f"🚨 [Security Violation]: محاولة استخدام دالة خطرة محظورة: {node.func.id}")
+                        logger.error(f"[Security Violation]: محاولة استخدام دالة خطرة محظورة: {node.func.id}")
                         return False
 
             return True
         except Exception as e:
-            logger.error(f"❌ [AST Analysis Error]: فشل التحليل الشجري للأمان: {e}")
+            logger.error(f"[AST Analysis Error]: فشل التحليل الشجري للأمان: {e}")
             return False
       
     async def analyze_and_synthesize_feature(self, prompt: str, module_name: str = "dynamic_addon") -> Dict[str, Any]:
         """
         الوكيل الإدراكي لتخليق وبناء الميزات البرمجية طياراً مع صياغة آمنة تماماً.
         """
-        logger.info(f"🔍 [Cognitive Agent]: جاري تفكيك وتحليل الطلب الابتكاري: '{prompt}'")
+        logger.info(f"[Cognitive Agent]: جاري تفكيك وتحليل الطلب الابتكاري: '{prompt}'")
 
         sanitized_module_name = module_name.replace(" ", "_").lower()
         
@@ -134,7 +137,7 @@ class SovereignMegaMetaEngine:
                 if not self._validate_ast_security(code_content):
                     return {"status": "failed", "error": "Security Sandbox Blocked: Unsafe AST structures detected."}
 
-                logger.info(f"🛡️ [Meta-Engine]: اجتاز الكود المخصص لـ [{module_name}] فحص النحو والأمان بنجاح تام.")
+                logger.info(f"[Meta-Engine Security]: اجتاز الكود المخصص لـ [{module_name}] فحص النحو والأمان بنجاح تام.")
 
                 # 3. التخزين المؤسسي المبرمج
                 with open(file_path, "w", encoding="utf-8") as f:
@@ -148,7 +151,7 @@ class SovereignMegaMetaEngine:
                     spec.loader.exec_module(module)
                     self.active_dynamic_modules[module_name] = module
                     
-                    logger.info(f"🚀 [Meta-Engine]: تم تفعيل وحقن الوحدة الذاتية [{module_name}] بنجاح في النواة الحية!")
+                    logger.info(f"[Meta-Engine Success]: تم تفعيل وحقن الوحدة الذاتية [{module_name}] بنجاح في النواة الحية!")
                     return {
                         "status": "success",
                         "module": module_name,
@@ -158,15 +161,15 @@ class SovereignMegaMetaEngine:
                     raise ImportError(f"تعذر إنشاء محمل سياقي للوحدة الديناميكية: {module_name}")
 
             except SyntaxError as se:
-                logger.error(f"❌ [Syntax Error Sandbox]: خطأ نحوي في الهيكل المُولد لـ {module_name}: {se}")
+                logger.error(f"[Syntax Error Sandbox]: خطأ نحوي في الهيكل المُولد لـ {module_name}: {se}")
                 return {"status": "failed", "error": f"Syntax Error: {str(se)}"}
             except Exception as e:
-                logger.error(f"❌ [Synthesis Exception]: فشل في تخليق الوحدة البرمجية {module_name}: {e}")
+                logger.error(f"[Synthesis Exception]: فشل في تخليق الوحدة البرمجية {module_name}: {e}")
                 return {"status": "error", "error": str(e)}
 
     async def execute_dynamic_capability(self, module_name: str, function_name: str, *args, **kwargs) -> Any:
         """
-        تشغيل الوظائف والدوال المُحدثة ذاتياً ديناميكياً مع حماية ضد الاستثناءات.
+        تشغيل الوظائف والدوال المُحدثة ذاتياً ديناميكياً مع حماية ضد الاستثناءات ותجميد الخادم.
         """
         try:
             module = self.active_dynamic_modules.get(module_name)
@@ -175,13 +178,21 @@ class SovereignMegaMetaEngine:
                 
             if module and hasattr(module, function_name):
                 func = getattr(module, function_name)
-                logger.info(f"⚡ [Dynamic Execution]: تشغيل القدرة المبتكرة [{module_name}.{function_name}] بنجاح.")
-                return await func(*args, **kwargs) if callable(func) else func
                 
-            logger.warning(f"⚠️ [Dynamic Execution]: الوحدة أو الوظيفة المطلوبة [{module_name}.{function_name}] غير متاحة.")
+                if callable(func):
+                    logger.info(f"[Dynamic Execution]: تشغيل القدرة المبتكرة [{module_name}.{function_name}] بنجاح.")
+                    # فحص ذكي للنوع لمنع خطأ TypeError الذي يعيق التشغيل
+                    if asyncio.iscoroutinefunction(func):
+                        return await func(*args, **kwargs)
+                    else:
+                        # إرسال الدالة المتزامنة لمسار خلفي لمنع تجميد السيرفر
+                        return await asyncio.to_thread(func, *args, **kwargs)
+                return func
+                
+            logger.warning(f"[Dynamic Execution Warning]: الوحدة أو الوظيفة المطلوبة [{module_name}.{function_name}] غير متاحة.")
             return None
         except Exception as e:
-            logger.error(f"❌ [Dynamic Execution Error]: فشل تنفيذ القدرة الديناميكية {module_name}: {e}")
+            logger.error(f"[Dynamic Execution Error]: فشل تنفيذ القدرة الديناميكية {module_name}: {e}")
             return None
         
 # تهيئة النسخة العامة للمحرك المدمج لاستخدامها في النظام المركزي
