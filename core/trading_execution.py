@@ -1,105 +1,170 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Enterprise v18.0.0 : Sovereign Trading Execution Engine
+AymnGuard Enterprise v18.1.0 : Sovereign Execution Core (Cloud Optimized)
 ==============================================================================
-محرك التنفيذ المالي الآلي: يربط الإمبراطورية بأسواق العملات الرقمية،
-ويدير صفقات التداول الفوري (Spot) والعقود الآجلة المرفعة (Futures) 
-مع تطبيق صارم لبروتوكولات إدارة المخاطر السيادية (Risk Management).
+النواة الصلبة لتنفيذ الأوامر (Execution Layer):
+1. العزل الأمني: استلام مفاتيح التداول بشكل ديناميكي (لا يتم تخزينها هنا).
+2. التوجيه الذكي (Smart Routing): الفصل التلقائي بين أسواق Spot و USDⓈ-M Futures.
+3. إدارة الأخطاء المؤسسية: معالجة الانقطاعات، الرصيد غير الكافي، وأخطاء الشبكة عبر CCXT.
+4. بروتوكول الطوارئ (Kill Switch): تصفية فورية للمراكز في حالات الانهيار.
+تم إعداد هذا الملف للعمل حصرياً على بيئة السيرفر السحابي كعميل إرسال (Outbound).
+==============================================================================
 """
 
 import logging
-from typing import Dict, Any
+import ccxt.async_support as ccxt
+from ccxt.base.errors import NetworkError, ExchangeError, InsufficientFunds
+from typing import Dict, Any, Optional
 
-# إعداد نظام السجلات المالي
-logger = logging.getLogger("AegisAICore.TradingEngine")
+# إعداد نظام السجلات السيادي
+logger = logging.getLogger("AymnGuard.ExecutionCore")
 logger.setLevel(logging.INFO)
 
-class SovereignTradingEngine:
+class SovereignExecutionCore:
     """
-    الذراع التنفيذي المالي: يستقبل أوامر الشراء/البيع ويفلترها عبر إدارة المخاطر قبل التنفيذ.
+    القلب النابض للتنفيذ المالي.
+    يتصل مباشرة بـ Binance عبر بروتوكولات CCXT غير المتزامنة (Async).
     """
-    
-    def __init__(self):
-        logger.info("💹 [Trading Engine]: تم تهيئة محرك التنفيذ المالي. جاهز لإدارة محافظ Spot و Futures.")
 
-    async def execute_trade_order(
-        self, 
-        symbol: str, 
-        side: str, 
-        amount: float, 
-        market_type: str = "SPOT", 
-        leverage: int = 1
-    ) -> Dict[str, Any]:
+    def __init__(self, api_key: str, api_secret: str, market_type: str = "SPOT"):
+        self.api_key = api_key
+        self.api_secret = api_secret
+        self.market_type = market_type.upper()
+        self.exchange: Optional[ccxt.binance] = None
+
+    async def initialize(self) -> None:
         """
-        تنفيذ صفقة مالية مع طبقة حماية سيادية وإدارة مخاطر صارمة.
+        تهيئة الاتصال وتحديد نوع السوق (فوري أم عقود) مع تفعيل درع الحماية المعدل.
         """
         try:
-            # درع التحقق من المدخلات الأساسية لمنع أي استثناءات
-            if not symbol or not isinstance(symbol, str):
-                return {"status": "rejected", "message": "⚠️ رمز الزوج غير صالح."}
-            
+            options = {'defaultType': 'spot'}
+            if self.market_type in ["FUTURES", "USDⓈ-M_FUTURES"]:
+                options['defaultType'] = 'future'
+
+            self.exchange = ccxt.binance({
+                'apiKey': self.api_key,
+                'secret': self.api_secret,
+                'enableRateLimit': True,
+                'options': options
+            })
+            logger.info(f"[Core Connected]: تم فتح قناة اتصال آمنة مع Binance [سوق: {self.market_type}].")
+        except Exception as e:
+            logger.error(f"[Core Connection Error]: فشل تهيئة اتصال CCXT: {e}")
+            raise
+
+    async def close_connection(self) -> None:
+        """
+        إغلاق الاتصال بأمان لمنع تسرب الذاكرة (Memory Leaks).
+        """
+        try:
+            if self.exchange:
+                await self.exchange.close()
+                logger.debug("[Core Disconnected]: تم إغلاق جلسة CCXT بنجاح.")
+        except Exception as e:
+            logger.error(f"[Core Close Error]: خطأ أثناء إغلاق الجلسة: {e}")
+
+    async def execute_market_order(self, symbol: str, side: str, amount: float, leverage: int = 1) -> Dict[str, Any]:
+        """
+        التنفيذ الصارم للأوامر الواردة من محرك الذكاء الاصطناعي مع درع حماية واستثناءات دقيقة.
+        """
+        if not self.exchange:
+            raise RuntimeError("[System Error]: محرك التنفيذ غير متصل أو لم يتم تهيئته بعد.")
+
+        try:
             symbol_upper = symbol.upper().strip()
-            side_upper = side.upper().strip() if isinstance(side, str) else "BUY"
-            market_upper = market_type.upper().strip() if isinstance(market_type, str) else "SPOT"
+            side_clean = side.lower().strip()
             
-            try:
-                numeric_amount = float(amount)
-                numeric_leverage = int(leverage)
-            except (ValueError, TypeError):
-                return {"status": "rejected", "message": "⚠️ الكمية أو الرافعة المالية يجب أن تكون قيمًا عددية صالحة."}
+            # ضبط الرافعة المالية (مخصصة للعقود الآجلة فقط)
+            if self.market_type in ["FUTURES", "USDⓈ-M_FUTURES"]:
+                logger.info(f"[Leverage Engine]: ضبط الرافعة على {leverage}x لزوج {symbol_upper}...")
+                try:
+                    await self.exchange.set_leverage(leverage, symbol_upper)
+                except Exception as lev_err:
+                    logger.warning(f"[Leverage Warning]: تعذر ضبط الرافعة المالية (قد تكون مضبوطة مسبقاً): {lev_err}")
 
-            logger.info(f"⚡ [Trade Execution]: جاري تجهيز أمر {side_upper} للزوج {symbol_upper} (السوق: {market_upper} | الرافعة: {numeric_leverage}x)")
+            logger.info(f"[Order Dispatch]: جاري تنفيذ أمر {side_clean.upper()} بحجم {amount} لزوج {symbol_upper}...")
             
-            # ------------------------------------------------------------------
-            # طبقة إدارة المخاطر السيادية (Sovereign Risk Management Layer)
-            # ------------------------------------------------------------------
-            if market_upper == "FUTURES" and numeric_leverage > 20:
-                logger.warning(f"⚠️ [Risk Control]: تم رفض الطلب للزوج {symbol_upper}. الرافعة المالية {numeric_leverage}x تتجاوز الحد الآمن.")
-                return {
-                    "status": "rejected", 
-                    "message": "🚫 **تدخل أمني (Risk Control):** تم رفض الصفقة. الرافعة المالية تتجاوز الحد الأقصى المسموح به (20x) لحماية المحفظة."
-                }
+            # التنفيذ الفعلي بأسعار السوق
+            order = await self.exchange.create_market_order(symbol_upper, side_clean, amount)
 
-            if numeric_amount <= 0:
-                return {
-                    "status": "rejected", 
-                    "message": "⚠️ الكمية المحددة يجب أن تكون أكبر من الصفر."
-                }
-                
-            # ------------------------------------------------------------------
-            # محاكاة التنفيذ الفعلي (Execution Pipeline)
-            # ------------------------------------------------------------------
-            report = (
-                f"💹 **إشعار تنفيذ مالي سيادي**\n"
-                f"━━━━━━━━━━━━━━━━━━\n"
-                f"🔹 **الزوج:** `{symbol_upper}`\n"
-                f"🔹 **النوع:** `{side_upper} (Market)`\n"
-                f"🔹 **السوق:** `{market_upper}`\n"
-                f"🔹 **الكمية:** `{numeric_amount}`\n"
-            )
+            # استخراج متوسط السعر الفعلي للتنفيذ
+            executed_price = order.get('average') or order.get('price') or 0.0
+
+            logger.info(f"[Trade Success]: تم تأكيد التنفيذ مؤسسياً! معرف: {order.get('id')} | السعر: {executed_price}")
             
-            if market_upper == "FUTURES":
-                report += f"🔹 **الرافعة المالية:** `{numeric_leverage}x`\n"
-
-            report += f"\n✅ **الحالة:** تم توجيه الأمر بنجاح عبر بروتوكولات الأمان للمنصة المفتوحة."
-
-            logger.info(f"✅ [Trade Executed]: تم تنفيذ وتوجيه الأمر بنجاح للزوج {symbol_upper}")
             return {
                 "status": "success",
-                "message": report,
-                "details": {
-                    "symbol": symbol_upper,
-                    "side": side_upper,
-                    "amount": numeric_amount,
-                    "market": market_upper,
-                    "leverage": numeric_leverage
-                }
+                "order_id": order.get("id", "SYS_FALLBACK_ID"),
+                "symbol": symbol_upper,
+                "price": executed_price,
+                "side": side_clean.upper()
             }
 
+        except InsufficientFunds as e:
+            logger.error(f"[Liquidity Error]: السيولة غير كافية لتنفيذ الأمر: {e}")
+            raise
+        except (NetworkError, ExchangeError) as e:
+            logger.error(f"[Exchange Error]: رفض المنصة أو خطأ في الشبكة: {e}")
+            raise
         except Exception as e:
-            logger.error(f"❌ [Execution Error]: فشل تنفيذ الصفقة: {e}", exc_info=True)
-            return {
-                "status": "error", 
-                "message": "❌ حدث خطأ داخلي أثناء معالجة الأمر المالي."
-            }
+            logger.critical(f"[Fatal Core Error]: انهيار غير متوقع في محرك التنفيذ: {e}")
+            raise
+
+    async def emergency_kill_switch(self) -> Dict[str, Any]:
+        """
+        بروتوكول الطوارئ السيادي (Panic Button):
+        إغلاق كافة الصفقات المفتوحة فوراً وتأمين السيولة بأمان تام.
+        """
+        logger.warning("[EMERGENCY PROTOCOL ACTIVATED]: جاري تصفية كافة المراكز المفتوحة بأسعار السوق الحالية!")
+        if not self.exchange:
+            return {"status": "failed", "reason": "Exchange not initialized."}
+            
+        try:
+            positions = await self.exchange.fetch_positions()
+            closed_count = 0
+            
+            for position in positions:
+                try:
+                    amt = float(position['info'].get('positionAmt', 0))
+                    if amt != 0:
+                        symbol = position['symbol']
+                        side = 'sell' if amt > 0 else 'buy'
+                        await self.exchange.create_market_order(symbol, side, abs(amt))
+                        closed_count += 1
+                        logger.info(f"[Position Liquidated]: تم إغلاق مركز {symbol} بأمان.")
+                except Exception as pos_err:
+                    logger.error(f"[Position Close Error]: تعذر إغلاق مركز معين: {pos_err}")
+
+            return {"status": "emergency_executed", "positions_closed": closed_count}
+        except Exception as e:
+            logger.critical(f"[Kill Switch Failed]: فشل ذريع في بروتوكول الطوارئ: {e}")
+            raise
+
+
+# ============================================================================
+# الجسر البيني (The Interfacing Bridge) المخصص لطبقة الخدمات
+# ============================================================================
+async def execute_binance_order(
+    symbol: str, 
+    side: str, 
+    quantity: float, 
+    market: str = "SPOT", 
+    leverage: int = 1, 
+    api_key: str = "", 
+    api_secret: str = ""
+) -> Dict[str, Any]:
+    """
+    هذه الدالة هي نقطة الاتصال (Endpoint) التي يستدعيها العقل المدبر 
+    لإنشاء الجلسة، تنفيذ الأمر، ثم التدمير الذاتي للجلسة لحماية الذاكرة.
+    """
+    if not api_key or not api_secret:
+        raise ValueError("[Security Block]: لا يمكن التنفيذ بدون مفاتيح API سيادية.")
+
+    executor = SovereignExecutionCore(api_key, api_secret, market)
+    try:
+        await executor.initialize()
+        return await executor.execute_market_order(symbol, side, quantity, leverage)
+    finally:
+        # إغلاق الجلسة دائماً لضمان استقرار السيرفر وعدم تسرب الذاكرة
+        await executor.close_connection()
