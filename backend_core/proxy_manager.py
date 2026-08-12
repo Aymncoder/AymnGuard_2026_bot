@@ -75,7 +75,7 @@ class SovereignUltraProxyManager:
         healthy_proxies = [p for p in self.proxy_pool if p["is_healthy"]]
         
         if not healthy_proxies:
-            logger.warning("⚠️ تحذير سيادي: جميع البروكسيات مسجلة كغير صالحة، سيتم إعادة ضبط الشبكة أو الاتصال المباشر.")
+            logger.warning("تحذير سيادي: جميع البروكسيات مسجلة كغير صالحة، سيتم إعادة ضبط الشبكة أو الاتصال المباشر.")
             if self.proxy_pool:
                 best = self.proxy_pool[0] # العودة لأفضل المتاح اضطرارياً
             else:
