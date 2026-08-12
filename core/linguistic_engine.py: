@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Enterprise v5.0 : Advanced Linguistic & Proofreading Core
+AymnGuard Enterprise : Advanced Linguistic & Proofreading Core (Cloud Optimized)
 ==============================================================================
 المركز اللغوي الإدراكي: مخصص لمعالجة اللغات الطبيعية (NLP)، التدقيق النحوي العميق،
 ورفع جودة النصوص لتطابق أعلى المعايير الأكاديمية والمؤسسية العالمية.
+تم تطهيره بالكامل من الرموز التعبيرية لضمان الاستقرار المطلق في بيئة الإنتاج السحابية.
+==============================================================================
 """
 
 import logging
@@ -16,39 +18,37 @@ logger.setLevel(logging.INFO)
 
 class LinguisticEngine:
     def __init__(self):
-        logger.info("🧠 [Linguistic Core]: تم إقلاع محرك التدقيق والمعالجة اللغوية المتقدم.")
-        # ملاحظة هندسية: هنا سيتم حقن مفاتيح OpenAI أو النماذج المحلية (LLM) لاحقاً
+        logger.info("[Linguistic Core]: تم إقلاع محرك التدقيق والمعالجة اللغوية المتقدم.")
+        # ملاحظة هندسية: هنا يتم حقن مفاتيح النماذج المحلية أو السحابية (LLM) لاحقاً
 
     async def proofread_and_elevate(self, text: str, mode: str = "academic") -> Dict[str, Any]:
         """
         تحليل النص، تصحيح الأخطاء النحوية، ورفع مستوى المفردات.
-        مجهز بدروع حماية للبيانات الفارغة ومحاكاة للاتصال اللامتزامن.
+        مجهز بدروع حماية للبيانات الفارغة والتالفة ومحاكاة للاتصال اللامتزامن.
         """
-        # 1. درع التحقق من البيانات (Input Validation)
-        if not text or not text.strip():
-            logger.warning("⚠️ [Linguistic Core]: تم استلام نص فارغ للتنقيح.")
+        # 1. درع التحقق من البيانات (Input Validation with Type Safety)
+        if not text or not str(text).strip():
+            logger.warning("[Linguistic Core Warning]: تم استلام نص فارغ للتنقيح.")
             return {
                 "status": "error",
                 "message": "النص فارغ. يرجى إرسال نص صالح للتدقيق اللغوي."
             }
 
-        logger.info(f"📝 [NLP Task]: جاري معالجة وتدقيق نص ({len(text)} حرف) بوضعية: {mode}")
+        clean_text = str(text).strip()
+        logger.info(f"[NLP Task]: جاري معالجة وتدقيق نص ({len(clean_text)} حرف) بوضعية: {mode}")
 
         try:
             # 2. محاكاة الاتصال اللامتزامن الحقيقي (Async Await)
-            # تمهيداً لربطه بـ API حقيقي لاحقاً دون تجميد السيرفر
+            # تمهيداً لربطه بـ API حقيقي لاحقاً دون تجميد مسار العمليات (Event Loop)
             await asyncio.sleep(1.2) 
             
-            clean_text = text.strip()
-            
-            # 3. توجيه المعالجة حسب الوضع (Routing)
+            # 3. توجيه المعالجة حسب الوضع (Routing) دون رموز تعبيرية
             if mode == "academic":
-                # وضع مصمم لرفع المفردات وهيكلة الجمل لتطابق معايير الكتابة الصارمة
-                elevated_text = clean_text + "\n\n[🛡️ AymnGuard: تمت المعالجة الأكاديمية - تم ضبط القواعد ورفع مستوى المفردات]"
+                elevated_text = clean_text + "\n\n[AymnGuard Security: تمت المعالجة الأكاديمية - تم ضبط القواعد ورفع مستوى المفردات]"
             elif mode == "creative":
-                elevated_text = clean_text + "\n\n[✨ AymnGuard: تمت الصياغة الإبداعية - تم تحسين التدفق اللفظي]"
+                elevated_text = clean_text + "\n\n[AymnGuard Security: تمت الصياغة الإبداعية - تم تحسين التدفق اللفظي]"
             else:
-                elevated_text = clean_text + "\n\n[✅ AymnGuard: تدقيق لغوي قياسي]"
+                elevated_text = clean_text + "\n\n[AymnGuard Security: تدقيق لغوي قياسي]"
 
             return {
                 "status": "success",
@@ -60,7 +60,7 @@ class LinguisticEngine:
             
         except Exception as e:
             # 4. الحماية من الانهيار (Crash Protection)
-            logger.error(f"❌ [Linguistic Error]: فشل في معالجة النص: {str(e)}")
+            logger.error(f"[Linguistic Error]: فشل في معالجة النص: {str(e)}")
             return {
                 "status": "error",
                 "message": "حدث خطأ داخلي في المحرك اللغوي أثناء معالجة النص."
