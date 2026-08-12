@@ -34,7 +34,7 @@ class AIStudioEngine:
             modifier = style_modifiers.get(asset_type, "High-end professional graphic design, masterpiece")
             enhanced_prompt = f"{prompt}, {modifier}"
             
-            logger.info(f"🎨 [AI Studio]: جاري معالجة وتوليد {asset_type} بالذكاء الاصطناعي للموجه: '{prompt}'")
+            logger.info(f"[AI Studio]: جاري معالجة وتوليد {asset_type} بالذكاء الاصطناعي للموجه: '{prompt}'")
             
             # هنا يتم ربط المحرك بنماذج التوليد العالمية (مثل DALL-E 3 أو Stable Diffusion API)
             # تم تجهيز البنية التحتية لتكون جاهزة تماماً للاستدعاء الفوري عبر مفاتيح البيئة الآمنة
@@ -49,5 +49,5 @@ class AIStudioEngine:
             }
             
         except Exception as e:
-            logger.error(f"❌ [AI Studio Error]: فشل توليد الأصول البصرية - التفاصيل: {str(e)}")
+            logger.error(f"[AI Studio Error]: فشل توليد الأصول البصرية - التفاصيل: {str(e)}")
             raise e
