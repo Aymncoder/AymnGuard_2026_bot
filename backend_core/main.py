@@ -7,7 +7,11 @@ Aymn Coder Plus : Aegis AI Core & AymnGuard Sovereign Enterprise Core (v19.0.0-I
 الـ WebSockets، الأتمتة، وإدارة الجلسات مع محرك الاكتشاف التلقائي الشامل.
 ==============================================================================
 """
-
+import asyncio
+try:
+    asyncio.get_event_loop()
+except RuntimeError:
+    asyncio.set_event_loop(asyncio.new_event_loop())
 import os
 import sys
 import time
@@ -38,8 +42,8 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
-from telethon import TelegramClient
-from pyrogram import Client as PyroClient
+# from telethon import TelegramClient
+# from pyrogram import Client as PyroClient
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column
@@ -66,12 +70,12 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s | 👑 IMPERIAL-%(le
 logger = logging.getLogger("AegisAICore.ImperialMasterHub")
 
 class SovereignSettings(BaseSettings):
-    TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "8885095463:AAGRRtirIswzPutKdhuOTf_OeDzO2PTu_FQ")
+    TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "8885095463:AAGcCsNOi68c0OYXC5y2ApcRXBVpTD-R-lU")
     TELEGRAM_SECRET_TOKEN: str = os.getenv("TELEGRAM_SECRET_TOKEN", "aymnguard_secure_secret_2026")
-    WEBHOOK_URL: str = os.getenv("WEBHOOK_URL", "https://410b9e4c09a3de.lhr.life/api/v1/telegram/webhook")
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./aymnguard_enterprise.db")
-    TELEGRAM_API_ID: int = int(os.getenv("TELEGRAM_API_ID", "2040"))
-    TELEGRAM_API_HASH: str = os.getenv("TELEGRAM_API_HASH", "b18441aff607e10a989891a5462e627")
+    WEBHOOK_URL: str = os.getenv("WEBHOOK_URL", "http://135.181.86.199:8000/api/v1/telegram/webhook")
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///aymnguard_enterprise.db")
+    TELEGRAM_API_ID: int = int(os.getenv("TELEGRAM_API_ID", 6))
+    TELEGRAM_API_HASH: str = os.getenv("TELEGRAM_API_HASH", "eb06d4abfb49dc3eeb1aeb98ae0f581e")
     HTTP_TIMEOUT: float = 15.0
 
     class Config:
@@ -232,8 +236,12 @@ except ImportError:
 # ==============================================================================
 # 6. عُقد الأتمتة الخلفية (Telethon & Pyrogram Background Workers)
 # ==============================================================================
+
+from telethon import TelegramClient
+from pyrogram import Client as PyroClient
+
 telethon_client = TelegramClient("aymnguard_telethon_session", settings.TELEGRAM_API_ID, settings.TELEGRAM_API_HASH)
-pyrogram_client = PyroClient("aymnguard_pyrogram_session", api_id=settings.TELEGRAM_API_ID, api_hash=settings.TELEGRAM_API_HASH, in_memory=True)
+pyrogram_client = PyroClient("aymnguard_pyrogram_session", api_id=settings.TELEGRAM_API_ID, api_hash=settings.TELEGRAM_API_HASH)
 
 async def start_automation_nodes():
     try: 
