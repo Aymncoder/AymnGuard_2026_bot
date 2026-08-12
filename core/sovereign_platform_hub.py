@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-AymnGuard Sovereign Independent Ecosystem Hub (v18.0.0-Master)
+AymnGuard Sovereign Independent Ecosystem Hub (v18.1.0-Cloud-Master)
 ==============================================================================
 منصة الإمبراطورية السيادية المستقلة (Standalone Core Platform):
 المضيف والمأوى المركزي الشامل القادر على استضافة، تسجيل، وإدارة مئات البوتات،
-الخدمات، والمحركات البرمجية الديناميكية بشكل مستقل تماماً عن أي منصة خارجية.
+الخدمات، والمحركات البرمجية الديناميكية بشكل مستقل تماماً.
+تم تحسينه للبيئة السحابية: منع تجميد السيرفر عند استدعاء الخدمات الثقيلة.
+==============================================================================
 """
 
 import logging
@@ -14,12 +16,12 @@ from typing import Dict, Any, Callable, Optional
 from datetime import datetime, timezone
 
 # إعداد السجلات المؤسسية للمنصة المستقلة
-logger = logging.getLogger("AegisAICore.SovereignPlatformHub")
+logger = logging.getLogger("AymnGuard.SovereignPlatformHub")
 logger.setLevel(logging.INFO)
 
 class SovereignPlatformHub:
     """
-    النواة الأم (The Mother Host): تدير تسجيل وتشغيل مئات الخدمات والمحركات والبوتات
+    النواة الأم (The Mother Host): تدير تسجيل وتشغيل مئات الخدمات والبوتات
     عبر نمط التصميم الموجه بالخدمات (Microservice & Plugin Registry Pattern).
     """
     
@@ -37,7 +39,7 @@ class SovereignPlatformHub:
     ):
         """تسجيل خدمة أو أداة جديدة ديناميكياً داخل المنصة دون الحاجة لتعديل النواة."""
         if service_id in cls._registered_services:
-            logger.warning(f"⚠️ [Platform Hub]: الخدمة '{service_id}' مسجلة مسبقاً، جاري التحديث...")
+            logger.warning(f"[Platform Hub Warning]: الخدمة '{service_id}' مسجلة مسبقاً، جاري التحديث...")
         
         cls._registered_services[service_id] = {
             "name": service_name,
@@ -46,20 +48,20 @@ class SovereignPlatformHub:
             "registered_at": datetime.now(timezone.utc).isoformat(),
             "status": "active"
         }
-        logger.info(f"🔗 [Service Registered]: تم ربط وتفعيل الخدمة المستقلة -> [{service_name}] (ID: {service_id})")
+        logger.info(f"[Service Registered]: تم ربط وتفعيل الخدمة المستقلة -> [{service_name}] (ID: {service_id})")
 
     @classmethod
     def register_bot_module(cls, bot_id: str, bot_executor: Callable):
         """تسجيل بوت مستقل جديد ضمن شبكة البوتات التابعة للإمبراطورية."""
         cls._registered_bots[bot_id] = bot_executor
-        logger.info(f"🤖 [Bot Hub]: تم إدراج وتثبيت البوت المستقل بنجاح -> [{bot_id}]")
+        logger.info(f"[Bot Hub]: تم إدراج وتثبيت البوت المستقل بنجاح -> [{bot_id}]")
 
     @classmethod
     async def dispatch_request_to_service(cls, service_id: str, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """توجيه الطلب الوارد إلى الخدمة المطلوبة بدقة تامة مع درع حماية يدعم الدوال المتزامنة واللامتزامنة."""
+        """توجيه الطلب الوارد إلى الخدمة المطلوبة بدقة تامة مع درع حماية للتنفيذ اللامتزامن."""
         service = cls._registered_services.get(service_id)
         if not service:
-            logger.error(f"❌ [Platform Dispatcher]: خطأ، الخدمة المستهدفة '{service_id}' غير موجودة أو معطلة.")
+            logger.error(f"[Platform Dispatcher Error]: خطأ، الخدمة المستهدفة '{service_id}' غير موجودة أو معطلة.")
             return {
                 "status": "error",
                 "code": 404,
@@ -68,15 +70,17 @@ class SovereignPlatformHub:
 
         try:
             handler = service["handler"]
-            logger.info(f"⚡ [Platform Execution]: تنفيذ الخدمة المستقلة '{service['name']}'...")
+            logger.info(f"[Platform Execution]: تنفيذ الخدمة المستقلة '{service['name']}'...")
             
             if not callable(handler):
                 result = {"status": "success", "data": "Static Service"}
             elif asyncio.iscoroutinefunction(handler):
+                # تنفيذ الدوال اللامتزامنة بشكل طبيعي
                 result = await handler(payload)
             else:
-                # دعم آمن للدوال المتزامنة العادية داخل البيئة اللامتزامنة
-                result = handler(payload)
+                # [إجراء سيادي للحماية من تجميد السيرفر]:
+                # إرسال الدوال المتزامنة (الثقيلة) لتعمل في مسار معالجة خلفي (Thread)
+                result = await asyncio.to_thread(handler, payload)
 
             return {
                 "status": "success",
@@ -84,7 +88,7 @@ class SovereignPlatformHub:
                 "result": result
             }
         except Exception as e:
-            logger.critical(f"❌ [Service Critical Error] في الخدمة '{service_id}': {str(e)}", exc_info=True)
+            logger.critical(f"[Service Critical Error] في الخدمة '{service_id}': {str(e)}", exc_info=True)
             return {
                 "status": "failed",
                 "service_id": service_id,
@@ -96,7 +100,7 @@ class SovereignPlatformHub:
         """استخراج تقرير استخباراتي شامل عن حالة المنصة ومجموع الخدمات والبوتات المرتبطة."""
         return {
             "platform_name": "AymnGuard Sovereign Independent Ecosystem",
-            "version": "18.0.0-Master",
+            "version": "18.1.0-Cloud-Master",
             "active_services_count": len(cls._registered_services),
             "active_bots_count": len(cls._registered_bots),
             "services_list": list(cls._registered_services.keys()),
