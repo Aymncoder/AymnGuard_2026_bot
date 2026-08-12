@@ -1,6 +1,6 @@
 // -*- coding: utf-8 -*-
 /// ==============================================================================
-/// AymnGuard Sovereign Enterprise : Main Application Entry Point v35.1 (Hardened Core)
+/// AymnGuard Sovereign Enterprise : Main Application Entry Point v35.2 (Hardened Core)
 /// ==============================================================================
 
 import 'dart:async';
@@ -114,7 +114,11 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
                         if (query.isEmpty) {
                           filteredList = List.from(_countriesList);
                         } else {
-                          filteredList = _countriesList.where((c) => c['name']!.contains(query) || c['code']!.contains(query)).toList();
+                          final lowerQuery = query.toLowerCase();
+                          filteredList = _countriesList.where((c) => 
+                            c['name']!.toLowerCase().contains(lowerQuery) || 
+                            c['code']!.contains(query)
+                          ).toList();
                         }
                       });
                     },
@@ -160,7 +164,9 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
   Future<void> _loginAndConnect() async {
     String rawPhone = _phoneController.text.trim();
     if (rawPhone.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("يرجى إدخال رقم الهاتف لبدء الجلسة")));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("يرجى إدخال رقم الهاتف لبدء الجلسة")));
+      }
       return;
     }
 
@@ -178,8 +184,17 @@ class _AccountLoginGatewayScreenState extends State<AccountLoginGatewayScreen> {
 
       if (mounted) Navigator.pop(context);
 
+      // حماية ضد استجابة فارغة أو غير متوقعة
+      if (response == null || response is! Map) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("استجابة غير صالحة من النظام السيادي")));
+        }
+        return;
+      }
+
       if (response['error'] == true) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("تعذر الاتصال: ${response['message']}")));
+        String errorMsg = response['message'] ?? 'خطأ غير معروف';
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("تعذر الاتصال: $errorMsg")));
       } else {
         if (mounted) {
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainSovereignScreen(userAccount: fullPhoneNumber)));
@@ -340,24 +355,26 @@ class SovereignDashboardTab extends StatelessWidget {
 }
 
 // ==============================================================================
-// 4. المحرك البصري (تشغيل صورتك الخاصة كخلفية)
+// 4. المحرك البصري (تشغيل صورتك الخاصة كخلفية بكفاءة وتأمين كامل)
 // ==============================================================================
 class CyberEnterpriseBackground extends StatelessWidget {
   final Widget child;
-  const CyberEnterpriseBackground({Key? key, required this.child}) : super(key: key);
+  const CyberEnterpriseBackground({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      decoration: const BoxDecoration(
-        // سحب الصورة التي قمت برفعها مسبقاً
+      decoration: BoxDecoration(
+        color: const Color(0xFF0B0F19), // خلفية احتياطية تمنع ظهور شاشة سوداء أثناء تحميل الصورة
         image: DecorationImage(
-          image: AssetImage('assets/images/bg.jpg'),
-          fit: BoxFit.cover, // لتتمدد الصورة وتغطي الشاشة بالكامل
-          // تعتيم خفيف جداً فوق الصورة لكي تظل النصوص واضحة ومقروءة
-          colorFilter: ColorFilter.mode(Colors.black54, BlendMode.darken),
+          image: const AssetImage('assets/images/bg.jpg'),
+          fit: BoxFit.cover, 
+          colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.55), BlendMode.darken),
+          onError: (exception, stackTrace) {
+            debugPrint('⚠️ [Asset Warning]: تعذر تحميل صورة الخلفية bg.jpg، وتم الاعتماد على اللون الاحتياطي: $exception');
+          },
         ),
       ),
       child: SafeArea(child: child),
@@ -369,7 +386,7 @@ class CyberEnterpriseBackground extends StatelessWidget {
 // 5. العناصر الجمالية المتبقية
 // ==============================================================================
 class SovereignBrandingHeader extends StatelessWidget {
-  const SovereignBrandingHeader({Key? key}) : super(key: key);
+  const SovereignBrandingHeader({super.key});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -401,7 +418,7 @@ class SovereignBrandingHeader extends StatelessWidget {
 }
 
 class SovereignStatusBanner extends StatelessWidget {
-  const SovereignStatusBanner({Key? key}) : super(key: key);
+  const SovereignStatusBanner({super.key});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -421,7 +438,7 @@ class SovereignStatusBanner extends StatelessWidget {
 class FloatingGlassyNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
-  const FloatingGlassyNavBar({Key? key, required this.currentIndex, required this.onTap}) : super(key: key);
+  const FloatingGlassyNavBar({super.key, required this.currentIndex, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
