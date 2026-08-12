@@ -40,10 +40,10 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 # ------------------------------------------------------------------------------
 FROM python:3.12-slim-bookworm AS runtime
 
-# إعداد متغيرات البيئة للتشغيل الآمن، الأداء العالي، والتوقيت المحلي
+# إعداد متغيرات البيئة للتشغيل الآمن، الأداء العالي، وتحديد البورت السحابي المدفوع على 8000
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PORT=10000 \
+    PORT=8000 \
     APP_ENV="production" \
     TZ="Asia/Aden"
 
@@ -82,15 +82,15 @@ RUN mkdir -p logs tmp && \
 # تفعيل المستخدم غير الجذري بشكل نهائي
 USER aymnuser
 
-# فحص ذاتي للصحة (Healthcheck) مع فترة سماح لبدء التشغيل
+# فحص ذاتي للصحة (Healthcheck) مع فترة سماح لبدء التشغيل على السيرفر السحابي
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-    CMD curl -f http://localhost:${PORT}/ || exit 1
+    CMD curl -f http://135.181.86.199:${PORT}/ || exit 1
 
-# فتح المنفذ التشغيلي الموحد
+# فتح المنفذ التشغيلي السحابي الموحد
 EXPOSE ${PORT}
 
 # استخدام Tini كمدير رئيسي (PID 1) لضمان إغلاق آمن ومعالجة صحيحة للعمليات
 ENTRYPOINT ["/usr/bin/tini", "--"]
 
-# أمر التشغيل النهائي المحسن لبيئة الإنتاج مع دعم حلقة uvloop والوكيل العكسي
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10000", "--workers", "4", "--loop", "uvloop", "--proxy-headers", "--forwarded-allow-ips", "*"]
+# أمر التشغيل النهائي الموجه للسيرفر السحابي المدفوع مع دعم حلقة uvloop والوكيل العكسي على البورت 8000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4", "--loop", "uvloop", "--proxy-headers", "--forwarded-allow-ips", "*"]
