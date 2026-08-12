@@ -104,5 +104,5 @@ class SovereignUltraProxyManager:
                 p["fail_count"] += 1
                 if p["fail_count"] >= 2:
                     p["is_healthy"] = False
-                    logger.error(🔥 عزل البروكسي البطيء/الميت: {host})
-                break
+              logger.error(f"[ERROR] عزل البروكسي البطيء/الميت: {host}")
+             break
