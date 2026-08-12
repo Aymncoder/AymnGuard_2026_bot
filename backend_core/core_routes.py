@@ -56,7 +56,7 @@ async def telegram_webhook(request: Request) -> Dict[str, Any]:
     """
     try:
         data = await request.json()
-        logger.info("📩 [Webhook Received]: تم التقاط إشارة تدفق جديدة من شبكة تيليجرام.")
+        logger.info("[Webhook Received]: تم التقاط إشارة تدفق جديدة من شبكة تيليجرام.")
 
         # استخراج الهيكل البياني للرسالة والمستخدم
         message = data.get("message", {})
@@ -69,7 +69,7 @@ async def telegram_webhook(request: Request) -> Dict[str, Any]:
 
         # فلترة الإشارات الفارغة أو النبضات العشوائية
         if not telegram_id:
-            logger.debug("⚠️ [Router Filter]: تم تجاهل إشارة لا تحتوي على معرف مستخدم صريح.")
+            logger.debug("[Router Filter]: تم تجاهل إشارة لا تحتوي على معرف مستخدم صريح.")
             return {"status": "ignored", "reason": "No direct user context found"}
 
         # =========================================================
@@ -84,13 +84,13 @@ async def telegram_webhook(request: Request) -> Dict[str, Any]:
                 "last_active_message": message_text,
                 "interaction_count": 1
             })
-            logger.info(f"🛡️ [Cognitive Vault]: تم بناء قاعدة وعي سيادية جديدة للعميل [ID: {user_id_str}].")
+            logger.info(f"[Cognitive Vault]: تم بناء قاعدة وعي سيادية جديدة للعميل [ID: {user_id_str}].")
         else:
             # تحديث الذاكرة القائمة بنبض النشاط الجديد
             context["last_active_message"] = message_text
             context["interaction_count"] = context.get("interaction_count", 1) + 1
             await ContextVault.store_context(user_id_str, context)
-            logger.debug(f"🔄 [Cognitive Vault]: تم تحديث الذاكرة التشغيلية للعميل [ID: {user_id_str}].")
+            logger.debug(f"[Cognitive Vault]: تم تحديث الذاكرة التشغيلية للعميل [ID: {user_id_str}].")
 
         # =========================================================
         # المرحلة الثانية: تغليف المهمة للمنسق المركزي ومحرك البث
@@ -103,7 +103,7 @@ async def telegram_webhook(request: Request) -> Dict[str, Any]:
                 msg = payload.get("message_text", "")
                 uname = payload.get("username", "Sovereign")
                 
-                logger.info(f"⚙️ [Background Nexus]: جاري تسليم الطلب للمنسق المركزي للعميل {uid}...")
+                logger.info(f"[Background Nexus]: جاري تسليم الطلب للمنسق المركزي للعميل {uid}...")
                 
                 # 1. العقل المفكر يحلل الطلب ويتخذ القرار
                 sovereign_result = await orchestrator.orchestrate_user_request(
@@ -118,14 +118,14 @@ async def telegram_webhook(request: Request) -> Dict[str, Any]:
                 # 3. محرك البث ينطق بالرد للمستخدم
                 await broadcaster.send_message(chat_id=int(uid), text=str(reply_text))
                 
-                logger.info(f"🤖 [Autonomous Action]: تمت المعالجة بنجاح للعميل [ID: {uid}]. النتيجة: {sovereign_result.get('type', 'Standard')}")
+                logger.info(f"[Autonomous Action]: تمت المعالجة بنجاح للعميل [ID: {uid}]. النتيجة: {sovereign_result.get('type', 'Standard')}")
             
             except Exception as bg_error:
-                logger.error(f"❌ [Background Orchestration Error]: فشل في المعالجة أو الإرسال للعميل {uid}: {bg_error}")
+                logger.error(f"[Background Orchestration Error]: فشل في المعالجة أو الإرسال للعميل {uid}: {bg_error}")
                 # إرسال رسالة اعتذار طوارئ (Fallback) لحماية تجربة العميل
                 await broadcaster.send_message(
                     chat_id=int(uid), 
-                    text="⚠️ <b>[تنبيه سيادي]:</b>\nيتم حالياً ترقية الأنظمة وتزامن الأسواق لخدمتك بشكل أفضل. يرجى المحاولة بعد قليل."
+                    text="<b>[تنبيه سيادي]:</b>\nيتم حالياً ترقية الأنظمة وتزامن الأسواق لخدمتك بشكل أفضل. يرجى المحاولة بعد قليل."
                 )
 
         # =========================================================
@@ -149,5 +149,5 @@ async def telegram_webhook(request: Request) -> Dict[str, Any]:
         }
 
     except Exception as e:
-        logger.error(f"❌ [Core Routes Nexus]: انهيار حرج في التوجيه السيادي -> {e}")
+        logger.error(f"[Core Routes Nexus]: انهيار حرج في التوجيه السيادي -> {e}")
         raise HTTPException(status_code=500, detail=f"Internal Sovereign Routing Error: {str(e)}")
