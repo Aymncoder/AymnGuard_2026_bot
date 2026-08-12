@@ -53,7 +53,7 @@ class SovereignCognitiveVault:
         # دمج البيانات الحية للجلسة
         user_record["data"].update(interaction_data)
         
-        logger.info(f"💾 [Cognitive Vault]: تم تحديث ذاكرة السيادة للعميل [ID: {user_id}]. التفاعلات الكلية: {user_record['interactions_count']}")
+        logger.info(f"[Cognitive Vault]: تم تحديث ذاكرة السيادة للعميل [ID: {user_id}]. التفاعلات الكلية: {user_record['interactions_count']}")
         return user_record
 
     @classmethod
@@ -64,16 +64,16 @@ class SovereignCognitiveVault:
         """
         record = cls._memory_store.get(user_id)
         if not record:
-            logger.warning(f"⚠️ [Cognitive Vault]: لم يتم العثور على سجل سابق للعميل [ID: {user_id}].")
+            logger.warning(f"[Cognitive Vault]: لم يتم العثور على سجل سابق للعميل [ID: {user_id}].")
             return None
 
         # فحص انتهاء الصلاحية الزمنية (TTL)
         if time.time() - record["timestamp"] > cls._ttl_seconds:
-            logger.info(f"⏳ [Cognitive Vault]: انتهت صلاحية جلسة العميل [ID: {user_id}]. جاري مسح الذاكرة الحية...")
+            logger.info(f"[Cognitive Vault]: انتهت صلاحية جلسة العميل [ID: {user_id}]. جاري مسح الذاكرة الحية...")
             await cls.clear_context(user_id)
             return None
 
-        logger.debug(f"🔍 [Cognitive Vault]: استرجاع فائق السرعة لسياق العميل [ID: {user_id}].")
+        logger.debug(f"[Cognitive Vault]: استرجاع فائق السرعة لسياق العميل [ID: {user_id}].")
         return record
 
     @classmethod
@@ -94,7 +94,7 @@ class SovereignCognitiveVault:
         else:
             strategy = "عميل مستكشف - تقديم إجابات دقيقة واحترافية تفوق توقعات الإدارة البشرية."
             
-        logger.info(f"🎯 [Persuasion Engine]: الاستراتيجية السيادية للعميل [ID: {user_id}]: {strategy}")
+        logger.info(f"[Persuasion Engine]: الاستراتيجية السيادية للعميل [ID: {user_id}]: {strategy}")
         return strategy
 
     @classmethod
@@ -102,4 +102,4 @@ class SovereignCognitiveVault:
         """التدمير الآمن لسياق المستخدم (عند انتهاء المعاملة أو تسجيل الخروج)"""
         if user_id in cls._memory_store:
             del cls._memory_store[user_id]
-            logger.info(f"🧹 [Cognitive Vault]: تم تطهير ومسح الذاكرة نهائياً للعميل [ID: {user_id}] لأسباب أمنية.")
+            logger.info(f"[Cognitive Vault]: تم تطهير ومسح الذاكرة نهائياً للعميل [ID: {user_id}] لأسباب أمنية.")
