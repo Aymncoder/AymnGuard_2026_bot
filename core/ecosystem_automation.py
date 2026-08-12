@@ -5,7 +5,7 @@ AymnGuard Sovereign Ecosystem Automation (v18.1.0-Cloud Enterprise)
 ==============================================================================
 محرك الأتمتة السيادي (نسخة التوافق المطلق مع Pyrogram والبيئة السحابية):
 سحب البيانات، النشر الفيروسي، وإدارة الأرقام الافتراضية مع حماية صارمة ضد الحظر.
-تم تطهيره بالكامل من الرموز التعبيرية لضمان الاستقرار المطلق في بيئة الإنتاج.
+تم تطهيره بالكامل من الرموز التعبيرية وتأمين الاتصالات الشبكية لضمان الاستقرار.
 ==============================================================================
 """
 
@@ -105,7 +105,7 @@ class EcosystemAutomationEngine:
     # 3. إدارة الأرقام الافتراضية (Virtual Numbers Integration)
     # =========================================================================
     async def request_virtual_number(self, country: str = "ru", service: str = "tg") -> Dict[str, Any]:
-        """طلب رقم افتراضي عبر واجهة API بشكل غير متزامن تماماً (Async)."""
+        """طلب رقم افتراضي عبر واجهة API بشكل غير متزامن تماماً (Async) مع مهلة زمنية آمنة."""
         if not self.sms_api_key:
             return {"status": "error", "message": "لم يتم إعداد مفتاح API للأرقام الافتراضية في بيئة النظام."}
             
@@ -116,13 +116,18 @@ class EcosystemAutomationEngine:
             "country": country
         }
         
+        timeout = aiohttp.ClientTimeout(total=15.0)
         try:
-            async with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession(timeout=timeout) as session:
                 async with session.get(self.sms_api_url, params=params) as response:
                     text = await response.text()
                     if "ACCESS_NUMBER" in text:
                         _, req_id, phone = text.split(":")
                         return {"status": "success", "phone": phone, "req_id": req_id}
                     return {"status": "error", "message": text}
+        except asyncio.TimeoutError:
+            logger.error("[SMS API Timeout]: انقضت مهلة الاتصال بمزود الأرقام الافتراضية.")
+            return {"status": "error", "message": "انقضت مهلة الاتصال بمزود الأرقام الافتراضية."}
         except Exception as e:
+            logger.error(f"[SMS API Error]: خطأ في الاتصال بمزود الأرقام: {str(e)}")
             return {"status": "error", "message": f"حدث خطأ في الاتصال بمزود الأرقام: {str(e)}"}
