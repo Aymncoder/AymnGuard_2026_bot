@@ -84,7 +84,7 @@ class SovereignUltraProxyManager:
             # اختيار الأسرع (الأول في القائمة المرتبة)
             best = healthy_proxies[0]
 
-        logger.info(f"🚀 توجيه فائق السرعة عبر البروكسي: {best['host']}:{best['port']} (زمن الاستجابة: {best['latency']:.2f}ms)")
+        logger.info(f"توجيه فائق السرعة عبر البروكسي: {best['host']}:{best['port']} (زمن الاستجابة: {best['latency']:.2f}ms)")
 
         return (
             socks.SOCKS5,
