@@ -33,44 +33,44 @@ class TaskBroker:
         حقن مهمة جديدة في طابور المعالجة بأمان تام وسرعة فائقة.
         """
         await self._queue.put((task_func, args, kwargs))
-        logger.debug(f"📥 [Task Broker]: New background task submitted -> {task_func.__name__}")
+        logger.debug(f"[Task Broker]: New background task submitted -> {task_func.__name__}")
 
     async def _worker(self, worker_id: int) -> None:
         """
         العامل (Worker) المستقل: يسحب المهام من الطابور وينفذها بصمت.
         معزول تماماً لمعالجة أخطائه ذاتياً دون التأثير على استقرار العمال الآخرين.
         """
-        logger.info(f"👷 [Worker {worker_id}]: Ready and listening for tasks...")
+        logger.info(f"[Worker {worker_id}]: Ready and listening for tasks...")
         while self._is_running:
             try:
                 task_data: Tuple[Callable, Tuple, dict] = await self._queue.get()
                 task_func, args, kwargs = task_data
                 
-                logger.info(f"⚙️ [Worker {worker_id}]: Executing task -> {task_func.__name__}")
+                logger.info(f"[Worker {worker_id}]: Executing task -> {task_func.__name__}")
                 
                 # التنفيذ الفعلي للمهمة
                 await task_func(*args, **kwargs)
                 
                 self._queue.task_done()
-                logger.info(f"✅ [Worker {worker_id}]: Task completed successfully -> {task_func.__name__}")
+                logger.info(f"[Worker {worker_id}]: Task completed successfully -> {task_func.__name__}")
                 
             except asyncio.CancelledError:
                 # استجابة طبيعية عند طلب إيقاف النظام
                 break
             except Exception as e:
                 # احتواء الخطأ داخلياً ومنع تسربه للطبقات العليا
-                logger.error(f"❌ [Worker {worker_id}]: Critical failure in task -> {e}", exc_info=True)
+                logger.error(f"[Worker {worker_id}]: Critical failure in task -> {e}", exc_info=True)
 
     async def start_broker(self, worker_count: int = 3) -> None:
         """
         إشعال محرك وسيط المهام وتشغيل العمال في الخلفية.
         """
         if self._is_running:
-            logger.warning("⚠️ [Task Broker]: Broker is already active and running!")
+            logger.warning("[Task Broker]: Broker is already active and running!")
             return
             
         self._is_running = True
-        logger.info(f"🚀 [Task Broker]: Initializing with {worker_count} independent sovereign workers.")
+        logger.info(f"[Task Broker]: Initializing with {worker_count} independent sovereign workers.")
         
         for i in range(worker_count):
             worker_task = asyncio.create_task(self._worker(i))
@@ -81,7 +81,7 @@ class TaskBroker:
         الإيقاف السيادي الآمن: ينتظر اكتمال المهام الحالية ثم يغلق النظام بسلام.
         """
         self._is_running = False
-        logger.info("🛑 [Task Broker]: Initiating graceful shutdown. Waiting for queue to empty...")
+        logger.info("[Task Broker]: Initiating graceful shutdown. Waiting for queue to empty...")
         
         if self._workers:
             # ننتظر حتى تكتمل جميع المهام المعلقة في الطابور
@@ -91,7 +91,7 @@ class TaskBroker:
             await asyncio.gather(*self._workers, return_exceptions=True)
             self._workers.clear()
             
-        logger.info("💤 [Task Broker]: Shutdown complete. All systems offline cleanly.")
+        logger.info("[Task Broker]: Shutdown complete. All systems offline cleanly.")
 
 # نسخة مفردة (Singleton) لتُستخدم في كافة أنحاء النظام لمنع تكرار الكائنات والمسارات
 broker = TaskBroker()
