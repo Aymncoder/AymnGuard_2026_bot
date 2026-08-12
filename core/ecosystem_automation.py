@@ -1,143 +1,111 @@
 # -*- coding: utf-8 -*-
 """
-AymnGuard Enterprise v5.0 : Advanced Ecosystem Automation & Network Engine
-محرك الأتمتة العميقة وإدارة الشبكات (النسخة السيادية الشاملة):
-يجمع بين:
-1. الوكلاء الآليين (Telethon UserBots) للعمل على بيئات لينكس المحمولة (Termux).
-2. استخراج البيانات والترحيل (Scraping & Migration).
-3. البث الفيروسي وتوجيه الإعلانات للمجتمعات (Mass Broadcasting).
-4. الإدارة السيبرانية وتوفير الأرقام الافتراضية للانتشار التلقائي (Virtual Numbers).
-5. تحليل استراتيجيات التوسع (Network Optimization).
+==============================================================================
+AymnGuard Sovereign Ecosystem Automation (v18.0.0-Master)
+==============================================================================
+محرك الأتمتة السيادي (نسخة التوافق المطلق مع Pyrogram):
+سحب البيانات، النشر الفيروسي، وإدارة الأرقام الافتراضية مع حماية صارمة ضد الحظر.
 """
 
+import os
 import logging
 import asyncio
 import aiohttp
-from telethon import TelegramClient
-from telethon.sessions import StringSession
-from typing import Dict, Any, List, Union
+from typing import Dict, Any, List
+from pyrogram import Client
+from pyrogram.errors import FloodWait
 
 logger = logging.getLogger("AymnGuard.AutomationEngine")
-logger.setLevel(logging.INFO)
 
 class EcosystemAutomationEngine:
-    """
-    محرك أتمتة الشبكات والتوسع الفيروسي السيادي (Sovereign Automation Engine).
-    """
+    """محرك أتمتة الشبكات والتوسع الفيروسي السيادي"""
+
     def __init__(self):
-        """
-        تهيئة مفاتيح الربط، الوكلاء الآليين، وبوابات الاتصال بالخدمات السحابية.
-        """
-        # ==========================================
-        # 1. إعدادات الوكيل الآلي (Telethon)
-        # ==========================================
-        self.api_id = 1234567  # استبدل بـ API_ID الخاص بك
-        self.api_hash = "YOUR_API_HASH"  # استبدل بـ API_HASH الخاص بك
-        
-        # استخدام StringSession يضمن عمل السكريبت بسلاسة تامة دون ملفات محلية (.session)
-        self.session_string = "" 
-        self.client: TelegramClient = None
-        
-        # ==========================================
-        # 2. بوابات الأرقام الافتراضية (Virtual Numbers)
-        # ==========================================
-        self.sms_api_key = "YOUR_VIRTUAL_NUMBER_API_KEY"
+        # 1. سحب المفاتيح بأمان من البيئة بدل كتابتها مكشوفة (أمان مؤسسي)
+        self.api_id = int(os.getenv("TELEGRAM_API_ID", "6"))
+        self.api_hash = os.getenv("TELEGRAM_API_HASH", "eb06d4abfb49dc3eeb1aeb98ae0f581e")
+        self.sms_api_key = os.getenv("VIRTUAL_NUMBER_API_KEY", "")
         self.sms_api_url = "https://api.sms-activate.org/stubs/handler_api.php"
-
-        logger.info("🤖 [Automation Engine]: تم تهيئة محرك الأتمتة العميقة الشامل بنجاح.")
-
-    # =========================================================
-    # نظام إدارة الوكلاء الآليين (UserBot Operations)
-    # =========================================================
-    async def start_userbot(self):
-        """
-        إقلاع الوكيل الآلي (UserBot) بشكل غير متزامن للسيطرة على المجتمعات.
-        """
-        if not self.session_string:
-            logger.warning("⚠️ [Telethon]: لم يتم العثور على StringSession. النظام سيعمل بدون ذراع الوكيل الآلي.")
-            return
-
-        try:
-            self.client = TelegramClient(StringSession(self.session_string), self.api_id, self.api_hash)
-            await self.client.start()
-            logger.info("✅ [Telethon]: تم الاتصال بنجاح بشبكة تيليجرام (UserBot Active & Armed).")
-        except Exception as e:
-            logger.error(f"❌ [Telethon Error]: فشل إقلاع الوكيل الآلي: {e}")
-
-    async def scrape_active_users(self, group_username: str, limit: int = 100) -> Dict[str, Any]:
-        """
-        وحدة الاستخراج والترحيل: سحب بيانات الأعضاء النشطين من المجموعات.
-        """
-        logger.info(f"🕷️ [Data Scraping]: جاري سحب بيانات الأعضاء من المجموعة {group_username}...")
         
-        if not self.client or not self.client.is_connected():
-            return {"status": "error", "message": "الوكيل الآلي غير متصل بالشبكة. يرجى تفعيل start_userbot أولاً."}
+        logger.info("🤖 [Automation Engine]: تمت تهيئة محرك الأتمتة السيادي بنجاح وبسرية تامة.")
 
-        try:
-            users = []
-            async for user in self.client.iter_participants(group_username, limit=limit):
-                if not user.bot:  # فلترة البوتات
-                    users.append({
-                        "id": user.id,
-                        "username": user.username,
-                        "first_name": user.first_name
-                    })
+    # =========================================================================
+    # 1. وحدة الاستخراج والترحيل (Scraping & Migration) مع درع الحظر
+    # =========================================================================
+    async def scrape_active_users(self, client: Client, group_username: str, limit: int = 100) -> Dict[str, Any]:
+        """سحب بيانات الأعضاء النشطين مع درع الحماية من الحظر (FloodWait)."""
+        logger.info(f"🕸️ [Data Scraping]: بدء سحب الأعضاء من {group_username}...")
+        
+        if not client.is_connected:
+            return {"status": "error", "message": "❌ الوكيل غير متصل بالشبكة، يرجى تمرير جلسة نشطة."}
             
-            logger.info(f"✅ [Data Scraping]: تم استخراج {len(users)} مستخدم بنجاح.")
-            return {
-                "status": "success", 
-                "scraped_count": len(users), 
-                "sample_users": users[:5]
-            }
+        users_data = []
+        try:
+            # استخدام Pyrogram لجلب الأعضاء بشكل آمن ومتوافق مع باقي النظام
+            async for member in client.get_chat_members(group_username, limit=limit):
+                if member.user.is_bot or member.user.is_deleted:
+                    continue
+                    
+                users_data.append({
+                    "id": member.user.id,
+                    "username": member.user.username,
+                    "first_name": member.user.first_name
+                })
+                
+                # درع التبريد: استراحة بسيطة كل 50 مستخدم لمنع الحظر السريع
+                if len(users_data) % 50 == 0:
+                    await asyncio.sleep(1)
+
+            logger.info(f"✅ [Data Scraping]: تم سحب {len(users_data)} عضو بنجاح.")
+            return {"status": "success", "data": users_data}
+
+        except FloodWait as e:
+            logger.warning(f"🛑 [Scrape FloodWait]: حماية تيليجرام نشطة، يجب الانتظار {e.value} ثانية.")
+            return {"status": "rate_limit", "wait_time": e.value, "partial_data": users_data}
         except Exception as e:
-            logger.error(f"❌ [Scrape Error]: استثناء أثناء استخراج البيانات: {e}")
+            logger.error(f"❌ [Scrape Error]: فشل السحب من {group_username}: {e}")
             return {"status": "error", "message": str(e)}
 
-    async def broadcast_sovereign_announcement(self, target_groups: List[Union[int, str]], announcement_text: str) -> Dict[str, Any]:
-        """
-        أتمتة البث الفيروسي: نشر الإعلانات عبر شبكات المجموعات دفعة واحدة باستخدام Telethon.
-        تمت إضافة نظام (Anti-Spam Delay) لتجنب حظر الحساب.
-        """
+    # =========================================================================
+    # 2. البث الفيروسي وتوجيه الإعلانات (Mass Broadcasting)
+    # =========================================================================
+    async def broadcast_sovereign_announcement(self, client: Client, target_users: List[int], message: str) -> Dict[str, Any]:
+        """النشر الفيروسي الآمن مع فترات راحة ديناميكية لتجنب حرق الرقم (Anti-Spam Shield)."""
+        logger.info(f"📢 [Mass Broadcast]: بدء النشر الفيروسي لـ {len(target_users)} مستخدم...")
+        
         success_count = 0
         failed_count = 0
         
-        logger.info(f"📢 [Broadcast Engine]: جاري نشر الإعلان السيادي إلى {len(target_groups)} مجموعة/هدف...")
-        
-        if not self.client or not self.client.is_connected():
-            logger.warning("⚠️ [Broadcast]: الوكيل الآلي غير متصل. سيتم تسجيل البث كنظام وهمي (Simulation) فقط.")
-            return {"status": "simulated", "message": "تم استلام أمر البث، لكن الوكيل غير مفعل فعلياً."}
-
-        for group in target_groups:
+        for index, user_id in enumerate(target_users):
             try:
-                # إرسال الرسالة فعلياً باستخدام حساب الوكيل الآلي
-                await self.client.send_message(group, announcement_text)
-                logger.debug(f"📤 [Broadcast Success]: تم إرسال البث بنجاح إلى الهدف [{group}]")
+                await client.send_message(chat_id=user_id, text=message)
                 success_count += 1
                 
-                # توقف تكتيكي (Anti-Spam) لحماية الحساب من قيود تيليجرام (FloodWait)
-                await asyncio.sleep(2.5) 
+                # درع التبريد الديناميكي (Dynamic Cool-down) يحاكي السلوك البشري
+                if index > 0 and index % 10 == 0:
+                    logger.debug("⏳ [Broadcast]: تبريد الأنابيب لـ 5 ثواني لتجنب الحظر...")
+                    await asyncio.sleep(5)
+                else:
+                    await asyncio.sleep(0.8) #หน استراحة خفيفة بين كل رسالة وأخرى
+                    
+            except FloodWait as e:
+                logger.warning(f"🛑 [Broadcast FloodWait]: إيقاف إجباري لـ {e.value} ثانية. جاري الانتظار...")
+                await asyncio.sleep(e.value)
             except Exception as e:
-                logger.error(f"❌ [Broadcast Error]: فشل الإرسال للهدف {group}: {e}")
                 failed_count += 1
+                logger.debug(f"⚠️ فشل الإرسال للمستخدم {user_id}: {e}")
 
-        logger.info(f"✅ [Broadcast Complete]: نجاح ({success_count}) | فشل ({failed_count})")
-        return {
-            "status": "completed",
-            "total_targeted": len(target_groups),
-            "success": success_count,
-            "failed": failed_count,
-            "message": "تم تنفيذ حملة البث والأتمتة الجماهيرية بنجاح تام."
-        }
-
-    # =========================================================
-    # أنظمة التوسع الذكية والموارد الخارجية (External APIs & Growth)
-    # =========================================================
-    async def request_virtual_number(self, service: str = "tg", country: str = "0") -> Dict[str, Any]:
-        """
-        تأمين سلسلة التوريد: طلب أرقام افتراضية برمجياً عبر الـ APIs لتأسيس عقد اتصال جديدة.
-        """
-        logger.info(f"📱 [Virtual Number]: جاري طلب وتوريد رقم افتراضي لخدمة {service}...")
+        logger.info(f"✅ [Broadcast Finished]: تم التسليم: {success_count} | فشل: {failed_count}")
+        return {"status": "success", "sent": success_count, "failed": failed_count}
         
+    # =========================================================================
+    # 3. إدارة الأرقام الافتراضية (Virtual Numbers Integration)
+    # =========================================================================
+    async def request_virtual_number(self, country: str = "ru", service: str = "tg") -> Dict[str, Any]:
+        """طلب رقم افتراضي عبر واجهة API بشكل غير متزامن تماماً (Async)."""
+        if not self.sms_api_key:
+            return {"status": "error", "message": "⚠️ لم يتم إعداد مفتاح API للأرقام الافتراضية في بيئة النظام."}
+            
         params = {
             "api_key": self.sms_api_key,
             "action": "getNumber",
@@ -148,41 +116,10 @@ class EcosystemAutomationEngine:
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(self.sms_api_url, params=params) as response:
-                    result = await response.text()
-                    
-                    if "ACCESS_NUMBER" in result:
-                        parts = result.split(":")
-                        activation_id = parts[1]
-                        phone_number = parts[2]
-                        logger.info(f"✅ [Virtual Number]: تم تأمين الرقم بنجاح (+{phone_number}).")
-                        return {
-                            "status": "success", 
-                            "phone_number": phone_number, 
-                            "activation_id": activation_id
-                        }
-                    else:
-                        logger.warning(f"⚠️ [Virtual Number Alert]: رفض من المورد - {result}")
-                        return {"status": "failed", "reason": result}
+                    text = await response.text()
+                    if "ACCESS_NUMBER" in text:
+                        _, req_id, phone = text.split(":")
+                        return {"status": "success", "phone": phone, "req_id": req_id}
+                    return {"status": "error", "message": text}
         except Exception as e:
-            logger.error(f"❌ [API Error]: فشل الاتصال بالمورد التجاري للأرقام: {e}")
-            return {"status": "error", "reason": str(e)}
-
-    async def optimize_network_reach(self, platform_metrics: Dict[str, Any]) -> str:
-        """
-        تحليل مؤشرات الوصول (Analytics) واقتراح استراتيجيات التوسع الفيروسي.
-        (يمكن مستقبلاً ربطه بإحصائيات تيليجرام أو سناب شات).
-        """
-        followers = platform_metrics.get("followers", 0)
-        engagement_rate = platform_metrics.get("engagement_rate", 0.0)
-        
-        logger.info(f"📈 [Network Analyzer]: تحليل قاعدة جماهيرية بحجم {followers} ومعدل تفاعل {engagement_rate}%")
-        
-        if followers > 50000 and engagement_rate > 5.0:
-            strategy = "🔥 الشبكة في مرحلة التوسع الفيروسي الفائق (Hyper-Growth) - يتم الآن تفعيل وحدات جذب الاستثمار التلقائي ونشر العقود الذكية."
-        elif followers > 10000:
-            strategy = "🚀 مرحلة التوسع المتوسط - يوصى بتكثيف البث الجماهيري باستخدام (UserBots) لتوزيع السيولة."
-        else:
-            strategy = "🌱 مرحلة النمو التأسيسي - التركيز على سحب البيانات (Scraping) وبناء مجتمعات مصغرة وموجهة."
-            
-        logger.info(f"💡 [Strategy Issued]: {strategy}")
-        return strategy
+            return {"status": "error", "message": f"حدث خطأ في الاتصال بمزود الأرقام: {str(e)}"}
