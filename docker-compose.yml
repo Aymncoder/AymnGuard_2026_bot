@@ -1,12 +1,11 @@
 # ==============================================================================
-# AymnGuard Enterprise v5.0 - Sovereign Multi-Service Docker Compose Architecture
-# مُعدل للعمل حصرياً على البورت السحابي 8000 لضمان الاتصال المباشر والمستقر
+# AymnGuard Enterprise v5.0 - Sovereign Multi-Service Architecture
 # ==============================================================================
 
 version: '3.8'
 
 services:
-  # 1. خدمة الذاكرة المؤقتة وموجه الطوابير
+  # 1. Message Broker & Cache Service
   redis:
     image: redis:7-alpine
     container_name: aymnguard_redis
@@ -26,7 +25,31 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # 2. خادم الويب المركزي (Backend FastAPI Core)
+  # 2. Sovereign Database Service (MongoDB)
+  database:
+    image: mongo:6.0
+    container_name: aymnguard_mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: aymnguard_db
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - aymn_network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # 3. Backend FastAPI Core
   backend:
     build:
       context: .
@@ -36,10 +59,16 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
+      database:
+        condition: service_healthy
     environment:
       - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///aymnguard_enterprise.db}
       - REDIS_URL=redis://redis:6379/0
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_USER=${MONGO_USER}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_SECRET_TOKEN=${TELEGRAM_SECRET_TOKEN:-aymnguard_secure_secret_2026}
       - BINANCE_API_KEY=${BINANCE_API_KEY}
@@ -52,7 +81,6 @@ services:
       - WEBHOOK_URL=${WEBHOOK_URL}
       - MINI_APP_URL=${MINI_APP_URL}
     volumes:
-      - .:/app
       - ./logs:/app/logs
     networks:
       - aymn_network
@@ -62,7 +90,7 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # 3. عامل المهام الخلفية
+  # 4. Background Worker Service
   worker:
     build:
       context: .
@@ -71,17 +99,22 @@ services:
     restart: always
     command: python services/worker.py
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
+      database:
+        condition: service_healthy
     environment:
       - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///aymnguard_enterprise.db}
       - REDIS_URL=redis://redis:6379/0
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_USER=${MONGO_USER}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - BINANCE_API_KEY=${BINANCE_API_KEY}
       - BINANCE_API_SECRET=${BINANCE_API_SECRET}
       - API_ID=${API_ID}
       - API_HASH=${API_HASH}
     volumes:
-      - .:/app
       - ./logs:/app/logs
     networks:
       - aymn_network
@@ -93,6 +126,7 @@ services:
 
 volumes:
   redis_data:
+  mongo_data:
 
 networks:
   aymn_network:
