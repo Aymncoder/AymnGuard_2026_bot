@@ -1,30 +1,30 @@
 <!-- ===========================================================================
-   AymnGuard Enterprise - Sovereign Feature Forge Component
+   AymnGuard Enterprise - Sovereign Feature Forge Component (Cloud Integrated)
    =========================================================================== -->
 <div class="sovereign-tactical-card" style="max-width: 700px; margin: 20px auto;">
   <div class="card-header">
-    <span class="card-title">⚡ Sovereign AI Feature Forge</span>
+    <span class="card-title">[CORE] Sovereign AI Feature Forge</span>
     <span class="card-status-badge">Autonomous Agent Active</span>
   </div>
   
   <div class="card-body">
-    <p style="margin-bottom: 12px; color: var(--text-muted);">
+    <p style="margin-bottom: 12px; color: var(--text-muted, #888);">
       اكتب أي ميزة برمجية، نظام معلومات، أو تحليل مؤسسي ترغب في إضافته، وسيقوم الوكيل الذكي ببنائها وهندستها وتفعيلها طياراً:
     </p>
     
     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
       <input type="text" id="featurePromptInput" 
              placeholder="مثال: إضافة نظام مراقبة ذكي لتحركات السيولة الحية..." 
-             style="flex: 1; min-width: 280px; background: var(--bg-core); border: 1px solid var(--border-active); color: var(--text-primary); padding: 12px; border-radius: var(--radius-md); font-family: var(--font-mono); outline: none;">
+             style="flex: 1; min-width: 280px; background: var(--bg-core, #111); border: 1px solid var(--border-active, #333); color: var(--text-primary, #fff); padding: 12px; border-radius: var(--radius-md, 4px); font-family: var(--font-mono, monospace); outline: none;">
              
-      <button onclick="forgeFeature()" 
-              style="background: var(--accent-tactical); color: var(--bg-core); border: none; padding: 12px 24px; font-weight: bold; border-radius: var(--radius-md); cursor: pointer; transition: var(--transition-fast); text-transform: uppercase; font-family: var(--font-mono);">
-        بناء وتطوير 🚀
+      <button id="forgeSubmitButton" onclick="forgeFeature()" 
+              style="background: var(--accent-tactical, #00E5FF); color: var(--bg-core, #000); border: none; padding: 12px 24px; font-weight: bold; border-radius: var(--radius-md, 4px); cursor: pointer; transition: 0.3s; text-transform: uppercase; font-family: var(--font-mono, monospace);">
+        بناء وتطوير
       </button>
     </div>
     
     <!-- منطقة عرض تقارير البناء المباشرة -->
-    <div id="forgeResultOutput" style="margin-top: 20px; font-family: var(--font-mono); font-size: 12px; color: var(--accent-cyber); background: var(--bg-core); padding: 15px; border-radius: var(--radius-md); border: 1px dashed var(--border-subtle); display: none;">
+    <div id="forgeResultOutput" style="margin-top: 20px; font-family: var(--font-mono, monospace); font-size: 12px; color: var(--accent-cyber, #00E5FF); background: var(--bg-core, #050505); padding: 15px; border-radius: var(--radius-md, 4px); border: 1px dashed var(--border-subtle, #333); display: none; white-space: pre-wrap; line-height: 1.5;">
     </div>
   </div>
 </div>
@@ -33,19 +33,29 @@
 async function forgeFeature() {
   const promptInput = document.getElementById('featurePromptInput');
   const outputDiv = document.getElementById('forgeResultOutput');
+  const submitBtn = document.getElementById('forgeSubmitButton');
   const promptText = promptInput.value.trim();
   
   if (!promptText) return;
   
+  // حماية ضد إغراق السيرفر بالطلبات (Anti-Spam Shield)
+  promptInput.disabled = true;
+  submitBtn.disabled = true;
+  submitBtn.style.opacity = '0.5';
+  
   outputDiv.style.display = 'block';
-  outputDiv.style.color = 'var(--accent-warning)';
-  outputDiv.innerText = "⏳ جاري المعالجة وتحليل الطلب وهندسة الأكواد بواسطة الوكيل الإدراكي...";
+  outputDiv.style.color = 'var(--accent-warning, #FFB300)';
+  outputDiv.innerText = "[System]: جاري المعالجة وتحليل الطلب وهندسة الأكواد بواسطة الوكيل الإدراكي السحابي...";
   
   try {
-    let response = await fetch('/api/v1/meta/forge-feature', {
+    // توجيه الاتصال حصرياً إلى النواة السحابية المدفوعة الخاصة بك
+    const CLOUD_API_URL = 'http://135.181.86.199:8000/api/v1/meta/forge-feature';
+    
+    let response = await fetch(CLOUD_API_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: JSON.stringify({ 
         feature_prompt: promptText,
@@ -57,15 +67,23 @@ async function forgeFeature() {
     let data = await response.json();
     
     if (response.ok) {
-      outputDiv.style.color = 'var(--accent-tactical)';
-      outputDiv.innerText = `✅ [نجاح التوليد المؤسسي]:\n- الرسالة: ${data.synthesis_report.agent_message}\n- الوحدة المستهدفة: ${data.synthesis_report.module_target}\n[تم حقن الكود وتفعيله في الذاكرة الحية بنجاح]`;
+      outputDiv.style.color = 'var(--accent-tactical, #00FF66)';
+      outputDiv.innerText = `[Success]: اكتمل التوليد المؤسسي\n- الرسالة: ${data.synthesis_report?.agent_message || 'تم التنفيذ بنجاح'}\n- الوحدة المستهدفة: ${data.synthesis_report?.module_target || 'dynamic_addon'}\n[تم حقن الكود وتفعيله في الذاكرة الحية بنجاح]`;
+      promptInput.value = ''; // تفريغ الحقل بعد النجاح
     } else {
-      outputDiv.style.color = 'var(--accent-critical)';
-      outputDiv.innerText = `❌ خطأ في عملية البناء: ${data.detail || 'فشل الاتصال بالنواة'}`;
+      outputDiv.style.color = 'var(--accent-critical, #FF3333)';
+      outputDiv.innerText = `[Error]: خطأ في عملية البناء - ${data.detail || 'رفض الخادم معالجة الطلب'}`;
     }
   } catch (err) {
-    outputDiv.style.color = 'var(--accent-critical)';
-    outputDiv.innerText = "❌ حدث خطأ شبكي حرج أثناء الاتصال بالخادم المركزي.";
+    console.error("[Network Error]:", err);
+    outputDiv.style.color = 'var(--accent-critical, #FF3333)';
+    outputDiv.innerText = "[Fatal]: حدث خطأ شبكي حرج أثناء الاتصال بالخادم المركزي (135.181.86.199). يرجى التأكد من حالة الجدار الناري والاتصال.";
+  } finally {
+    // إعادة تفعيل الواجهة بعد انتهاء دورة الاتصال
+    promptInput.disabled = false;
+    submitBtn.disabled = false;
+    submitBtn.style.opacity = '1';
+    promptInput.focus();
   }
 }
 </script>
