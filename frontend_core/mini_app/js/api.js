@@ -1,16 +1,17 @@
 /**
  * ==============================================================================
  * AymnGuard Enterprise - Sovereign Advanced API Gateway
- * بوابة الاتصال الذكية والمحصنة مع النواة المركزية
+ * Enterprise-grade API communication gateway for cloud production environments.
  * ==============================================================================
  */
 
 import { GlobalState } from './state.js';
 
-const API_BASE_URL = '/api/v1';
+// استخدام الرابط السحابي المدفوع للإنتاج بدلاً من المسار النسبي المحلي لمنع انقطاع الاتصال
+const CLOUD_API_BASE_URL = window.ENV_API_URL || "https://api.aymnguard.cloud/api/v1";
 
 export const ApiGateway = {
-    async request(endpoint, options = {}, retries = 2) {
+    async request(endpoint, options = {}, retries = 2, timeoutMs = 25000) {
         const token = GlobalState.get('token');
         const tgInitData = window.Telegram?.WebApp?.initData || '';
 
@@ -21,11 +22,15 @@ export const ApiGateway = {
             ...options.headers
         };
 
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // مهلة 10 ثوانٍ
+        const controller = new AbortController();
+        // زيادة مهلة الاتصال إلى 25 ثانية لمنع أخطاء انتهاء المهلة (Timeout) مع السيرفرات السحابية
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        try {
+            const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+            const targetUrl = `${CLOUD_API_BASE_URL}${cleanEndpoint}`;
+
+            const response = await fetch(targetUrl, {
                 ...options,
                 headers,
                 signal: controller.signal
@@ -35,22 +40,25 @@ export const ApiGateway = {
 
             if (!response.ok) {
                 if (response.status === 401 && retries > 0) {
-                    // محاولة تجديد الجلسة أو إعادة المصادقة تلقائياً
-                    console.warn("⚠️ انتهاء صلاحية الجلسة، جاري إعادة المحاولة...");
-                    return await this.request(endpoint, options, retries - 1);
+                    console.warn("Session expired or unauthorized, attempting automatic retry.");
+                    return await this.request(endpoint, options, retries - 1, timeoutMs);
                 }
+                
                 const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.detail || `خطأ في الخادم برمز الاستجابة: ${response.status}`);
+                throw new Error(errorData.detail || `Server error with status code: ${response.status}`);
             }
 
             return await response.json();
 
         } catch (error) {
+            clearTimeout(timeoutId);
+            
             if (error.name === 'AbortError') {
-                console.error("❌ مهلة الاتصال انتهت (Timeout)");
-                throw new Error("استجابة الخادم بطيئة جداً. يجدر التحقق من الاتصال.");
+                console.error("API Gateway Error: Request timed out reaching the cloud server.");
+                throw new Error("انتهت مهلة الاتصال بالخادم السحابي. يجدر التحقق من جودة الشبكة واستقرار الاتصال.");
             }
-            console.error(`❌ [API Gateway Error] على المسار ${endpoint}:`, error.message);
+            
+            console.error(`API Gateway Error on route [${endpoint}]:`, error.message);
             throw error;
         }
     }
