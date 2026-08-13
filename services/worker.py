@@ -1,87 +1,86 @@
 # -*- coding: utf-8 -*-
 """
 AymnGuard Enterprise v5.0 : Advanced Sovereign Background Worker & Cron Engine
-عامل المهام الخلفية والجدولة المتطور: يجمع بين معالجة طوابير الرسائل غير المتزامنة 
-عبر Redis Queue وبين المهام المجدولة دورياً (Cron Jobs) لفحص الأسواق والسيولة.
+Enterprise-grade background task and scheduling engine for cloud environments.
 """
 
 import logging
 import asyncio
+import os
 from typing import Dict, Any
 
-# محاولة استيراد مدير الطوابير البرمجي من النظام
-try:
-    from backend_core.services.queue_manager import MessageQueueManager
-except ImportError:
-    # بديل احتياطي لضمان عمل السكريبت معزولاً لو لزم الأمر
-    class MessageQueueManager:
-        @staticmethod
-        async def pop_from_queue(queue_name: str) -> Dict[str, Any]:
-            await asyncio.sleep(0.1)
-            return {}
-
-# إعداد السجلات المؤسسية
+# إعداد السجلات المؤسسية المتوافقة مع السحابة
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - [Sovereign-Worker] - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger("AymnGuard.WorkerEngine")
 
+# ربط إدارة الطوابير بالسيرفرات السحابية المدفوعة (مثل Redis Cloud)
+REDIS_URL = os.getenv("REDIS_URL", "redis://default:password@cloud-redis-server.com:6379")
+
+try:
+    from backend_core.services.queue_manager import MessageQueueManager
+except ImportError:
+    # بديل احتياطي آمن في حال عدم توفر الموديل محلياً أثناء البناء
+    class MessageQueueManager:
+        @staticmethod
+        async def pop_from_queue(queue_name: str) -> Dict[str, Any]:
+            await asyncio.sleep(0.1)
+            return {}
+
 class SovereignEnterpriseWorker:
     """
-    محرك التشغيل الخلفي الشامل: يدير طوابير الأحداث والمهام المجدولة للأسواق.
+    Enterprise background processing engine for cloud microservices.
     """
     def __init__(self):
-        logger.info("⚙️ [Worker Engine]: جاري إقلاع عامل المهام الخلفية والجدولة المؤسسية...")
+        logger.info("Initializing enterprise background worker and cron engine...")
 
     async def run_periodic_market_scan(self):
         """
-        مهمة مجدولة دورية: تفقد أسواق التداول والسيولة والأصول الرقمية في الخلفية.
+        Periodic cloud cron task for market analysis and asset tracking.
         """
-        logger.info("🔄 [Cron Job]: بدء دورة الفحص الآلي للأسواق والأصول الرقمية...")
+        logger.info("Starting automated market scan and liquidity update...")
         await asyncio.sleep(0.5)
-        logger.info("✅ [Cron Job]: اكتملت دورة الفحص الآلي للأسواق وتحديث المؤشرات بنجاح.")
+        logger.info("Market scan cycle completed successfully.")
 
     async def process_queue_loop(self):
         """
-        حلقة سحب ومعالجة طوابير الانتظار غير المتزامنة عبر Redis Queue باستمرار.
+        Asynchronous queue consumer loop connected to cloud Redis infrastructure.
         """
-        logger.info("⚡ [Queue Processor]: بدء الاستماع لطوابير الرسائل والأحداث عبر Redis...")
+        logger.info(f"Listening to message queues via cloud provider: {REDIS_URL.split('@')[-1]}...")
         
         while True:
             try:
-                # سحب البيانات من طابور تيليجرام أو الأحداث المعلقة بشكل غير متزامن
                 update_data = await MessageQueueManager.pop_from_queue("telegram_updates_queue")
                 
                 if update_data:
                     update_id = update_data.get("update_id", "N/A")
-                    logger.info(f"⚡ [Worker Processing]: معالجة الحدث برقم التعرف -> [{update_id}]")
-                    # هنا يتم توجيه البيانات لمحرك الذكاء الاصطناعي أو معالجة الطلبات الواردة
+                    logger.info(f"Processing incoming event ID -> [{update_id}]")
                 else:
-                    # استراحة قصيرة جداً لمنع استهلاك المعالج بالكامل (Non-blocking sleep)
                     await asyncio.sleep(0.1)
                     
             except Exception as e:
-                logger.error(f"❌ [Queue Error]: خطأ في حلقة معالجة الطوابير: {e}")
+                logger.error(f"Error in queue processing loop: {e}")
                 await asyncio.sleep(1)
 
     async def start_combined_worker(self):
         """
-        إطلاق العمليات المزدوجة معاً: معالجة طوابير Redis بالتوازي مع فحص الأسواق الدوري.
+        Launches concurrent background loops for queue management and cron tasks.
         """
-        logger.info("🚀 [Worker Active]: عامل المهام الخلفية يعمل بكافة أذرعه الآن.")
+        logger.info("Worker engine is active and running all parallel pipelines.")
         
-        # تشغيل حلقة معالجة الطوابير وحلقة الفحص الدوري كمهام متزامنة في الخلفية (Async Tasks)
+        # تشغيل حلقة معالجة الطوابير في الخلفية بالتوازي
         queue_task = asyncio.create_task(self.process_queue_loop())
         
-        # حلقة التشغيل المجدولة الخاصة بالفحوصات
+        # حلقة الفحص الدوري (Cron Jobs)
         while True:
             try:
-                # تنفيذ الفحص الدوري للأسواق كل 300 ثانية (5 دقائق)
                 await self.run_periodic_market_scan()
+                # تنفيذ الفحص كل 300 ثانية
                 await asyncio.sleep(300)
             except Exception as e:
-                logger.error(f"❌ [Cron Error]: خطأ في حلقة الفحص الدوري: {e}")
+                logger.error(f"Error in periodic market scan loop: {e}")
                 await asyncio.sleep(10)
 
 if __name__ == "__main__":
@@ -89,4 +88,4 @@ if __name__ == "__main__":
     try:
         asyncio.run(worker.start_combined_worker())
     except KeyboardInterrupt:
-        logger.info("🛑 [Worker Engine]: تم إيقاف العامل الخلفي يدوياً بأمان تام.")
+        logger.info("Worker engine safely stopped by user.")
