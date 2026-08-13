@@ -7,11 +7,11 @@
 
 import { GlobalState } from './state.js';
 
-// استخدام الرابط السحابي المدفوع للإنتاج بدلاً من المسار النسبي المحلي لمنع انقطاع الاتصال
 const CLOUD_API_BASE_URL = window.ENV_API_URL || "https://api.aymnguard.cloud/api/v1";
 
 export const ApiGateway = {
-    async request(endpoint, options = {}, retries = 2, timeoutMs = 25000) {
+    // تم تعديل المهلة الافتراضية إلى دقيقة كاملة (60000 ميلي ثانية)
+    async request(endpoint, options = {}, retries = 2, timeoutMs = 60000) {
         const token = GlobalState.get('token');
         const tgInitData = window.Telegram?.WebApp?.initData || '';
 
@@ -23,7 +23,6 @@ export const ApiGateway = {
         };
 
         const controller = new AbortController();
-        // زيادة مهلة الاتصال إلى 25 ثانية لمنع أخطاء انتهاء المهلة (Timeout) مع السيرفرات السحابية
         const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
         try {
